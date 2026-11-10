@@ -3,21 +3,27 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Consulta DJEN</title>
+<title>Advocacia Lunelli · Consulta DJEN</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap">
 <style>
 :root{
   --bg:#f3f5f8; --surface:#fff; --ink:#18212f; --muted:#5b6678; --line:#d5dbe4;
-  --accent:#1f4f8f; --accent-ink:#fff; --soft:#e6ebf2;
+  --accent:#000065; --accent-ink:#fff; --soft:#e6e8f3;
   --crit:#a8281f; --crit-soft:#f7e1de; --warn:#7a5200; --warn-soft:#f8ebc9; --ok:#1f6b3a; --ok-soft:#dcefe1;
-  --sans:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif; --mono:Consolas,"Cascadia Mono",ui-monospace,monospace;
+  --sans:"Barlow","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif; --mono:Consolas,"Cascadia Mono",ui-monospace,monospace;
 }
 @media (prefers-color-scheme: dark){ :root{
   --bg:#10151d; --surface:#19212c; --ink:#e7ecf3; --muted:#9aa6b8; --line:#2e3948;
-  --accent:#7fb0ee; --accent-ink:#0d1622; --soft:#232d3b;
+  --accent:#a3b1ff; --accent-ink:#0a0d2a; --soft:#232d3b;
   --crit:#ff9a8f; --crit-soft:#47201d; --warn:#f0c66a; --warn-soft:#40330f; --ok:#84d19c; --ok-soft:#173622; color-scheme:dark } }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.45}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.45}
+.brand{background:#000065;color:#fff}
+.brand .in{max-width:1080px;margin:0 auto;padding:14px 16px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px}
+.logo{display:block;width:150px;height:40px;background:#fff;-webkit-mask:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAABQBAMAAABRxFVIAAAAGFBMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABWNxwqAAAACHRSTlMA/zPMmWYAAAfIcfQAAAj4SURBVHjazZrbUxtHFsZ/0zPCUAEkUq7EqRjRSCi7VeuAIHElXt+UsKlyqlKJAvZfmVqvtpJ9ypoim919WAc8xs7FNzSWsU1sYAZiYxJJPfswI2lG6OZCttJPw0zT/fXpc/nOOdIJDzE/sDcwMPCnY8qhh0MLg5q7Y1WeJx5bvxNYqcEgEnH24u8C1sRm3cfphV7BEi1QceXDXsHSq0+R8v6v6+9bPZaWONbo87Vsj3XrA7OxNDd6Kq1kY1SUZ3oJSww3m5DP9lDls2bTGfd3ewYr8qD5DHXup15d4icV1xW1D8v6Kf/plSWKaMDsIsfqfdXZXG9gJbe8P6IWgF6v/tpWby7Rx2F4YirLuqik9Ua3fDi86b9z6mCpTE9gjdbgRD6SUCDwEuD7F4kg0YA1oAPjHhEVDxGTP5R3MfqAqZH1mriOvCiqmpgdeLQLIM6/YXu7JEZs0MAY8lXrMfowRC0RBX2j8hpganH/8dTBycX5/Kpn/qn4luVb3PwC+qAlQtcVB9IoSfIUpQDZWglee9S2bdvejh1cVrbyHyadyhmNBSg/RUDFf7qBrYdz8Ld0Q1tUV2OAPmQeHNala/7DX5cqr0YBSgiEWdu7glldmUFEaxuroOtXBahN7fLwNpKiZgAuGCByCAvyjAVnh25MvQwHUeXKZShmGPUtNRNCUnhZDsuLM5agxqey8BX3fSVbsZpkIi923JVAHBFQEguKmVKWM/uBuC8Llro+k5heRquwB59ARAYNZ7DB9GhAeFqsWxzfGKqsNBLeQ+gB3p6BYqZ0qrmFvLyYGDSr68BXNHRITs+y6oq4mltIRxEXUTEikQAQqbmgqEXqwlwb0YssutwLvNjYhTt9Dac+C+hWP4jduoj70Au0YmLatvYAUjPDPz8DY/KBVXy9KuyJ+Lp7pXgi7696qLLSANDvACI5bbMu0kEFai4uvcXpJmbtS6tYgJid2lhGAuff2ViygMiQBepprc5ROL20HW9a3IjMTm0uAyKgNOKqr10NRisP4VbXqK4m8r7OnhJpoORfm7HJaA61wpVs66WCsFwVK2egKJ8T1p0rlafSkr+cWvIMx1gZ+kbWgtfbnu248O/GS5WW5D6VP8Ndeb2J1XUaB9PhP0+/bSmzGrx0C93yIn+5dbIuAiaWwxPXve7Z+bVFTy2Ff27/eBIWO3UQOkRMrneTIWhHfbLmAgjTI5pggtEpLA0UlLNdhPWp4zETj7BpVSUrQLlTWOXKWboWafRvQ144HnLL2Y69fLdH6WiLuOp0rlsFwAyZwcFGeGuzKi3tOWC54Ep0q6VHfz5D3EclRS1laUl4AwZRlpbaodRFzrdfQ9ScOeNgt80xhQzdfV7q4Ty/7Xi3xbfy/rB6dyRv24hEIhHvUFqsgNpRaTPmdB6qn0MPXUAsdSjnQILjSsjLexPPo/H6i2H5QVjsgNpRm+07ac1DuNm6wqc6dIkiuI4nrg7UpDmsLnliEbLTHVA7niaPhGu7zQKSqju/2cYA0h3CCt1OVVzTX6/euio7kELd+0irFFB2XroIwXqnIi5jAVDXO4BVd/pSq0uMBZ2oaB0TA0qj/zPtSsjDSSDM6s2mNYMQkA+dNvWFqofVrNZ5Yu28R/mWHdAx/EL8l23dk/deSV+ekSut9ipUy9jAmTYxMRYIrKW0KznFSSAhg3ou2oeXNFCaTLfxp5XtxLXW0iIXPLnDjmEaOUjaT4JeptjcuhxfUhYw05IKqwxVRn72WJtoagTcnWHhnuYkiC3KmYCiNxNCpqZ5a5BsTTn5ElAzAPMr7bh8MQBrFDCNHIx5IdJsmOvXbi7iT7gHlI/PO0594l91eRZAKQPkj0sxv/B26/ghqieuOvKT4ezRz6RqI/UpQCKRSKRO+YpcksDthVFv2t1tSGQBMQeICYCPJMDfJXB7O7pgLAIkPgPUnEScB0hJSDnA/YTmlav8uvy4A8Zjv4GgbeE3EkLNKDFdp8jLfqGKicvw+aIYjy9bzHr/OZpDT9emVdpv/i9S/ElDi0kPQtmMTHr7aRAZrFbdjCE4m0NERdxizOTzxU5bd6m4M3YRmJi+3NrE5ld5dehiJ427aW8hsYk4a05chnFn6t6W2Ax+4eU3hQe8WpJ7xHELn3wNAv0He9RwEJUi0zN60CFbq8Us9QUwxjG4ZdVM7gy9gFX0vdL9ahHHV4/TvkS71RQW8rk6+/cOBXv4co/fngEYtp8Nr3cH1fyh/jYrzR5+EICl/dGz1LXXHDBc4M95EGe8RYTbpXpu8WGsNSxhb/mdSx3AfcXTabf48a+z9wHWT3N40nfh8scu3eEvfW1guScePwi6fjHV3NmIoW7l/pHBsU67fV6g9gl8wzG2fFBFn7PdBZi/u73BBchl+UJ8yGAO5reHL1Y+p6IjtwpJ+TWpMWfD8tNS+8R6U554UM3K9N1aPfeT/iCp7Njd791Ha9F8xrzx8+tO8sbuIWnNDN3Mn/vJKE8O3Cgevbmraz+89uhZJVteO9Rk0cmDdlkN+/7agLWX2bi23h+73WfvvmE/3Ypu9R955MZv2pu/7RbW+629z9bMh+LJicJu5sHrv+7tVTxm6dUmiy4eXKdcpBBmGR2KRBBWCZAFDUdRdtEVQiy+qVcoctpCVrnTnYZMT3/lwKDU7CmB0ImjAWnFDFlhERMKtL8Mu++cFBIdiofPAvzybi4RpHTfNHDBYvDgVqguPpmpcT1LSS/ux1xAfWGphSczXuS7dRHgdn5WBmGp6/twidNd8A1iavu7WDXFKJBQIVYqotvfBQuH4/bQYih1KV6V9ai6EQw167IwKWN5lSRWYl61UoM0CFdcFpbHqoUE4Yzm4uFMS10N/T4xOdSVEB0XCIkiQhYoSjdHQUko6/wL0lJjXFKUBowDOjHxal0CqC4drgJLfvBdd7y7pS5MxpAZNbGDgJgGroxFrOGS1ObmhylfiMaQTvmjVNTCLfP959uhnjDAVn70hDYyMpL8w6VuRcJIn6W29977R+TXG/3JVdbeeog7+PPxgR/ZeMvU//u0z1Ljhff+9/7ynnp6ZOD4+Co3+47+HykkIpOVn2azAAAAAElFTkSuQmCC) left center/contain no-repeat;mask:url(data:image/png;base64,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) left center/contain no-repeat}
+.brand .tagline{font-weight:500;font-size:13px;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
 .wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px;display:flex;flex-direction:column;gap:16px}
 h1{font-size:22px;font-weight:600;margin:0}
 .sub{color:var(--muted);font-size:13px;margin:2px 0 0}
@@ -67,6 +73,7 @@ footer{color:var(--muted);font-size:12px}
 </style>
 </head>
 <body>
+<header class="brand"><div class="in"><span class="logo" role="img" aria-label="Lunelli Advocacia"></span><span class="tagline">Advocacia Empresarial</span></div></header>
 <div class="wrap">
   <div>
     <h1>Consulta DJEN</h1>
@@ -119,7 +126,7 @@ footer{color:var(--muted);font-size:12px}
 
   <div class="list" id="list"><div class="empty">Informe um nome e clique em Consultar. O período padrão são os últimos 30 dias.</div></div>
 
-  <footer>Fonte: API pública do DJEN (comunicaapi.pje.jus.br). Aparece apenas o que os tribunais publicam no DJEN; processos em segredo de justiça não constam. O CNJ limita a cerca de 20 consultas por minuto, por isso buscas longas avançam em etapas.</footer>
+  <footer>Advocacia Lunelli · ferramenta de uso interno. Fonte: API pública do DJEN (comunicaapi.pje.jus.br). Aparece apenas o que os tribunais publicam no DJEN; processos em segredo de justiça não constam. O CNJ limita a cerca de 20 consultas por minuto, por isso buscas longas avançam em etapas.</footer>
 </div>
 
 <script>
