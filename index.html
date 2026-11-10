@@ -116,7 +116,7 @@ footer{color:var(--muted);font-size:12px}
   <div class="panel" id="resBox" hidden>
     <div class="acts">
       <b id="resumo"></b>
-      <button class="btn sec" id="csv" type="button">Baixar planilha (CSV)</button>
+      <button class="btn sec" id="csv" type="button">Baixar planilha (Excel)</button>
     </div>
     <div class="checks">
       <label><input type="checkbox" id="fExato" checked> Só quando o nome consta como parte</label>
@@ -213,6 +213,7 @@ async function consultar(alvos) {
   if (!alvos.length && !proc && !oab) { aviso("Informe ao menos o nome da parte, o número do processo ou a OAB."); return; }
   if (!ini || !fim || ini > fim) { aviso("Confira o período: a data inicial deve ser anterior à final."); return; }
   if (!alvos.length) alvos = [{ nome: "", doc: $("doc").value.trim() }];
+  E.busca = { nomes: alvos.map(a => a.nome).filter(Boolean).join("; "), ini, fim, trib };
   E.rodando = true; E.parar = false; E.itens = []; E.termos = alvos.map(a => norm(a.nome)).filter(Boolean);
   $("go").disabled = true; $("stop").hidden = false; aviso(""); $("resBox").hidden = true;
   $("list").textContent = ""; $("list").appendChild(el("div", "empty", "Consultando o DJEN…"));
@@ -319,13 +320,79 @@ function desenhar() {
   if (gs.length > 300) list.appendChild(el("div", "empty", "Mostrando os 300 processos mais recentes de " + gs.length + ". Baixe a planilha para ver todos."));
 }
 
-$("csv").onclick = () => {
+function baixarCsv() {
   const cab = ["Data", "Tribunal", "Processo", "Classe", "Órgão", "Tipo", "Documento", "Nome buscado", "Consta como parte", "Polo", "CPF/CNPJ no texto", "Partes", "Advogados", "Link", "Texto"];
   const q = v => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"';
   const vis = new Set(grupos().flatMap(g => g.pubs.map(p => p.id)));
   const linhas = E.itens.filter(i => vis.has(i.id)).sort((a, b) => b.data.localeCompare(a.data)).map(i => [br(i.data), i.tribunal, i.processo, i.classe, i.orgao, i.tipo, i.docTipo, i.buscado, i.exato ? "Sim" : "Não", i.polo, i.temDoc ? "Sim" : "Não", i.dest.map(d => d.nome + (d.polo ? " (" + d.polo + ")" : "")).join("; "), i.advs.join("; "), i.link, i.texto.slice(0, 2000)].map(q).join(";"));
-  const blob = new Blob(["﻿" + cab.map(q).join(";") + "\r\n" + linhas.join("\r\n")], { type: "text/csv;charset=utf-8" });
-  const a = el("a"); a.href = URL.createObjectURL(blob); a.download = "consulta-djen-" + iso(new Date()) + ".csv"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  salvar(new Blob(["﻿" + cab.map(q).join(";") + "\r\n" + linhas.join("\r\n")], { type: "text/csv;charset=utf-8" }), "consulta-djen-" + iso(new Date()) + ".csv");
+}
+function salvar(blob, nome) { const a = el("a"); a.href = URL.createObjectURL(blob); a.download = nome; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000); }
+
+// ---- planilha Excel formatada (a biblioteca so e carregada quando o botao e usado)
+const LIBS = ["https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js", "https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"];
+function carregarExcel() {
+  if (window.ExcelJS) return Promise.resolve(true);
+  return LIBS.reduce((p, url) => p.then(ok => ok || new Promise(res => { const s = document.createElement("script"); s.src = url; s.onload = () => res(!!window.ExcelJS); s.onerror = () => res(false); document.head.appendChild(s); })), Promise.resolve(false));
+}
+const poloTxt = d => d.polo === "P" ? " (passivo)" : d.polo === "A" ? " (ativo)" : d.polo ? " (" + d.polo + ")" : "";
+const dataXls = d => /^\d{4}-\d{2}-\d{2}/.test(d || "") ? new Date(Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10))) : (d || "");
+
+async function baixarXlsx() {
+  const NAVY = "FF000065", BORDA = { style: "thin", color: { argb: "FFC9CDD8" } };
+  const wb = new ExcelJS.Workbook(); wb.creator = "Advocacia Lunelli"; wb.created = new Date();
+  const gs = grupos(), b = E.busca || {};
+  const quando = new Date().toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  const resumo = "Busca: " + (b.nomes || "sem nome") + (b.trib ? " · Tribunal: " + b.trib : " · Todos os tribunais") + " · Período: " + br(b.ini) + " a " + br(b.fim) + " · Consulta feita em " + quando + " · Fonte: DJEN/CNJ";
+
+  function folha(nome, cols, linhas) {
+    const ws = wb.addWorksheet(nome, { views: [{ state: "frozen", ySplit: 4, xSplit: 1, showGridLines: false }], pageSetup: { orientation: "landscape", fitToPage: true, fitToWidth: 1, fitToHeight: 0, paperSize: 9 } });
+    ws.columns = cols.map(c => ({ width: c.w }));
+    ws.mergeCells(1, 1, 1, cols.length); ws.mergeCells(2, 1, 2, cols.length);
+    const t = ws.getCell(1, 1); t.value = "Advocacia Lunelli · Consulta DJEN · " + nome; t.font = { name: "Arial", size: 14, bold: true, color: { argb: "FFFFFFFF" } }; t.fill = { type: "pattern", pattern: "solid", fgColor: { argb: NAVY } }; t.alignment = { vertical: "middle", indent: 1 }; ws.getRow(1).height = 30;
+    const s = ws.getCell(2, 1); s.value = resumo; s.font = { name: "Arial", size: 9, color: { argb: "FF4A5262" } }; s.alignment = { vertical: "middle", wrapText: true, indent: 1 }; ws.getRow(2).height = 28;
+    const h = ws.getRow(4); h.height = 30;
+    cols.forEach((c, k) => { const x = h.getCell(k + 1); x.value = c.t; x.font = { name: "Arial", size: 10, bold: true, color: { argb: "FFFFFFFF" } }; x.fill = { type: "pattern", pattern: "solid", fgColor: { argb: NAVY } }; x.alignment = { vertical: "middle", horizontal: c.c ? "center" : "left", wrapText: true }; x.border = { top: BORDA, bottom: BORDA, left: BORDA, right: BORDA }; });
+    linhas.forEach((vals, n) => {
+      const r = ws.getRow(5 + n);
+      vals.forEach((v, k) => {
+        const x = r.getCell(k + 1), c = cols[k];
+        if (c.link) { if (/^https:\/\//.test(v || "")) { x.value = { text: "abrir documento", hyperlink: v }; x.font = { name: "Arial", size: 10, underline: true, color: { argb: "FF1F4F8F" } }; } else x.value = ""; }
+        else { x.value = v; x.font = { name: "Arial", size: 10, bold: !!c.b }; }
+        if (v instanceof Date) x.numFmt = "dd/mm/yyyy";
+        x.alignment = { vertical: "top", horizontal: c.c ? "center" : "left", wrapText: true };
+        x.border = { top: BORDA, bottom: BORDA, left: BORDA, right: BORDA };
+        if (n % 2) x.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF3F4FA" } };
+        if (c.polo && /assivo/i.test(v || "")) { x.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF7E1DE" } }; x.font = { name: "Arial", size: 10, bold: true, color: { argb: "FFA8281F" } }; }
+        if (c.sim && v === "Sim") { x.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFDDE3FF" } }; x.font = { name: "Arial", size: 10, bold: true, color: { argb: NAVY } }; }
+      });
+    });
+    ws.autoFilter = { from: { row: 4, column: 1 }, to: { row: 4 + Math.max(linhas.length, 1), column: cols.length } };
+    return ws;
+  }
+
+  folha("Processos", [
+    { t: "Processo", w: 27, b: 1 }, { t: "Tribunal", w: 10, c: 1 }, { t: "Polo do nome buscado", w: 14, c: 1, polo: 1 }, { t: "Veio por lista de distribuição", w: 14, c: 1, sim: 1 },
+    { t: "Classe", w: 30 }, { t: "Órgão", w: 34 }, { t: "Partes", w: 60 }, { t: "Primeira publicação", w: 13, c: 1 }, { t: "Última publicação", w: 13, c: 1 },
+    { t: "Nº de publicações", w: 12, c: 1 }, { t: "CPF/CNPJ no texto", w: 11, c: 1, sim: 1 }, { t: "Advogados na publicação", w: 50 }, { t: "Documento mais recente", w: 18, c: 1, link: 1 }
+  ], gs.map(g => [g.processo, g.tribunal, g.polo ? g.polo.charAt(0).toUpperCase() + g.polo.slice(1) : "", g.dist ? "Sim" : "Não", g.classe, g.orgao,
+    g.dest.slice(0, 30).map(d => d.nome + poloTxt(d)).join("; ") + (g.dest.length > 30 ? "; e mais " + (g.dest.length - 30) : ""),
+    dataXls(g.primeira), dataXls(g.ultima), g.pubs.length, g.temDoc ? "Sim" : "Não", g.advs.slice(0, 20).join("; "), (g.pubs.find(p => /^https:\/\//.test(p.link)) || {}).link || ""]));
+
+  folha("Publicações", [
+    { t: "Processo", w: 27, b: 1 }, { t: "Data", w: 12, c: 1 }, { t: "Tribunal", w: 10, c: 1 }, { t: "Tipo de ato", w: 18 }, { t: "Documento", w: 18 },
+    { t: "Polo do nome buscado", w: 14, c: 1, polo: 1 }, { t: "Órgão", w: 34 }, { t: "Texto da publicação", w: 90 }, { t: "Documento", w: 18, c: 1, link: 1 }
+  ], gs.flatMap(g => g.pubs.map(p => [p.processo, dataXls(p.data), p.tribunal, p.tipo, p.docTipo, p.polo, p.orgao, p.texto.length > 900 ? p.texto.slice(0, 900) + " (…)" : p.texto, p.link])));
+
+  const buf = await wb.xlsx.writeBuffer();
+  salvar(new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }), "consulta-djen-" + iso(new Date()) + ".xlsx");
+}
+
+$("csv").onclick = async () => {
+  const bt = $("csv"), rot = bt.textContent; bt.disabled = true; bt.textContent = "Montando a planilha…";
+  try { if (await carregarExcel()) await baixarXlsx(); else { baixarCsv(); aviso("Não foi possível carregar o gerador de Excel (sem acesso à internet ou bloqueio na rede). Baixei a versão simples, em CSV."); } }
+  catch (e) { baixarCsv(); aviso("Houve um erro ao montar o Excel. Baixei a versão simples, em CSV."); }
+  bt.disabled = false; bt.textContent = rot;
 };
 
 $("form").addEventListener("submit", e => { e.preventDefault(); consultar([{ nome: $("nome").value, doc: $("doc").value }]); });
