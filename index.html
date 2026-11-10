@@ -70,6 +70,8 @@ summary{cursor:pointer;color:var(--accent);width:fit-content}
 a{color:var(--accent)}
 .empty{background:var(--surface);border:1px dashed var(--line);border-radius:8px;padding:28px 16px;text-align:center;color:var(--muted)}
 footer{color:var(--muted);font-size:12px}
+.lim{font-size:13px;gap:6px}
+.lim ul{margin:0;padding-left:18px;color:var(--muted);display:flex;flex-direction:column;gap:3px}
 </style>
 </head>
 <body>
@@ -125,6 +127,19 @@ footer{color:var(--muted);font-size:12px}
   </div>
 
   <div class="list" id="list"><div class="empty">Informe um nome e clique em Consultar. O período padrão são os últimos 30 dias.</div></div>
+
+  <div class="panel lim" id="limites" hidden>
+    <b>O que esta consulta pode não mostrar</b>
+    <ul>
+      <li>Processos em segredo de justiça.</li>
+      <li>Processos que ainda não tiveram nenhuma publicação no DJEN. Nem todo tribunal publica a lista de distribuição, e a citação feita por carta, oficial de justiça ou Domicílio Judicial Eletrônico não aparece aqui.</li>
+      <li>Publicações fora do período escolhido (o padrão são os últimos 30 dias).</li>
+      <li>Nomes grafados de outra forma no processo: abreviações, nome fantasia ou erro de cadastro. Vale repetir a busca com variações.</li>
+      <li>Homônimos: a busca é pelo nome. O CPF ou CNPJ só é conferido quando aparece no texto da publicação.</li>
+      <li>Buscas muito amplas, que são interrompidas em 3.000 resultados.</li>
+    </ul>
+    <span>A ausência de resultados não substitui certidão negativa nem a consulta direta ao tribunal.</span>
+  </div>
 
   <footer>Advocacia Lunelli · ferramenta de uso interno. Fonte: API pública do DJEN (comunicaapi.pje.jus.br). Aparece apenas o que os tribunais publicam no DJEN; processos em segredo de justiça não constam. O CNJ limita a cerca de 20 consultas por minuto, por isso buscas longas avançam em etapas.</footer>
 </div>
@@ -240,6 +255,7 @@ async function consultar(alvos) {
     desenhar();
   }
   E.rodando = false; $("go").disabled = false; $("stop").hidden = true;
+  desenhar(); $("limites").hidden = false;
 }
 
 function grupos() {
@@ -271,7 +287,7 @@ function desenhar() {
   $("resBox").hidden = !E.itens.length;
   const npub = gs.reduce((n, g) => n + g.pubs.length, 0);
   $("resumo").textContent = gs.length + " processo(s), " + npub + " publicação(ões)" + (npub < E.itens.length ? " · " + (E.itens.length - npub) + " ocultas pelos filtros" : "");
-  if (!E.itens.length) { list.appendChild(el("div", "empty", E.rodando ? "Consultando o DJEN…" : "Nenhuma publicação encontrada para essa busca no período.")); return; }
+  if (!E.itens.length) { list.appendChild(el("div", "empty", E.rodando ? "Consultando o DJEN…" : "Sem resultados disponíveis")); return; }
   if (!gs.length) { list.appendChild(el("div", "empty", "Há publicações, mas nenhuma passa pelos filtros marcados acima.")); return; }
   for (const g of gs.slice(0, 300)) {
     const c = el("article", "card" + (g.passivo ? " passivo" : "")), top = el("div", "top");
