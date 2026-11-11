@@ -311,6 +311,10 @@ h3.audDia{margin:14px 0 4px;font-size:14px;text-transform:capitalize;color:var(-
 .crmbarra select{font-size:14px;padding:6px 8px}
 .crmbarra input[type=text]{font-size:14px;padding:6px 10px}
 .crmboard .col h3{flex-wrap:wrap;gap:0 8px;font-size:12px}
+.mdlista{display:flex;flex-direction:column;gap:2px;max-height:300px;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:6px}
+label.mdlinha{display:flex;flex-direction:row;align-items:center;gap:8px;color:var(--ink);font-size:14px;padding:4px 2px}
+label.mdlinha input{width:auto;flex:none}
+#dlgModelo h3{font-size:14px;margin:10px 0 4px}
 
 </style>
 </head>
@@ -552,7 +556,7 @@ h3.audDia{margin:14px 0 4px;font-size:14px;text-transform:capitalize;color:var(-
     <div class="hd"><h2>Quadro de tarefas</h2>
       <div class="acts"><label style="flex-direction:row;align-items:center;gap:6px;color:var(--ink)">Responsável
         <select id="orgResp" style="width:auto"><option value="">Todos</option><option value="Fábio">Fábio</option><option value="Davi">Davi</option><option value="Equipe">Equipe</option><option value="Secretaria">Secretaria</option></select></label>
-        <button class="btn sm" id="orgNova" type="button">Nova tarefa</button></div></div>
+        <button class="btn sm sec" id="orgModelo" type="button">Aplicar modelo de tarefas</button> <button class="btn sm" id="orgNova" type="button">Nova tarefa</button></div></div>
     <div class="board" id="board"></div>
     <div class="hint">Arraste os cartões entre as colunas (ou use as setas). Clique no título para editar. Tarefas também podem ser criadas a partir de uma publicação, na tela Advogados.</div>
   </div>
@@ -783,6 +787,43 @@ h3.audDia{margin:14px 0 4px;font-size:14px;text-transform:capitalize;color:var(-
     <label>Motivo <select id="cpMotivo"></select></label>
     <div class="hint">O motivo alimenta o painel e ajuda a melhorar a captação.</div>
     <div class="acts" style="justify-content:flex-end"><button class="btn sec" type="button" id="cpCancel">Cancelar</button><button class="btn danger" type="submit" id="cpSave">Marcar como perdido</button></div>
+  </form>
+</dialog>
+
+<dialog id="dlgModelo" class="big">
+  <form method="dialog" id="fModelo">
+    <h2>Aplicar modelo de tarefas</h2>
+    <p class="hint">Cria de uma vez todas as tarefas de um fluxo de trabalho, com prazos calculados a partir de uma data-base. Os prazos são em dias corridos e servem para organizar o trabalho interno: o prazo legal (dias úteis) deve ser conferido no processo.</p>
+    <div class="grid">
+      <label class="wide">Modelo <select id="mdSel"></select></label>
+      <label><span id="mdBaseRot">Data-base</span> <input type="date" id="mdBase"></label>
+      <label>Processo (opcional) <select id="mdProc"></select></label>
+      <label class="wide">Cliente <input type="text" id="mdCli" list="mdDlCli" autocomplete="off"></label>
+    </div>
+    <datalist id="mdDlCli"></datalist>
+    <h3>Tarefas que serão criadas</h3>
+    <div id="mdLista" class="mdlista"></div>
+    <div class="acts" style="justify-content:space-between">
+      <span><button class="btn sec sm" type="button" id="mdGerir">Gerenciar modelos</button></span>
+      <span class="acts"><button class="btn sec" type="button" id="mdCancel">Cancelar</button><button class="btn" type="submit" id="mdCriar">Criar tarefas</button></span>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlgModelos" class="big">
+  <form method="dialog" id="fModelos">
+    <h2>Gerenciar modelos de tarefas</h2>
+    <p class="hint">Uma tarefa por linha, no formato <b>dias | responsável | título | prioridade</b>. Dias contam a partir da data-base (negativo = antes; ex.: -5 numa audiência). Responsável: Advogado (o do processo), Fábio, Davi, Equipe ou Secretaria. Prioridade (opcional): alta ou baixa.</p>
+    <div class="grid">
+      <label class="wide">Modelo <select id="mgSel"></select></label>
+      <label class="wide">Nome <input type="text" id="mgNome" autocomplete="off"></label>
+      <label class="wide">Nome da data-base <input type="text" id="mgBase" autocomplete="off" placeholder="Ex.: Data da citação"></label>
+    </div>
+    <label>Tarefas <textarea id="mgTarefas" rows="12" spellcheck="false" style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px"></textarea></label>
+    <div class="acts" style="justify-content:space-between">
+      <span class="acts"><button class="btn sec sm" type="button" id="mgNovo">Novo modelo</button><button class="btn danger sm" type="button" id="mgExcluir">Excluir modelo</button><button class="btn sec sm" type="button" id="mgPadrao">Restaurar padrão</button></span>
+      <span class="acts"><button class="btn sec" type="button" id="mgCancel">Cancelar</button><button class="btn" type="submit" id="mgSalvar">Salvar modelos</button></span>
+    </div>
   </form>
 </dialog>
 
@@ -1846,7 +1887,7 @@ function pPrazos(p, c, sg) {
   c.appendChild(el("div", "hint", "As datas estimadas pela calculadora consideram dias úteis, feriados nacionais, Carnaval, Corpus Christi e o recesso de 20/12 a 20/01. Feriados locais e suspensões do tribunal não entram: confira sempre no processo."));
 }
 function pTarefas(p, c, tarefas) {
-  const top = el("div", "acts"); top.appendChild(btn("Nova tarefa deste processo", () => abrirTarefa({ titulo: "", proc: p.numero, cli: p.cliente, resp: p.resp }), "")); c.appendChild(top);
+  const top = el("div", "acts"); top.appendChild(btn("Nova tarefa deste processo", () => abrirTarefa({ titulo: "", proc: p.numero, cli: p.cliente, resp: p.resp }), "")); top.appendChild(btn("Aplicar modelo de tarefas", () => modeloAbrir({ proc: p.numero, cli: p.cliente, resp: p.resp }))); c.appendChild(top);
   if (!tarefas.length) { c.appendChild(el("div", "hint", "Nenhuma tarefa ligada a este processo. As tarefas aparecem também no quadro da tela Organização.")); return; }
   const ul = el("ul", "mini"); for (const t of tarefas) ul.appendChild(linhaEvt(t.prazo ? br(t.prazo) : "sem prazo", " " + t.titulo + " · " + t.resp + " · " + (COLS.find(x => x[0] === t.status) || ["", t.status])[1], [btn("Abrir", () => abrirTarefa(null, t.id))], t.status === "concluida" ? "feito" : "")); c.appendChild(ul);
 }
@@ -2657,6 +2698,7 @@ function crmFicha(c) {
   const wa = linkWhats(c.tel); if (wa) { const a = el("a", "btn sec sm", "WhatsApp"); a.href = wa; a.target = "_blank"; a.rel = "noopener noreferrer"; ac.appendChild(a); }
   if (c.email) { const a = el("a", "btn sec sm", "E-mail"); a.href = "mailto:" + c.email; ac.appendChild(a); }
   ac.append(btn("Registrar contato feito", () => crmAbrirAtiv(null, { contatoId: c.id, feita: true, feitaEm: hojeIso(), titulo: "" })), btn("Agendar atividade", () => crmAbrirAtiv(null, { contatoId: c.id, data: somaDias(hojeIso(), 1) })));
+  ac.appendChild(btn("Aplicar modelo de tarefas", () => { $("dlgCrmContato").close(); modeloAbrir({ cli: c.nome, resp: c.resp }); }));
   if (crmVeValores()) ac.appendChild(btn("Novo " + T("negocio"), () => { $("dlgCrmContato").close(); crmAbrirNegocio(null, { contatoId: c.id, origem: c.origem }); }, ""));
   box.appendChild(ac);
   if (crmVeValores()) {
@@ -2737,9 +2779,8 @@ function crmNegocioFinal(tipo) {
   if (tipo === "ganho") {
     crmGanhar(n); $("dlgCrmNegocio").close(); crmRefazer();
     const c = crmContato(n.contatoId);
-    if (confirm("Caso contratado! Criar uma tarefa para a secretaria abrir a pasta e cadastrar o processo de " + (c ? c.nome : "este cliente") + "?")) {
-      TAREFAS.push({ id: uid(), criada: hojeIso(), titulo: "Abrir pasta e cadastrar o processo — " + (c ? c.nome : n.titulo), proc: "", cli: c ? c.nome : "", resp: "Secretaria", prazo: somaDias(hojeIso(), 3), prio: "normal", status: "fazer", nota: "Caso contratado no CRM: " + n.titulo + (n.area ? " (" + n.area + ")" : "") + ". Reunir documentos, procuração e contrato de honorários." }); salvarTarefas(); atualizarTudo();
-    }
+    const m = modeloPorId("m-novo"), nome = c ? c.nome : n.titulo;
+    if (confirm("Caso contratado! Criar as " + m.tarefas.length + " tarefas de abertura do caso (modelo “" + m.nome + "”) para " + nome + "?")) { modeloAplicar(m, hojeIso(), { cli: nome, resp: n.resp }); atualizarTudo(); }
     return;
   }
   CP.id = n.id; optsSel($("cpMotivo"), crmCfg().motivos); $("dlgCrmPerda").showModal();
@@ -2906,6 +2947,177 @@ function ideiasDesenhar() {
   for (const [t, itens] of IDEIAS) { const c = el("div", "card"); c.appendChild(el("h3", "", t)); const ul = el("ul"); for (const i of itens) ul.appendChild(el("li", "", i)); c.appendChild(ul); box.appendChild(c); }
 }
 function orgIniciar() { $("orgResp").addEventListener("change", orgDesenhar); orgDesenhar(); rotinaDesenhar(); ideiasDesenhar(); }
+
+
+/* ===== 41-modelos: modelos de tarefas (fluxos de trabalho) =====
+   Um modelo é uma lista de tarefas com prazo RELATIVO a uma data-base (ex.: data da citação, data da audiência) e responsável.
+   Ao aplicar, o escritório escolhe a data-base e o sistema cria todas as tarefas no quadro da Organização, ligadas ao processo/cliente.
+   Os modelos padrão ficam aqui; as edições do escritório são gravadas em crm_config.modelosTarefas (sincroniza com a equipe). */
+const MODELOS_PADRAO = [
+  { id: "m-novo", nome: "Novo cliente — abertura do caso", base: "Data da contratação", tarefas: [
+    { d: 0, r: "Advogado", t: "Conferir conflito de interesses e viabilidade do caso", p: "alta" },
+    { d: 0, r: "Secretaria", t: "Abrir pasta e cadastrar o processo/cliente no sistema" },
+    { d: 1, r: "Advogado", t: "Elaborar contrato de honorários e procuração" },
+    { d: 2, r: "Secretaria", t: "Coletar documentos pessoais e do caso (RG, CPF, comprovante de residência, provas)" },
+    { d: 3, r: "Secretaria", t: "Colher assinaturas (contrato, procuração e declarações necessárias)" },
+    { d: 3, r: "Equipe", t: "Registrar o consentimento LGPD do cliente" },
+    { d: 5, r: "Advogado", t: "Definir estratégia e cronograma do caso" },
+    { d: 7, r: "Advogado", t: "Dar retorno ao cliente com o plano de ação" }] },
+  { id: "m-inicial", nome: "Ação cível — ajuizamento", base: "Data de início da preparação", tarefas: [
+    { d: 0, r: "Secretaria", t: "Reunir documentos e provas com o cliente" },
+    { d: 1, r: "Advogado", t: "Pesquisar jurisprudência e fundamentos da inicial" },
+    { d: 5, r: "Advogado", t: "Redigir a petição inicial" },
+    { d: 7, r: "Advogado", t: "Revisar a minuta: pedidos, valor da causa, provas e documentos", p: "alta" },
+    { d: 8, r: "Secretaria", t: "Calcular custas e emitir a guia (ou instruir pedido de gratuidade)" },
+    { d: 9, r: "Advogado", t: "Protocolar a petição inicial", p: "alta" },
+    { d: 10, r: "Secretaria", t: "Cadastrar o processo e conferir a distribuição" },
+    { d: 12, r: "Equipe", t: "Informar o cliente do ajuizamento e do número do processo" },
+    { d: 30, r: "Equipe", t: "Acompanhar citação e despachos iniciais" }] },
+  { id: "m-contest", nome: "Contestação / defesa", base: "Data da citação ou intimação (início do prazo)", tarefas: [
+    { d: 0, r: "Equipe", t: "Cadastrar o prazo fatal e conferir a contagem em dias úteis", p: "alta" },
+    { d: 1, r: "Secretaria", t: "Pedir ao cliente documentos e informações para a defesa" },
+    { d: 4, r: "Advogado", t: "Analisar a inicial e os documentos; definir as teses" },
+    { d: 7, r: "Advogado", t: "Redigir a contestação" },
+    { d: 10, r: "Advogado", t: "Revisar a peça: preliminares, mérito, provas e pedidos", p: "alta" },
+    { d: 11, r: "Advogado", t: "Protocolar a contestação, com folga antes do prazo fatal", p: "alta" },
+    { d: 12, r: "Equipe", t: "Informar o cliente e acompanhar a réplica" }] },
+  { id: "m-recurso", nome: "Recurso (apelação, agravo, recurso inominado)", base: "Data da intimação da decisão", tarefas: [
+    { d: 0, r: "Equipe", t: "Cadastrar o prazo recursal e conferir a contagem", p: "alta" },
+    { d: 1, r: "Advogado", t: "Analisar a decisão e definir o cabimento do recurso" },
+    { d: 2, r: "Equipe", t: "Avisar o cliente da decisão e obter a autorização para recorrer" },
+    { d: 6, r: "Advogado", t: "Redigir as razões do recurso" },
+    { d: 8, r: "Secretaria", t: "Emitir a guia e pagar o preparo (comprovar na interposição) ou verificar a gratuidade" },
+    { d: 9, r: "Advogado", t: "Revisar a peça e conferir o prequestionamento", p: "alta" },
+    { d: 10, r: "Advogado", t: "Protocolar o recurso, com folga antes do prazo fatal", p: "alta" },
+    { d: 11, r: "Secretaria", t: "Conferir o protocolo e juntar os comprovantes" }] },
+  { id: "m-audiencia", nome: "Audiência — preparação", base: "Data da audiência", tarefas: [
+    { d: -15, r: "Equipe", t: "Confirmar data, hora e modalidade e cadastrar a audiência no sistema" },
+    { d: -14, r: "Secretaria", t: "Avisar o cliente e as testemunhas (intimação ou comparecimento espontâneo)" },
+    { d: -10, r: "Advogado", t: "Rever os autos e definir pauta, perguntas e limite de acordo" },
+    { d: -7, r: "Secretaria", t: "Reunir e conferir os documentos e provas que serão levados" },
+    { d: -5, r: "Advogado", t: "Reunião de preparação com o cliente e as testemunhas" },
+    { d: -2, r: "Secretaria", t: "Testar equipamento e link (se virtual) e confirmar presenças" },
+    { d: -1, r: "Advogado", t: "Revisão final da pauta", p: "alta" },
+    { d: 0, r: "Advogado", t: "Comparecer à audiência", p: "alta" },
+    { d: 1, r: "Advogado", t: "Registrar resultado, ata e providências; informar o cliente", p: "alta" }] },
+  { id: "m-cumprimento", nome: "Cumprimento de sentença / execução", base: "Data do trânsito em julgado ou início", tarefas: [
+    { d: 0, r: "Equipe", t: "Conferir o trânsito em julgado e o título executivo" },
+    { d: 2, r: "Secretaria", t: "Atualizar o cálculo do débito (correção, juros e honorários)" },
+    { d: 5, r: "Advogado", t: "Redigir o requerimento de cumprimento ou a petição de execução" },
+    { d: 7, r: "Advogado", t: "Protocolar e requerer as medidas de constrição (Sisbajud, Renajud, Infojud)", p: "alta" },
+    { d: 15, r: "Equipe", t: "Acompanhar a intimação do executado e o prazo para pagamento" },
+    { d: 30, r: "Advogado", t: "Avaliar novas medidas de constrição e pesquisa patrimonial" }] },
+  { id: "m-previd", nome: "Previdenciário — requerimento e ação", base: "Data de início", tarefas: [
+    { d: 0, r: "Secretaria", t: "Reunir CNIS, CTPS, PPP/laudos, documentos médicos e rurais" },
+    { d: 2, r: "Advogado", t: "Analisar tempo de contribuição, carência e o melhor benefício" },
+    { d: 5, r: "Secretaria", t: "Protocolar o requerimento administrativo no Meu INSS e guardar o protocolo" },
+    { d: 45, r: "Equipe", t: "Conferir a resposta do INSS e o andamento do requerimento" },
+    { d: 50, r: "Advogado", t: "Se indeferido ou sem resposta: preparar a ação (JEF) com perícia e provas" }] },
+  { id: "m-trab", nome: "Reclamação trabalhista — defesa da empresa", base: "Data da notificação", tarefas: [
+    { d: 0, r: "Equipe", t: "Cadastrar a audiência e o prazo da defesa; conferir a notificação", p: "alta" },
+    { d: 1, r: "Secretaria", t: "Pedir à empresa contrato, controle de ponto, holerites, rescisão, ASO e treinamentos" },
+    { d: 4, r: "Advogado", t: "Analisar os pedidos e valores; definir teses e testemunhas" },
+    { d: 7, r: "Advogado", t: "Redigir a contestação e conferir os cálculos" },
+    { d: 9, r: "Advogado", t: "Protocolar a defesa antes da audiência", p: "alta" },
+    { d: 10, r: "Secretaria", t: "Organizar a pasta de provas e a lista de testemunhas" }] },
+  { id: "m-fim", nome: "Encerramento do caso", base: "Data do encerramento", tarefas: [
+    { d: 0, r: "Advogado", t: "Conferir saldo de honorários, custas e alvarás ou levantamentos pendentes" },
+    { d: 2, r: "Secretaria", t: "Prestar contas e repassar valores ao cliente, se houver" },
+    { d: 3, r: "Equipe", t: "Comunicar o cliente sobre o encerramento e a guarda dos documentos" },
+    { d: 5, r: "Secretaria", t: "Devolver os originais ao cliente e arquivar a pasta" },
+    { d: 7, r: "Equipe", t: "Atualizar o contato no CRM e agendar retorno periódico (pós-atendimento)" }] }
+];
+const modelosLista = () => { const m = crmCfg().modelosTarefas; return Array.isArray(m) && m.length ? m : MODELOS_PADRAO; };
+const modeloPorId = id => modelosLista().find(m => m.id === id) || modelosLista()[0];
+const PRIOS_MODELO = { alta: "alta", baixa: "baixa" };
+
+// "Advogado" vira o responsável do processo (ou quem está logado); os demais nomes valem como estão
+function modeloResp(r, ctx) {
+  if (r !== "Advogado") return RESPS.includes(r) ? r : (r || "Equipe");
+  const base = ctx && ctx.resp; return base && ["Fábio", "Davi"].includes(base) ? base : (["Fábio", "Davi"].includes(respPadrao()) ? respPadrao() : "Equipe");
+}
+function modeloItens(m, base, ctx) { // pré-visualização: [{t, data, resp, prio, d}]
+  return m.tarefas.map(x => ({ t: x.t, d: x.d, data: base ? somaDias(base, x.d) : "", resp: modeloResp(x.r, ctx), prio: PRIOS_MODELO[x.p] || "normal" }));
+}
+function modeloAplicar(m, base, ctx, marcados) { // cria as tarefas; devolve quantas
+  const itens = modeloItens(m, base, ctx); let n = 0;
+  itens.forEach((x, i) => {
+    if (marcados && !marcados.includes(i)) return;
+    TAREFAS.push({ id: uid(), criada: hojeIso(), titulo: x.t + (ctx.cli ? " — " + ctx.cli : ""), proc: ctx.proc || "", cli: ctx.cli || "", resp: x.resp, prazo: x.data, prio: x.prio, status: "fazer", nota: "Modelo: " + m.nome + (base ? " (data-base " + br(base) + ")" : "") }); n++;
+  });
+  if (n) salvarTarefas(); return n;
+}
+// texto <-> linhas:  dias | responsável | título | prioridade
+const modeloParaTexto = m => m.tarefas.map(x => [x.d, x.r, x.t].concat(x.p ? [x.p] : []).join(" | ")).join("\n");
+function modeloDeTexto(txt) {
+  const out = [], erros = [];
+  txt.split("\n").forEach((l, i) => {
+    if (!l.trim()) return; const p = l.split("|").map(s => s.trim()), d = parseInt(p[0], 10);
+    if (p.length < 3 || isNaN(d) || !p[2]) { erros.push(i + 1); return; }
+    out.push(Object.assign({ d, r: p[1] || "Equipe", t: p[2] }, /^(alta|baixa)$/i.test(p[3] || "") ? { p: p[3].toLowerCase() } : {}));
+  });
+  return { tarefas: out, erros };
+}
+
+// ---------- diálogo: aplicar modelo
+const MD = { ctx: {} };
+function modeloAbrir(preset) {
+  preset = preset || {}; MD.ctx = { proc: preset.proc || "", cli: preset.cli || "", resp: preset.resp || "" };
+  optsSel($("mdSel"), modelosLista().map(m => [m.id, m.nome])); if (preset.modeloId) $("mdSel").value = modeloPorId(preset.modeloId).id;
+  const ps = PROCS.filter(p => p.status !== "arquivado").sort((a, b) => (a.cliente || "").localeCompare(b.cliente || "", "pt"));
+  optsSel($("mdProc"), ps.map(p => [p.numero, p.numero + (p.cliente ? " · " + p.cliente : "")]), "— sem processo —"); $("mdProc").value = MD.ctx.proc;
+  const dl = $("mdDlCli"); dl.textContent = ""; for (const n of new Set([...PROCS.map(p => p.cliente), ...CRM_CONTATOS.map(c => c.nome)].filter(Boolean))) { const o = el("option"); o.value = n; dl.appendChild(o); }
+  $("mdCli").value = MD.ctx.cli; $("mdBase").value = preset.base || hojeIso(); $("mdGerir").hidden = souSecretaria();
+  modeloPrever(true); const dlg = $("dlgModelo"); if (!dlg.open) dlg.showModal();
+}
+function modeloPrever(zerar) {
+  const m = modeloPorId($("mdSel").value), base = $("mdBase").value, ctx = { resp: MD.ctx.resp };
+  $("mdBaseRot").textContent = m.base; const box = $("mdLista"), marc = zerar ? null : [...box.querySelectorAll("input:checked")].map(i => +i.dataset.i);
+  box.textContent = ""; const hoje = hojeIso();
+  modeloItens(m, base, ctx).forEach((x, i) => {
+    const li = el("label", "chk mdlinha"), cb = el("input"); cb.type = "checkbox"; cb.dataset.i = i; cb.checked = marc ? marc.includes(i) : !(x.data && x.data < hoje);
+    li.append(cb, el("span", "tag" + (x.data && x.data < hoje ? " warn" : ""), x.data ? br(x.data).slice(0, 5) : "sem data"), el("span", "tag", x.resp), el("span", "", x.t));
+    if (x.prio === "alta") li.appendChild(el("span", "tag crit", "alta")); box.appendChild(li);
+  });
+  const n = box.querySelectorAll("input:checked").length; $("mdCriar").textContent = "Criar " + n + " tarefa" + (n === 1 ? "" : "s"); $("mdCriar").disabled = !n;
+}
+$("mdSel").onchange = () => modeloPrever(true); $("mdBase").onchange = () => modeloPrever(true); $("mdLista").addEventListener("change", () => modeloPrever(false));
+$("mdProc").onchange = () => { const p = PROCS.find(x => x.numero === $("mdProc").value); MD.ctx.proc = $("mdProc").value; if (p) { $("mdCli").value = p.cliente || $("mdCli").value; MD.ctx.resp = p.resp || MD.ctx.resp; modeloPrever(false); } };
+$("mdCancel").onclick = () => $("dlgModelo").close();
+$("mdGerir").onclick = () => { $("dlgModelo").close(); modeloGerir(); };
+$("fModelo").addEventListener("submit", e => {
+  e.preventDefault(); const m = modeloPorId($("mdSel").value), marc = [...$("mdLista").querySelectorAll("input:checked")].map(i => +i.dataset.i);
+  if (!$("mdBase").value) { alert("Informe a data-base: " + m.base + "."); return; }
+  const n = modeloAplicar(m, $("mdBase").value, { proc: $("mdProc").value, cli: $("mdCli").value.trim(), resp: MD.ctx.resp }, marc);
+  $("dlgModelo").close(); atualizarTudo(); if (n) alert(n + " tarefa(s) criada(s) no quadro da Organização.");
+});
+
+// ---------- diálogo: gerenciar modelos (somente advogados)
+const MG = { lista: [], id: null };
+function modeloGerir() {
+  MG.lista = JSON.parse(JSON.stringify(modelosLista())); MG.id = MG.lista[0].id; modeloGerirDesenhar(); $("dlgModelos").showModal();
+}
+function modeloGerirGuardar() { // lê o formulário para o item em edição; devolve false se houver linha inválida
+  const m = MG.lista.find(x => x.id === MG.id); if (!m) return true;
+  const r = modeloDeTexto($("mgTarefas").value); if (r.erros.length) { alert("Linha(s) inválida(s): " + r.erros.join(", ") + ".\nUse: dias | responsável | título | prioridade (opcional). Ex.: -5 | Advogado | Reunião de preparação"); return false; }
+  m.nome = $("mgNome").value.trim() || m.nome; m.base = $("mgBase").value.trim() || "Data-base"; m.tarefas = r.tarefas; return true;
+}
+function modeloGerirDesenhar() {
+  optsSel($("mgSel"), MG.lista.map(m => [m.id, m.nome])); $("mgSel").value = MG.id; const m = MG.lista.find(x => x.id === MG.id);
+  $("mgNome").value = m ? m.nome : ""; $("mgBase").value = m ? m.base : ""; $("mgTarefas").value = m ? modeloParaTexto(m) : ""; $("mgExcluir").disabled = MG.lista.length <= 1;
+}
+$("mgSel").onchange = () => { const novo = $("mgSel").value; if (!modeloGerirGuardar()) { $("mgSel").value = MG.id; return; } MG.id = novo; modeloGerirDesenhar(); };
+$("mgNovo").onclick = () => { if (!modeloGerirGuardar()) return; const id = "m-" + uid(); MG.lista.push({ id, nome: "Novo modelo", base: "Data-base", tarefas: [{ d: 0, r: "Equipe", t: "Primeira tarefa" }] }); MG.id = id; modeloGerirDesenhar(); $("mgNome").select(); };
+$("mgExcluir").onclick = () => { if (MG.lista.length <= 1 || !confirm("Excluir este modelo?")) return; MG.lista = MG.lista.filter(x => x.id !== MG.id); MG.id = MG.lista[0].id; modeloGerirDesenhar(); };
+$("mgPadrao").onclick = () => { if (!confirm("Restaurar os modelos padrão? As suas edições serão perdidas.")) return; MG.lista = JSON.parse(JSON.stringify(MODELOS_PADRAO)); MG.id = MG.lista[0].id; modeloGerirDesenhar(); };
+$("mgCancel").onclick = () => $("dlgModelos").close();
+$("fModelos").addEventListener("submit", e => {
+  e.preventDefault(); if (!modeloGerirGuardar()) return;
+  crmSalvarCfg({ modelosTarefas: MG.lista }); $("dlgModelos").close(); modeloAbrir({});
+});
+
+// ---------- ganchos nas telas
+$("orgModelo").onclick = () => modeloAbrir({});
 
 
 /* ===== 45-nuvem: login (Firebase Auth), dados compartilhados (Firestore) e perfis de acesso =====
