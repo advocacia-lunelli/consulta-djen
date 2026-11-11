@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Advocacia Lunelli · Radar DJEN</title>
+<title>Advocacia Lunelli · App Organização</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap">
 <style>
-/* Advocacia Lunelli · Radar DJEN — estilos. Identidade: azul-marinho #000065, fonte Barlow. Layout inspirado em sistemas de gestão jurídica (menu lateral + painéis). */
+/* Advocacia Lunelli · App Organização — estilos. Identidade: azul-marinho #000065, fonte Barlow. Layout inspirado em sistemas de gestão jurídica (menu lateral + painéis). */
 :root{
   --bg:#f3f5f8; --surface:#fff; --ink:#18212f; --muted:#5b6678; --line:#d5dbe4;
   --accent:#000065; --accent-ink:#fff; --soft:#e6e8f3;
@@ -576,7 +576,7 @@ label.mdlinha input{width:auto;flex:none}
 <div id="nvAviso" class="nvaviso" role="status" hidden></div>
 <div id="login" class="login" hidden>
   <div class="lg-card">
-    <div class="lg-top"><span class="logo" role="img" aria-label="Lunelli Advocacia"></span><div class="lg-sub">Radar DJEN · área restrita</div></div>
+    <div class="lg-top"><span class="logo" role="img" aria-label="Lunelli Advocacia"></span><div class="lg-sub">App Organização · área restrita</div></div>
     <div class="lg-body">
       <div id="lgCarregando"><p>Conectando…</p></div>
       <form id="fEntrar" hidden>
@@ -3533,7 +3533,7 @@ function inicioDesenhar() {
 // ---- backup dos dados deste navegador
 $("bkExp").onclick = () => {
   const dados = {}; try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k.startsWith("djen.") && k !== "djen.ultima") dados[k] = localStorage.getItem(k); } } catch (e) {}
-  salvar(new Blob([JSON.stringify({ app: "radar-djen-lunelli", versao: 1, geradoEm: new Date().toISOString(), dados })], { type: "application/json" }), "backup-radar-djen-" + hojeIso() + ".json");
+  salvar(new Blob([JSON.stringify({ app: "radar-djen-lunelli", versao: 1, geradoEm: new Date().toISOString(), dados })], { type: "application/json" }), "backup-app-organizacao-" + hojeIso() + ".json");
 };
 $("bkImp").onclick = () => $("bkFile").click();
 $("bkFile").onchange = async () => {
