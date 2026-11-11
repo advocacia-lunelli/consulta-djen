@@ -66,7 +66,7 @@ input,select,button,textarea{font:inherit;color:inherit}
 .grid .wide{grid-column:span 2}
 @media (max-width:420px){.grid .wide{grid-column:span 1}}
 label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted);min-width:0}
-input[type=text],input[type=date],input[type=number],select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 9px;min-width:0;width:100%;color:var(--ink)}
+input[type=text],input[type=url],input[type=time],input[type=date],input[type=number],select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 9px;min-width:0;width:100%;color:var(--ink)}
 textarea{resize:vertical;min-height:60px}
 .acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:6px;padding:8px 16px;font-weight:600;cursor:pointer}
@@ -254,6 +254,23 @@ body.sem-sessao .app{visibility:hidden}
 #v-secretaria .tk{margin:0}
 @media print{#login,.nvaviso{display:none!important}}
 
+/* ===== Audiências ===== */
+dialog.big{width:min(780px,96vw);max-height:92vh;overflow:auto}
+dialog label.chk{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+dialog label.chk input{width:auto}
+dialog label.chk .btn{margin-left:auto}
+.testrow{display:grid;grid-template-columns:2fr 1.4fr 1fr 1fr auto;gap:6px;margin:4px 0}
+@media (max-width:620px){.testrow{grid-template-columns:1fr 1fr}}
+.envbox{display:flex;flex-direction:column;gap:4px}
+.envbox .acts label{flex-direction:row;align-items:center;gap:6px}
+details.sec-res{border:1px dashed var(--line);border-radius:8px;padding:8px 12px}
+details.sec-res summary{cursor:pointer;font-size:13px;color:var(--muted)}
+details.sec-res[open] summary{margin-bottom:8px}
+details.sec-res .grid{margin-bottom:8px}
+#v-audiencias .hd .acts input,#v-audiencias .hd .acts select{width:auto;min-width:0}
+h3.audDia{margin:14px 0 4px;font-size:14px;text-transform:capitalize;color:var(--muted)}
+.card.feito{opacity:.75}
+
 </style>
 </head>
 <body>
@@ -267,6 +284,7 @@ body.sem-sessao .app{visibility:hidden}
     <a href="#inicio" data-v="inicio"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>Início</a>
     <a href="#consulta" data-v="consulta"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>Consulta</a>
     <a href="#processos" data-v="processos"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Processos<span class="bd" id="bdProc" hidden></span></a>
+    <a href="#audiencias" data-v="audiencias"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 15h3"/></svg>Audiências</a>
     <a href="#relatorios" data-v="relatorios"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Relatórios</a>
     <a href="#advogados" data-v="advogados"><svg viewBox="0 0 24 24"><path d="M12 3v18M5 7h14M5 7l-3 7a3 3 0 006 0zM19 7l-3 7a3 3 0 006 0z"/></svg>Advogados<span class="bd" id="bdAdv" hidden></span></a>
     <a href="#organizacao" data-v="organizacao"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="10" rx="1"/><rect x="17" y="4" width="4" height="6" rx="1"/></svg>Organização<span class="bd red" id="bdOrg" hidden></span></a>
@@ -415,6 +433,24 @@ body.sem-sessao .app{visibility:hidden}
   <div id="pDetalhe" hidden></div>
 </section>
 
+<!-- ===================== AUDIÊNCIAS ===================== -->
+<section class="view" id="v-audiencias" hidden>
+  <div class="kpis" id="audKpis"></div>
+  <div class="panel">
+    <div class="hd"><h2>Audiências <span class="hint" id="audContagem"></span></h2>
+      <div class="acts">
+        <input type="text" id="audBusca" placeholder="Buscar nº, cliente, vara, testemunha…" aria-label="Buscar audiências">
+        <select id="audPer" aria-label="Período"></select>
+        <select id="audResp" aria-label="Responsável"></select>
+        <select id="audStatusF" aria-label="Situação"></select>
+        <select id="audModalF" aria-label="Modalidade"><option value="">Todas as modalidades</option><option>Presencial</option><option>Virtual</option><option>Híbrido</option></select>
+        <button class="btn sm" id="audNova" type="button">Nova audiência</button>
+        <button class="btn sec sm" id="audXls" type="button">Exportar Excel</button>
+      </div></div>
+    <div class="list" id="audLista"></div>
+  </div>
+</section>
+
 <!-- ===================== RELATÓRIOS ===================== -->
 <section class="view" id="v-relatorios" hidden>
   <div class="relbar noprint" id="relBar">
@@ -520,18 +556,62 @@ body.sem-sessao .app{visibility:hidden}
   </div>
 </div>
 
-<dialog id="dlgAud">
+<dialog id="dlgAud" class="big">
   <form method="dialog" id="fAud">
-    <h2>Audiência</h2>
-    <label>Tipo <input type="text" id="auTipo" autocomplete="off" placeholder="Ex.: Conciliação, Instrução, Una"></label>
+    <h2 id="auTitulo">Audiência</h2>
+    <label id="auProcWrap" hidden>Processo <input type="text" id="auProc" list="dlAudProc" autocomplete="off" placeholder="Digite o número ou o cliente e escolha na lista"></label>
+    <datalist id="dlAudProc"></datalist><datalist id="dlAudTipo"></datalist>
+    <div class="hint" id="auProcInfo"></div>
     <div class="grid">
+      <label class="wide">Tipo <input type="text" id="auTipo" list="dlAudTipo" autocomplete="off" placeholder="Ex.: Conciliação, Instrução, Una"></label>
+      <label>Situação <select id="auStatus"></select></label>
       <label>Data <input type="date" id="auData" required></label>
-      <label>Hora <input type="time" id="auHora"></label>
-      <label>Responsável <select id="auResp"><option>Fábio</option><option>Davi</option><option>Equipe</option><option>Secretaria</option></select></label>
+      <label>Início <input type="time" id="auHora"></label>
+      <label>Término <input type="time" id="auFim"></label>
+      <label>Modalidade <select id="auModal"><option>Presencial</option><option>Virtual</option><option>Híbrido</option><option>Não se aplica</option></select></label>
+      <label>Responsável <select id="auResp"></select></label>
+      <label>Alerta de antecedência <select id="auAlerta"></select></label>
     </div>
-    <label>Local / link <input type="text" id="auLocal" autocomplete="off" placeholder="Sala, vara ou link da videoconferência"></label>
+    <div class="envbox"><span class="hint">Outros envolvidos</span><div class="acts" id="auEnv"></div></div>
+    <fieldset class="calc"><legend>Local</legend>
+      <div class="grid">
+        <label class="wide">Fórum / órgão <input type="text" id="auForum" autocomplete="off"></label>
+        <label>Sala <input type="text" id="auSala" autocomplete="off"></label>
+        <label class="wide">Endereço ou local <input type="text" id="auLocal" autocomplete="off" placeholder="Rua, número, cidade"></label>
+        <label class="wide">Link da videoconferência <input type="url" id="auLink" autocomplete="off" placeholder="https://…"></label>
+      </div>
+    </fieldset>
+    <fieldset class="calc"><legend>Participantes</legend>
+      <div class="grid">
+        <label>Cliente <select id="auCliente"></select></label>
+        <label>Preposto / representante <input type="text" id="auPreposto" autocomplete="off"></label>
+        <label class="wide">Correspondente / substabelecido <input type="text" id="auCorresp" autocomplete="off" placeholder="Nome, OAB e contato"></label>
+      </div>
+      <label class="chk"><input type="checkbox" id="auCliAv"> Cliente avisado da audiência</label>
+      <div class="acts"><b>Testemunhas</b><button class="btn sm sec" type="button" id="auTestAdd">Adicionar testemunha</button></div>
+      <div id="auTest"></div>
+    </fieldset>
+    <fieldset class="calc"><legend>Preparação (checklist)</legend>
+      <div id="auCheck"></div><div class="hint" id="auCheckInfo"></div>
+      <div class="acts"><input type="text" id="auCheckNovo" placeholder="Novo item do checklist…" autocomplete="off"><button class="btn sm sec" type="button" id="auCheckAdd">Adicionar</button></div>
+    </fieldset>
+    <fieldset class="calc so-adv"><legend>Estratégia (só advogados)</legend>
+      <label>Pontos de atenção e perguntas <textarea id="auPauta"></textarea></label>
+      <label>Proposta / limite de acordo <input type="text" id="auAcordo" autocomplete="off"></label>
+    </fieldset>
+    <details class="so-adv sec-res" id="auResBox"><summary>Resultado (preencha depois da audiência)</summary>
+      <div class="grid">
+        <label>Resultado <select id="auRes"></select></label>
+        <label>Valor do acordo / condenação <input type="text" id="auValor" autocomplete="off"></label>
+        <label>Nova data (redesignada ou continuação) <input type="date" id="auNova"></label>
+      </div>
+      <label>Ata / resumo do que ocorreu <textarea id="auAta"></textarea></label>
+      <label>Providências decorrentes <textarea id="auProv"></textarea></label>
+      <label class="chk" id="auGerarBox"><input type="checkbox" id="auGerarTarefa"> Criar uma tarefa com as providências</label>
+      <label class="chk" id="auGerarNovaBox"><input type="checkbox" id="auGerarNova" checked> Criar a nova audiência na data acima</label>
+    </details>
     <label>Observações <textarea id="auObs"></textarea></label>
-    <div class="acts" style="justify-content:flex-end"><button class="btn sec" type="button" id="auCancel">Cancelar</button><button class="btn" type="submit">Salvar</button></div>
+    <div class="acts"><button class="btn danger" type="button" id="auDel" hidden>Excluir</button><span style="flex:1"></span><button class="btn sec" type="button" id="auCancel">Cancelar</button><button class="btn" type="submit">Salvar</button></div>
   </form>
 </dialog>
 
@@ -1602,7 +1682,7 @@ function pAudiencias(p, c, sg) {
   if (sg.aud.length) { c.appendChild(el("h3", "", "Detectadas nas publicações (confirme antes de adicionar)")); const ul = el("ul", "mini"); for (const s of sg.aud) ul.appendChild(linhaEvt(br(s.data) + (s.hora ? " " + s.hora : ""), " " + (s.tipo ? s.tipo + " — " : "") + "“…" + s.trecho.slice(0, 120) + "…”", [btn("Adicionar", () => abrirAud(p, { data: s.data, hora: s.hora, tipo: s.tipo, pubId: s.pubId })), btn("Ignorar", () => { p.ignoradas.push(s.pubId); salvarProcs(); pDetalhe(p); })])); c.appendChild(ul); }
   const lista = p.audiencias.slice().sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora));
   if (!lista.length) c.appendChild(el("div", "hint", "Nenhuma audiência cadastrada."));
-  const ul = el("ul", "mini"); for (const a of lista) ul.appendChild(linhaEvt(br(a.data) + (a.hora ? " " + a.hora : ""), " " + (a.tipo || "Audiência") + (a.local ? " · " + a.local : "") + " · " + (a.resp || p.resp) + (a.feita ? " · realizada" : a.data < hojeIso() ? " · data passada, dê baixa" : "") + (a.obs ? " — " + a.obs : ""), [btn(a.feita ? "Reabrir" : "Realizada", () => { a.feita = !a.feita; salvarProcs(); pDetalhe(p); atualizarBadges(); }), btn("Editar", () => abrirAud(p, a, a.id)), btn("Excluir", () => { if (confirm("Excluir esta audiência?")) { p.audiencias = p.audiencias.filter(x => x.id !== a.id); salvarProcs(); pDetalhe(p); atualizarBadges(); } }, "danger")], a.feita ? "feito" : ""));
+  const ul = el("ul", "mini"); for (const a of lista) ul.appendChild(linhaEvt(br(a.data) + (a.hora ? " " + a.hora : ""), " " + audResumo(a, p), [btn(audAberta(a) ? "Dar baixa" : "Reabrir", () => { if (audAberta(a)) abrirAud(p, a, a.id, { status: "realizada" }); else { a.status = "agendada"; a.feita = false; salvarProcs(); pDetalhe(p); atualizarBadges(); } }), btn("Editar", () => abrirAud(p, a, a.id)), btn("Excluir", () => { if (confirm("Excluir esta audiência?")) { p.audiencias = p.audiencias.filter(x => x.id !== a.id); salvarProcs(); pDetalhe(p); atualizarBadges(); } }, "danger")], audAberta(a) ? "" : "feito"));
   c.appendChild(ul);
 }
 function pPrazos(p, c, sg) {
@@ -1629,19 +1709,7 @@ function pPartes(p, c) {
 
 // ---------- diálogos de audiência e prazo
 let audEd = null, audPub = null, prazoEd = null, prazoPub = null, procDlg = null;
-function abrirAud(p, v, id) {
-  procDlg = p; audEd = id || null; audPub = (v && v.pubId) || null; v = v || {};
-  $("auTipo").value = v.tipo || ""; $("auData").value = v.data || ""; $("auHora").value = v.hora || ""; $("auLocal").value = v.local || ""; $("auResp").value = v.resp || p.resp; $("auObs").value = v.obs || "";
-  $("dlgAud").showModal(); $("auData").focus();
-}
-$("auCancel").onclick = () => $("dlgAud").close();
-$("fAud").addEventListener("submit", e => {
-  e.preventDefault(); const p = procDlg; if (!p) return;
-  const d = { tipo: $("auTipo").value.trim(), data: $("auData").value, hora: $("auHora").value, local: $("auLocal").value.trim(), resp: $("auResp").value, obs: $("auObs").value.trim() }; if (!d.data) return;
-  if (audEd) Object.assign(p.audiencias.find(x => x.id === audEd) || {}, d); else p.audiencias.push(Object.assign({ id: uid() }, d));
-  if (audPub) p.ignoradas.push(audPub);
-  salvarProcs(); $("dlgAud").close(); atualizarTudo();
-});
+// abrirAud e o cadastro completo de audiência ficam em 37-audiencias.js
 function abrirPrazo(p, v, id) {
   procDlg = p; prazoEd = id || null; prazoPub = (v && v.pubId) || null; v = v || {};
   $("pzDesc").value = v.desc || ""; $("pzData").value = v.data || ""; $("pzResp").value = v.resp || p.resp; $("pzObs").value = v.obs || "";
@@ -1676,6 +1744,248 @@ function procIniciar() {
   $("pStatusF").addEventListener("change", () => { P.filtroStatus = $("pStatusF").value; pLista(); });
   $("pRespF").addEventListener("change", () => { P.respF = $("pRespF").value; pLista(); });
   procsMesclarAdv();
+}
+
+
+/* ===== 37-audiencias: cadastro completo de audiências (tela própria + diálogo detalhado) =====
+   Cada audiência fica dentro da pasta do processo (p.audiencias), então segue sincronizada na nuvem junto com a pasta.
+   Campos antigos (tipo, data, hora, local, resp, obs, feita) continuam valendo; os novos são opcionais. */
+const AUD_TIPOS = ["Conciliação", "Mediação", "Instrução", "Instrução e julgamento", "Conciliação, instrução e julgamento", "Una (trabalhista)", "Inicial (trabalhista)", "Justificação prévia", "Saneamento e organização do processo", "Interrogatório", "Custódia", "Admonitória", "Pré-perícia / entrevista", "Perícia", "Sessão de julgamento (pauta)", "Sustentação oral", "Encerramento de instrução"];
+const AUD_STATUS = [["agendada", "Agendada"], ["confirmada", "Confirmada"], ["realizada", "Realizada"], ["redesignada", "Redesignada"], ["cancelada", "Cancelada"], ["nao", "Não realizada"]];
+const AUD_RES = ["", "Acordo homologado", "Sem acordo", "Instrução encerrada", "Instrução continuará (nova data)", "Redesignada", "Sentença em audiência", "Prova pericial determinada", "Prazo para alegações finais", "Ausência do cliente", "Ausência da parte contrária", "Outro"];
+const AUD_CLIENTE = ["A confirmar", "Comparece", "Não comparece", "Dispensado"];
+const AUD_ALERTAS = [[0, "Sem alerta"], [1, "1 dia antes"], [2, "2 dias antes"], [3, "3 dias antes"], [5, "5 dias antes"], [7, "7 dias antes"], [10, "10 dias antes"], [15, "15 dias antes"], [20, "20 dias antes"]];
+const AUD_ENV = ["Fábio", "Davi", "Secretaria", "Equipe"];
+const AUD_TEST_SIT = ["A levar", "A intimar", "Intimada", "Avisada", "Ouvida", "Não compareceu"];
+
+const audStatus = a => a.status || (a.feita ? "realizada" : "agendada");
+const audAberta = a => { const s = audStatus(a); return s === "agendada" || s === "confirmada"; };
+const audRotStatus = s => (AUD_STATUS.find(x => x[0] === s) || [0, s])[1];
+const audPrep = a => { const c = a.check || []; return { ok: c.filter(i => i.ok).length, total: c.length }; };
+const audPendPrep = a => audAberta(a) && a.data >= hojeIso() && audPrep(a).ok < audPrep(a).total;
+const audAlertaAtivo = a => audPendPrep(a) && a.alerta > 0 && hojeIso() >= somaDias(a.data, -a.alerta);
+const audLinkOk = u => /^https?:\/\//i.test(u || "");
+
+// Itens padrão de preparação (inspirados nos fluxos "Preparação para audiências", "Audiência conciliatória" e "Audiência por videoconferência")
+function audCheckPadrao(modal) {
+  const base = ["Avisar o cliente da data, do horário e do local", "Conferir o agendamento no processo / tribunal", "Compilar as provas já produzidas", "Elaborar as perguntas às testemunhas", "Testemunhas avisadas ou intimadas", "Orientar o cliente (como se portar, documentos a levar)", "Definir com o cliente a proposta e o limite de acordo"];
+  if (modal === "Virtual" || modal === "Híbrido") base.push("Organizar a informática (câmera, áudio, internet, sala virtual)", "Enviar o link ao cliente e às testemunhas (até 2 dias úteis antes)");
+  if (modal === "Presencial" || modal === "Híbrido") base.push("Combinar deslocamento e horário de chegada");
+  return base.map(t => ({ t, ok: false }));
+}
+
+function audTodas() {
+  const out = []; for (const p of PROCS) for (const a of p.audiencias || []) out.push({ a, p });
+  return out.sort((x, y) => (x.a.data + (x.a.hora || "")).localeCompare(y.a.data + (y.a.hora || "")));
+}
+function audResumo(a, p) {
+  const st = audStatus(a), partes = [(a.tipo || "Audiência")];
+  if (a.modal) partes.push(a.modal);
+  const loc = [a.forum, a.sala, a.local].filter(Boolean).join(" · "); if (loc) partes.push(loc);
+  partes.push(a.resp || p.resp);
+  if (st !== "agendada") partes.push(audRotStatus(st).toLowerCase());
+  else if (a.data < hojeIso()) partes.push("data passada, dê baixa");
+  const pr = audPrep(a); if (pr.total && audAberta(a)) partes.push("preparo " + pr.ok + "/" + pr.total);
+  if (a.res) partes.push(a.res);
+  return partes.join(" · ") + (a.obs ? " — " + a.obs : "");
+}
+
+// ---------- diálogo
+const AUD = { test: [], check: [], tocou: false, novo: true };
+function audOpcoes(sel, lista, textoDe) { sel.textContent = ""; for (const it of lista) { const v = Array.isArray(it) ? it[0] : it, t = Array.isArray(it) ? it[1] : it; sel.appendChild(Object.assign(el("option", "", textoDe ? textoDe(t) : t), { value: v })); } }
+(function audMontarDialogo() {
+  audOpcoes($("auStatus"), AUD_STATUS); audOpcoes($("auAlerta"), AUD_ALERTAS); audOpcoes($("auCliente"), AUD_CLIENTE); audOpcoes($("auRes"), AUD_RES, t => t || "—");
+  audOpcoes($("auResp"), RESPS);
+  const dt = $("dlAudTipo"); for (const t of AUD_TIPOS) dt.appendChild(Object.assign(el("option"), { value: t }));
+  const env = $("auEnv"); for (const n of AUD_ENV) { const l = el("label", "chk"), c = el("input"); c.type = "checkbox"; c.value = n; l.append(c, document.createTextNode(n)); env.appendChild(l); }
+  const fil = $("audResp"); if (fil) audOpcoes(fil, [["", "Todos os responsáveis"], ...RESPS.map(r => [r, r])]);
+  const fs = $("audStatusF"); if (fs) audOpcoes(fs, [["", "Todas as situações"], ...AUD_STATUS]);
+})();
+
+function auTestDesenhar() {
+  const box = $("auTest"); box.textContent = "";
+  AUD.test.forEach((t, i) => {
+    const row = el("div", "testrow");
+    const nome = el("input"); nome.type = "text"; nome.placeholder = "Nome da testemunha"; nome.value = t.nome || ""; nome.oninput = () => { t.nome = nome.value; };
+    const tel = el("input"); tel.type = "text"; tel.placeholder = "Telefone / contato"; tel.value = t.tel || ""; tel.oninput = () => { t.tel = tel.value; };
+    const polo = el("select"); audOpcoes(polo, [["nossa", "Nossa"], ["contraria", "Parte contrária"]]); polo.value = t.polo || "nossa"; polo.onchange = () => { t.polo = polo.value; };
+    const sit = el("select"); audOpcoes(sit, AUD_TEST_SIT); sit.value = t.sit || "A levar"; sit.onchange = () => { t.sit = sit.value; };
+    const x = el("button", "btn sm danger", "×"); x.type = "button"; x.title = "Remover"; x.onclick = () => { AUD.test.splice(i, 1); auTestDesenhar(); };
+    row.append(nome, tel, polo, sit, x); box.appendChild(row);
+  });
+  if (!AUD.test.length) box.appendChild(el("div", "hint", "Nenhuma testemunha cadastrada."));
+}
+function auCheckDesenhar() {
+  const box = $("auCheck"); box.textContent = "";
+  AUD.check.forEach((c, i) => {
+    const l = el("label", "chk"), k = el("input"); k.type = "checkbox"; k.checked = !!c.ok; k.onchange = () => { c.ok = k.checked; auCheckResumo(); };
+    const x = el("button", "btn sm sec", "×"); x.type = "button"; x.title = "Remover item"; x.onclick = () => { AUD.check.splice(i, 1); AUD.tocou = true; auCheckDesenhar(); };
+    l.append(k, document.createTextNode(c.t)); l.appendChild(x); box.appendChild(l);
+  });
+  auCheckResumo();
+}
+function auCheckResumo() { const ok = AUD.check.filter(c => c.ok).length; $("auCheckInfo").textContent = AUD.check.length ? ok + " de " + AUD.check.length + " itens concluídos" : "Sem itens."; }
+
+function audProcsDatalist() {
+  const dl = $("dlAudProc"); dl.textContent = "";
+  for (const p of PROCS.filter(x => x.status !== "arquivado")) dl.appendChild(Object.assign(el("option"), { value: p.numero + (p.cliente ? " · " + p.cliente : "") }));
+}
+function audAcharProc(txt) {
+  const dig = (txt || "").replace(/\D/g, "").slice(0, 20); if (dig.length < 15) return null;
+  return PROCS.find(x => x.chave === dig) || null;
+}
+
+function abrirAud(p, v, id, extra) {
+  procDlg = p || null; audEd = id || null; audPub = (v && v.pubId) || null; v = Object.assign({}, v || {}, extra || {});
+  const adv = !souSecretaria();
+  AUD.novo = !id; AUD.tocou = !!(v.check && v.check.length);
+  $("auTitulo").textContent = id ? "Editar audiência" : "Nova audiência";
+  $("auProcWrap").hidden = !!p; $("auProc").value = ""; $("auProc").required = !p; if (!p) audProcsDatalist();
+  $("auProcInfo").textContent = p ? p.numero + (p.cliente ? " · " + p.cliente : "") + (p.orgao ? " · " + p.orgao : "") : "";
+  $("auTipo").value = v.tipo || ""; $("auData").value = v.data || ""; $("auHora").value = v.hora || ""; $("auFim").value = v.fim || "";
+  $("auModal").value = v.modal || "Presencial"; $("auStatus").value = audStatus(v); $("auResp").value = v.resp || (p ? p.resp : respPadrao()); $("auAlerta").value = String(v.alerta == null ? 7 : v.alerta);
+  const env = v.env || []; for (const c of $("auEnv").querySelectorAll("input")) c.checked = env.includes(c.value);
+  $("auForum").value = v.forum != null ? v.forum : (p && p.orgao) || ""; $("auSala").value = v.sala || ""; $("auLocal").value = v.local || ""; $("auLink").value = v.link || "";
+  $("auCliente").value = v.cliente || "A confirmar"; $("auCliAv").checked = !!v.cliAv; $("auPreposto").value = v.preposto || ""; $("auCorresp").value = v.corresp || "";
+  AUD.test = (v.test || []).map(t => Object.assign({}, t)); AUD.check = v.check && v.check.length ? v.check.map(c => Object.assign({}, c)) : (!id || audAberta(v) ? audCheckPadrao($("auModal").value) : []);
+  auTestDesenhar(); auCheckDesenhar();
+  $("auPauta").value = v.pauta || ""; $("auAcordo").value = v.acordo || "";
+  $("auRes").value = v.res || ""; $("auValor").value = v.valor || ""; $("auNova").value = v.nova || ""; $("auAta").value = v.ata || ""; $("auProv").value = v.prov || "";
+  $("auGerarTarefa").checked = false; $("auGerarBox").hidden = !!v.tarefaGerada; $("auGerarNova").checked = true; $("auGerarNovaBox").hidden = !!v.novaId;
+  $("auObs").value = v.obs || ""; $("auDel").hidden = !id;
+  for (const e of document.querySelectorAll("#dlgAud .so-adv")) e.hidden = !adv;
+  if (adv && (extra && extra.status) && !v.res) $("auResBox").open = true;
+  $("dlgAud").showModal(); $("auData").focus();
+}
+$("auCancel").onclick = () => $("dlgAud").close();
+$("auProc").addEventListener("input", () => { const p = audAcharProc($("auProc").value); $("auProcInfo").textContent = p ? (p.classe || "") + (p.orgao ? " · " + p.orgao : "") : ""; if (p && !$("auForum").value) $("auForum").value = p.orgao || ""; });
+$("auModal").addEventListener("change", () => { if (AUD.novo && !AUD.tocou) { AUD.check = audCheckPadrao($("auModal").value); auCheckDesenhar(); } });
+$("auTestAdd").onclick = () => { AUD.test.push({ nome: "", tel: "", polo: "nossa", sit: "A levar" }); auTestDesenhar(); const i = $("auTest").querySelectorAll("input"); if (i.length) i[i.length - 2].focus(); };
+$("auCheckAdd").onclick = () => { const t = $("auCheckNovo").value.trim(); if (!t) return; AUD.check.push({ t, ok: false }); AUD.tocou = true; $("auCheckNovo").value = ""; auCheckDesenhar(); };
+$("auCheckNovo").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); $("auCheckAdd").click(); } });
+$("auDel").onclick = () => {
+  const p = procDlg || (audAcharProc($("auProc").value)); if (!audEd || !p || !confirm("Excluir esta audiência?")) return;
+  p.audiencias = p.audiencias.filter(x => x.id !== audEd); salvarProcs(); $("dlgAud").close(); atualizarTudo();
+};
+
+$("fAud").addEventListener("submit", e => {
+  e.preventDefault();
+  const adv = !souSecretaria(); let p = procDlg;
+  if (!p) { p = audAcharProc($("auProc").value); if (!p) { alert("Escolha um processo da lista (digite o número ou o cliente)."); return; } }
+  const d = {
+    tipo: $("auTipo").value.trim(), data: $("auData").value, hora: $("auHora").value, fim: $("auFim").value, modal: $("auModal").value, status: $("auStatus").value, resp: $("auResp").value,
+    alerta: +$("auAlerta").value || 0, env: [...$("auEnv").querySelectorAll("input:checked")].map(c => c.value),
+    forum: $("auForum").value.trim(), sala: $("auSala").value.trim(), local: $("auLocal").value.trim(), link: $("auLink").value.trim(),
+    cliente: $("auCliente").value, cliAv: $("auCliAv").checked, preposto: $("auPreposto").value.trim(), corresp: $("auCorresp").value.trim(),
+    test: AUD.test.filter(t => (t.nome || "").trim()).map(t => ({ nome: t.nome.trim(), tel: (t.tel || "").trim(), polo: t.polo || "nossa", sit: t.sit || "A levar" })),
+    check: AUD.check.map(c => ({ t: c.t, ok: !!c.ok })), obs: $("auObs").value.trim()
+  };
+  if (!d.data) return;
+  if (adv) Object.assign(d, { pauta: $("auPauta").value.trim(), acordo: $("auAcordo").value.trim(), res: $("auRes").value, valor: $("auValor").value.trim(), nova: $("auNova").value, ata: $("auAta").value.trim(), prov: $("auProv").value.trim() });
+  const res = adv ? d.res : ((p.audiencias.find(x => x.id === audEd) || {}).res || "");
+  if (adv && res === "Redesignada" && ["agendada", "confirmada", "realizada"].includes(d.status)) d.status = "redesignada";
+  else if (adv && res && (d.status === "agendada" || d.status === "confirmada")) d.status = "realizada"; // resultado informado = audiência já ocorreu
+  d.feita = !(d.status === "agendada" || d.status === "confirmada");
+  let a;
+  if (audEd) { a = p.audiencias.find(x => x.id === audEd); if (a) Object.assign(a, d); }
+  if (!a) { a = Object.assign({ id: uid() }, d); p.audiencias.push(a); }
+  if (adv && $("auGerarNova").checked && d.nova && !a.novaId && (d.res === "Redesignada" || d.res === "Instrução continuará (nova data)")) {
+    const n = Object.assign({}, JSON.parse(JSON.stringify(a)), { id: uid(), data: d.nova, status: "agendada", feita: false, res: "", valor: "", nova: "", ata: "", prov: "", novaId: "", tarefaGerada: false, cliAv: false, check: audCheckPadrao(d.modal) });
+    p.audiencias.push(n); a.novaId = n.id;
+  }
+  if (adv && $("auGerarTarefa").checked && d.prov && !a.tarefaGerada) {
+    TAREFAS.push({ id: uid(), criada: Date.now(), titulo: "Providências da audiência de " + br(d.data) + (d.tipo ? " (" + d.tipo + ")" : ""), proc: p.numero, cli: p.cliente || "", resp: d.resp, prazo: "", prio: "normal", status: "fazer", nota: d.prov });
+    salvarTarefas(); a.tarefaGerada = true;
+  }
+  if (audPub) p.ignoradas.push(audPub);
+  salvarProcs(); $("dlgAud").close(); atualizarTudo();
+});
+
+// ---------- tela "Audiências"
+const AUDF = { per: "futuras", resp: "", status: "", modal: "", q: "" };
+const AUD_PERIODOS = [["futuras", "Hoje e próximas"], ["hoje", "Hoje"], ["7", "Próximos 7 dias"], ["30", "Próximos 30 dias"], ["semBaixa", "Sem baixa (data passada)"], ["passadas", "Passadas"], ["todas", "Todas"]];
+function audFiltrar(todas) {
+  const hoje = hojeIso(), q = norm(AUDF.q);
+  const dentro = a => {
+    switch (AUDF.per) {
+      case "futuras": return a.data >= hoje;
+      case "hoje": return a.data === hoje;
+      case "7": return a.data >= hoje && a.data <= somaDias(hoje, 7);
+      case "30": return a.data >= hoje && a.data <= somaDias(hoje, 30);
+      case "semBaixa": return audAberta(a) && a.data < hoje;
+      case "passadas": return a.data < hoje;
+      default: return true;
+    }
+  };
+  return todas.filter(({ a, p }) => dentro(a) && (!AUDF.resp || (a.resp || p.resp) === AUDF.resp) && (!AUDF.status || audStatus(a) === AUDF.status) && (!AUDF.modal || a.modal === AUDF.modal) &&
+    (!q || norm([p.numero, p.cliente, p.classe, a.tipo, a.forum, a.sala, a.local, a.corresp, a.preposto, (a.test || []).map(t => t.nome).join(" "), p.partes.map(x => x.nome).join(" ")].join(" ")).includes(q)));
+}
+function audCard(a, p) {
+  const st = audStatus(a), hoje = hojeIso(), c = el("article", "card" + (audAberta(a) ? "" : " feito")), top = el("div", "top");
+  const quando = el("a", "num", br(a.data) + (a.hora ? " " + a.hora + (a.fim ? "–" + a.fim : "") : "")); quando.href = "#audiencias"; quando.onclick = e => { e.preventDefault(); abrirAud(p, a, a.id); };
+  top.append(quando, el("b", "", a.tipo || "Audiência"), el("span", "tag" + (st === "realizada" ? " ok" : st === "cancelada" || st === "nao" ? " crit" : st === "redesignada" ? " warn" : " dist"), audRotStatus(st)));
+  if (a.modal && a.modal !== "Não se aplica") top.appendChild(el("span", "tag", a.modal));
+  if (audAberta(a) && a.data < hoje) top.appendChild(el("span", "tag crit", "dar baixa"));
+  if (audAlertaAtivo(a)) top.appendChild(el("span", "tag warn", "preparar"));
+  if (audAberta(a) && a.data >= hoje && !a.cliAv) top.appendChild(el("span", "tag warn", "cliente não avisado"));
+  c.appendChild(top);
+  const r = el("div", "row"), pn = el("a", "num", p.numero); pn.href = "#processos"; pn.onclick = e => { e.preventDefault(); abrirPasta(p.id); };
+  r.append(pn, el("span", "", "Cliente: " + (p.cliente || "—")), el("span", "", [a.forum, a.sala, a.local].filter(Boolean).join(" · ") || p.orgao || "Local não informado"), el("span", "", "Resp.: " + (a.resp || p.resp) + ((a.env || []).length ? " + " + a.env.join(", ") : "")));
+  if (audLinkOk(a.link)) { const l = el("a", "", "link da sala"); l.href = a.link; l.target = "_blank"; l.rel = "noopener noreferrer"; r.appendChild(l); }
+  const pr = audPrep(a); if (pr.total && audAberta(a)) r.appendChild(el("span", "", "Preparo " + pr.ok + "/" + pr.total));
+  if ((a.test || []).length) r.appendChild(el("span", "", a.test.length + " testemunha(s)"));
+  if (a.corresp) r.appendChild(el("span", "", "Correspondente: " + a.corresp));
+  c.appendChild(r);
+  if (a.res) c.appendChild(Object.assign(el("div", "partes"), { textContent: "Resultado: " + a.res + (a.valor ? " · " + a.valor : "") }));
+  const ac = el("div", "acts"); ac.append(btn("Editar", () => abrirAud(p, a, a.id), ""), btn("Pasta", () => abrirPasta(p.id)));
+  if (audAberta(a)) ac.appendChild(btn("Dar baixa", () => abrirAud(p, a, a.id, { status: "realizada" })));
+  c.appendChild(ac); return c;
+}
+function audDesenhar() {
+  const hoje = hojeIso(), todas = audTodas().filter(x => x.p.status !== "arquivado" || AUDF.per === "todas"), box = $("audLista"); box.textContent = "";
+  const abertas = todas.filter(x => audAberta(x.a));
+  const K = (v, l, s) => { const d = el("div", "kpi"); d.append(el("div", "v", v), el("div", "l", l)); if (s) d.appendChild(el("div", "s", s)); return d; };
+  const k = $("audKpis"); k.textContent = "";
+  k.append(K(abertas.filter(x => x.a.data === hoje).length, "Hoje"), K(abertas.filter(x => x.a.data > hoje && x.a.data <= somaDias(hoje, 7)).length, "Próximos 7 dias"),
+    K(abertas.filter(x => audPendPrep(x.a) && x.a.data <= somaDias(hoje, 7)).length, "Preparação pendente", "nos próximos 7 dias"), K(abertas.filter(x => x.a.data >= hoje && !x.a.cliAv).length, "Clientes a avisar"), K(abertas.filter(x => x.a.data < hoje).length, "Sem baixa", "data já passou"));
+  const lista = audFiltrar(todas); if (AUDF.per === "passadas" || AUDF.per === "semBaixa") lista.reverse();
+  $("audContagem").textContent = lista.length + " audiência(s)";
+  if (!lista.length) { box.appendChild(el("div", "empty", todas.length ? "Nenhuma audiência com estes filtros." : "Nenhuma audiência cadastrada. Use “Nova audiência” ou cadastre dentro da pasta do processo.")); return; }
+  let dia = "";
+  for (const { a, p } of lista) {
+    if (a.data !== dia) { dia = a.data; const w = new Date(a.data + "T12:00:00").toLocaleDateString("pt-BR", { weekday: "long" }); box.appendChild(el("h3", "audDia", br(a.data) + " · " + w + (a.data === hoje ? " (hoje)" : ""))); }
+    box.appendChild(audCard(a, p));
+  }
+}
+
+async function audExportar() {
+  const lista = audFiltrar(audTodas().filter(x => x.p.status !== "arquivado" || AUDF.per === "todas")); if (!lista.length) { alert("Nada para exportar com os filtros atuais."); return; }
+  const cab = ["Data", "Início", "Término", "Tipo", "Situação", "Modalidade", "Processo", "Cliente", "Fórum / órgão", "Sala", "Local", "Link", "Responsável", "Outros envolvidos", "Cliente", "Cliente avisado", "Preposto", "Correspondente", "Testemunhas", "Preparo", "Resultado", "Valor", "Providências"];
+  const linha = ({ a, p }) => [a.data, a.hora || "", a.fim || "", a.tipo || "", audRotStatus(audStatus(a)), a.modal || "", p.numero, p.cliente || "", a.forum || p.orgao || "", a.sala || "", a.local || "", a.link || "", a.resp || p.resp, (a.env || []).join(", "), a.cliente || "", a.cliAv ? "Sim" : "Não", a.preposto || "", a.corresp || "", (a.test || []).map(t => t.nome + (t.polo === "contraria" ? " (parte contrária)" : "") + " – " + t.sit).join("; "), audPrep(a).total ? audPrep(a).ok + "/" + audPrep(a).total : "", a.res || "", a.valor || "", a.prov || ""];
+  const nome = "audiencias-" + hojeIso();
+  if (await carregarExcel()) {
+    const wb = new ExcelJS.Workbook(); wb.creator = "Advocacia Lunelli"; wb.created = new Date();
+    const ws = wb.addWorksheet("Audiências", { views: [{ state: "frozen", ySplit: 1, xSplit: 3, showGridLines: false }] });
+    ws.columns = cab.map((c, i) => ({ header: c, width: [11, 8, 8, 24, 13, 12, 28, 26, 28, 10, 26, 30, 12, 20, 14, 10, 20, 24, 36, 8, 26, 14, 40][i] }));
+    const h = ws.getRow(1); h.height = 22; h.eachCell(c => { c.font = { bold: true, color: { argb: "FFFFFFFF" } }; c.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF000065" } }; c.alignment = { vertical: "middle", wrapText: true }; });
+    for (const x of lista) { const r = ws.addRow(linha(x)); r.getCell(1).value = dataXls(x.a.data); r.getCell(1).numFmt = "dd/mm/yyyy"; r.alignment = { vertical: "top", wrapText: true }; }
+    ws.autoFilter = { from: { row: 1, column: 1 }, to: { row: 1, column: cab.length } };
+    salvar(new Blob([await wb.xlsx.writeBuffer()], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }), nome + ".xlsx");
+  } else {
+    const q = v => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"';
+    salvar(new Blob(["﻿" + cab.map(q).join(";") + "\r\n" + lista.map(x => linha(x).map(q).join(";")).join("\r\n")], { type: "text/csv;charset=utf-8" }), nome + ".csv");
+  }
+}
+
+function audIniciar() {
+  audOpcoes($("audPer"), AUD_PERIODOS); $("audPer").value = AUDF.per;
+  $("audPer").onchange = () => { AUDF.per = $("audPer").value; audDesenhar(); };
+  $("audResp").onchange = () => { AUDF.resp = $("audResp").value; audDesenhar(); };
+  $("audStatusF").onchange = () => { AUDF.status = $("audStatusF").value; audDesenhar(); };
+  $("audModalF").onchange = () => { AUDF.modal = $("audModalF").value; audDesenhar(); };
+  $("audBusca").oninput = () => { AUDF.q = $("audBusca").value; audDesenhar(); };
+  $("audNova").onclick = () => abrirAud(null);
+  $("audXls").onclick = () => audExportar();
 }
 
 
@@ -1810,10 +2120,10 @@ function orgIniciar() { $("orgResp").addEventListener("change", orgDesenhar); or
    pastas/tarefas/clientes/valores compartilhados entre todos, e telas por perfil (advogado, secretaria, administrador). */
 const NV = { ativo: !!NUVEM_CFG, user: null, perfil: null, papel: "local", advId: null, db: null, auth: null, unsubs: [], mapas: {}, sessao: false, cadastrando: false, users: [] };
 const ACESSO = {
-  local: ["inicio", "consulta", "processos", "relatorios", "advogados", "organizacao"],
-  admin: ["meu", "inicio", "secretaria", "consulta", "processos", "relatorios", "advogados", "organizacao", "usuarios"],
-  advogado: ["meu", "inicio", "consulta", "processos", "relatorios", "advogados", "organizacao"],
-  secretaria: ["secretaria", "processos"]
+  local: ["inicio", "consulta", "processos", "audiencias", "relatorios", "advogados", "organizacao"],
+  admin: ["meu", "inicio", "secretaria", "consulta", "processos", "audiencias", "relatorios", "advogados", "organizacao", "usuarios"],
+  advogado: ["meu", "inicio", "consulta", "processos", "audiencias", "relatorios", "advogados", "organizacao"],
+  secretaria: ["secretaria", "audiencias", "processos"]
 };
 const PAPEL_ROT = { admin: "Administrador", advogado: "Advogado(a)", secretaria: "Secretaria", local: "" };
 const souAdvogado = () => NV.papel !== "secretaria";
@@ -2154,6 +2464,7 @@ const VIEWS = {
   inicio: ["Início", "Visão geral do escritório"],
   consulta: ["Consulta DJEN", "Busca por nome da parte no Diário de Justiça Eletrônico Nacional"],
   processos: ["Processos", "Pastas dos processos: cadastro pelo número, audiências, prazos e tarefas"],
+  audiencias: ["Audiências", "Cadastro completo: local, participantes, preparação, resultado e providências"],
   relatorios: ["Relatórios", "Indicadores e gráficos do cliente pesquisado, prontos para imprimir ou apresentar"],
   advogados: ["Advogados", "Publicações do DJEN em nome de Fábio (OAB/SC 15.044) e Davi (OAB/SC 39.336)"],
   organizacao: ["Organização", "Tarefas, prazos e rotina do escritório"],
@@ -2163,6 +2474,7 @@ function vistaAtual() { const v = (location.hash || "").replace("#", ""); return
 function desenharVista(v) {
   if (v === "relatorios") relatorioAtualizar();
   if (v === "processos") procDesenhar();
+  if (v === "audiencias") audDesenhar();
   if (v === "inicio") inicioDesenhar();
   if (v === "advogados") advDesenhar();
   if (v === "organizacao") orgDesenhar();
@@ -2229,7 +2541,7 @@ $("bkFile").onchange = async () => {
 let appIniciado = false;
 function iniciarApp() {
   if (appIniciado) return; appIniciado = true;
-  iniciarConsulta(); desenharInicioClientes(); orgIniciar(); procIniciar(); telasIniciar(); advIniciar(); irPara();
+  iniciarConsulta(); desenharInicioClientes(); orgIniciar(); procIniciar(); audIniciar(); telasIniciar(); advIniciar(); irPara();
 }
 if (!NV.ativo) { aplicarPapel(); iniciarApp(); }
 
