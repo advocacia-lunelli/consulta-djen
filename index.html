@@ -207,6 +207,24 @@ dialog form{display:flex;flex-direction:column;gap:10px}
 
 a.btn{text-decoration:none;display:inline-block}
 
+/* ---- Processos (pastas) */
+#v-processos .panel{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+#pNums{min-height:84px;font-family:var(--mono)}
+.mini li.feito{opacity:.55}
+.mini li .acts{margin-left:auto}
+.mini li .acts .btn{white-space:nowrap}
+fieldset.calc{border:1px dashed var(--line);border-radius:8px;padding:8px 12px 12px;display:flex;flex-direction:column;gap:8px}
+fieldset.calc legend{font-size:12px;color:var(--muted);padding:0 6px}
+#pDetalhe h3{margin:10px 0 4px;font-size:14px;color:var(--accent)}
+#pDetalhe .tabs{margin-bottom:0}
+#pDetalhe textarea{min-height:56px}
+#pDetalhe label,#v-processos label,dialog label{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--muted)}
+.tk .m a{font-size:12px}
+@media print{#v-processos{display:none}}
+#pDetalhe .hd>.btn{width:fit-content;align-self:flex-start}
+#v-processos .hd .acts input,#v-processos .hd .acts select{width:auto;min-width:0}
+#pBusca{min-width:200px}
+
 </style>
 </head>
 <body>
@@ -217,6 +235,7 @@ a.btn{text-decoration:none;display:inline-block}
   <nav class="nav" id="nav" aria-label="Seções">
     <a href="#inicio" data-v="inicio"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>Início</a>
     <a href="#consulta" data-v="consulta"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>Consulta</a>
+    <a href="#processos" data-v="processos"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Processos<span class="bd" id="bdProc" hidden></span></a>
     <a href="#relatorios" data-v="relatorios"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Relatórios</a>
     <a href="#advogados" data-v="advogados"><svg viewBox="0 0 24 24"><path d="M12 3v18M5 7h14M5 7l-3 7a3 3 0 006 0zM19 7l-3 7a3 3 0 006 0z"/></svg>Advogados<span class="bd" id="bdAdv" hidden></span></a>
     <a href="#organizacao" data-v="organizacao"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="10" rx="1"/><rect x="17" y="4" width="4" height="6" rx="1"/></svg>Organização<span class="bd red" id="bdOrg" hidden></span></a>
@@ -238,7 +257,7 @@ a.btn{text-decoration:none;display:inline-block}
   <div class="kpis" id="kpisInicio"></div>
   <div class="cols2">
     <div class="panel"><h2>Publicações novas por advogado <a class="btn sec sm" href="#advogados">Abrir</a></h2><div id="inAdv"></div></div>
-    <div class="panel"><h2>Próximos prazos e tarefas <a class="btn sec sm" href="#organizacao">Abrir</a></h2><div id="inPrazos"></div></div>
+    <div class="panel"><h2>Agenda: audiências, prazos e tarefas <a class="btn sec sm" href="#organizacao">Abrir</a></h2><div id="inPrazos"></div></div>
   </div>
   <div class="panel"><h2>Clientes monitorados</h2>
     <div class="chips" id="inClientes"></div>
@@ -305,6 +324,31 @@ a.btn{text-decoration:none;display:inline-block}
   </div>
 </section>
 
+<!-- ===================== PROCESSOS ===================== -->
+<section class="view" id="v-processos" hidden>
+  <div id="pLista">
+    <div class="panel">
+      <h2>Cadastrar processos pelo número</h2>
+      <div class="hint">Cole um ou vários números no padrão CNJ (0000000-00.0000.0.00.0000), um por linha ou no meio de um texto. O site confere o dígito verificador, busca o histórico no DJEN e cria uma pasta para cada processo.</div>
+      <textarea id="pNums" placeholder="Ex.: 0001234-56.2026.8.24.0023"></textarea>
+      <div class="grid">
+        <label>Cliente (pasta) <input type="text" id="pCli" list="dlClientes" autocomplete="off" placeholder="Opcional: se vazio, tenta reconhecer pelos nomes salvos"></label>
+        <label>Responsável <select id="pResp"><option>Davi</option><option>Fábio</option><option>Equipe</option></select></label>
+      </div>
+      <div class="acts"><button class="btn" id="pBuscar" type="button">Buscar no DJEN e cadastrar</button><button class="btn danger" id="pParar" type="button" hidden>Parar</button><span class="hint" id="pStatus"></span></div>
+      <ul class="mini" id="pRelat"></ul>
+      <datalist id="dlClientes"></datalist>
+    </div>
+    <div class="panel">
+      <div class="hd"><h2>Pastas de processos <span class="hint" id="pContagem"></span></h2>
+        <div class="acts"><input type="text" id="pBusca" placeholder="Buscar nº, cliente, parte…" aria-label="Buscar nas pastas"><select id="pStatusF" aria-label="Situação"><option value="ativo">Ativos</option><option value="arquivado">Arquivados</option><option value="todos">Todos</option></select><button class="btn sec sm" id="pAtualizarTodas" type="button">Atualizar andamentos</button></div></div>
+      <div class="acts" id="pPastas"></div>
+      <div class="list" id="pTabela"></div>
+    </div>
+  </div>
+  <div id="pDetalhe" hidden></div>
+</section>
+
 <!-- ===================== RELATÓRIOS ===================== -->
 <section class="view" id="v-relatorios" hidden>
   <div class="relbar noprint" id="relBar">
@@ -362,7 +406,7 @@ a.btn{text-decoration:none;display:inline-block}
   </div>
   <div class="cols2">
     <div class="panel"><h2>Rotina do escritório</h2><div id="rotina"></div><div class="hint">Os itens reiniciam sozinhos a cada dia, semana ou mês.</div></div>
-    <div class="panel"><h2>Prazos nos próximos 14 dias</h2><div id="orgPrazos"></div></div>
+    <div class="panel"><h2>Agenda dos próximos 14 dias <span class="hint">audiências, prazos dos processos e tarefas</span></h2><div id="orgPrazos"></div></div>
   </div>
   <div class="panel"><h2>Sugestões para começar a organizar o escritório</h2>
     <div class="ideas" id="ideias"></div></div>
@@ -372,6 +416,44 @@ a.btn{text-decoration:none;display:inline-block}
 </main>
 </div>
 </div>
+
+<dialog id="dlgAud">
+  <form method="dialog" id="fAud">
+    <h2>Audiência</h2>
+    <label>Tipo <input type="text" id="auTipo" autocomplete="off" placeholder="Ex.: Conciliação, Instrução, Una"></label>
+    <div class="grid">
+      <label>Data <input type="date" id="auData" required></label>
+      <label>Hora <input type="time" id="auHora"></label>
+      <label>Responsável <select id="auResp"><option>Fábio</option><option>Davi</option><option>Equipe</option></select></label>
+    </div>
+    <label>Local / link <input type="text" id="auLocal" autocomplete="off" placeholder="Sala, vara ou link da videoconferência"></label>
+    <label>Observações <textarea id="auObs"></textarea></label>
+    <div class="acts" style="justify-content:flex-end"><button class="btn sec" type="button" id="auCancel">Cancelar</button><button class="btn" type="submit">Salvar</button></div>
+  </form>
+</dialog>
+
+<dialog id="dlgPrazo">
+  <form method="dialog" id="fPrazo">
+    <h2>Prazo</h2>
+    <label>Descrição <input type="text" id="pzDesc" required autocomplete="off" placeholder="Ex.: Contestação, Manifestação sobre laudo"></label>
+    <fieldset class="calc">
+      <legend>Calculadora (estimativa)</legend>
+      <div class="grid">
+        <label>Disponibilização no DJEN <input type="date" id="pzDisp"></label>
+        <label>Dias <input type="number" id="pzDias" min="1" max="365" value="15"></label>
+        <label>Contagem <select id="pzTipo"><option value="uteis">Dias úteis (CPC)</option><option value="corridos">Dias corridos</option></select></label>
+      </div>
+      <div class="acts"><button class="btn sec sm" type="button" id="pzCalc">Calcular vencimento</button><span class="hint" id="pzEst"></span></div>
+    </fieldset>
+    <div class="grid">
+      <label>Vencimento (prazo fatal) <input type="date" id="pzData" required></label>
+      <label>Responsável <select id="pzResp"><option>Fábio</option><option>Davi</option><option>Equipe</option></select></label>
+    </div>
+    <div class="hint" id="pzInt"></div>
+    <label>Observações <textarea id="pzObs"></textarea></label>
+    <div class="acts" style="justify-content:flex-end"><button class="btn sec" type="button" id="pzCancel">Cancelar</button><button class="btn" type="submit">Salvar</button></div>
+  </form>
+</dialog>
 
 <dialog id="dlgTarefa">
   <form method="dialog" id="fTarefa">
@@ -652,7 +734,8 @@ function desenhar() {
     const c = el("article", "card" + (g.passivo ? " passivo" : "")), top = el("div", "top");
     const num = el("span", "num", g.processo); top.appendChild(num);
     const cp = el("button", "copy", "copiar"); cp.type = "button"; cp.onclick = () => copiar(g.processo, cp);
-    top.append(cp, el("span", "tag", g.tribunal));
+    const bp = el("button", "copy", PROCS.some(x => x.chave === g.chave) ? "abrir pasta" : "criar pasta"); bp.type = "button"; bp.onclick = () => { const ex = PROCS.find(x => x.chave === g.chave); if (ex) abrirPasta(ex.id); else cadastrarRapido(g.processo, { cliente: E.busca && E.busca.nomes && E.termos.length === 1 ? E.busca.nomes : "" }); };
+    top.append(cp, bp, el("span", "tag", g.tribunal));
     if (g.dist) top.appendChild(el("span", "tag dist", "Distribuição"));
     if (g.polo) top.appendChild(el("span", "tag" + (g.passivo ? " crit" : ""), "Polo " + g.polo));
     if (g.temDoc) top.appendChild(el("span", "tag ok", "CPF/CNPJ no texto"));
@@ -998,12 +1081,12 @@ const ehNova = p => !(AD.estado[p.id] && AD.estado[p.id].tratada);
 
 function advSalvar() {
   const ids = Object.keys(AD.pubs);
-  if (ids.length > 2500) { ids.sort((a, b) => (AD.pubs[b].data || "").localeCompare(AD.pubs[a].data || "")); for (const id of ids.slice(2500)) delete AD.pubs[id]; }
+  if (ids.length > 1500) { ids.sort((a, b) => (AD.pubs[b].data || "").localeCompare(AD.pubs[a].data || "")); for (const id of ids.slice(1500)) delete AD.pubs[id]; }
   if (!LS.set("adv.pubs", AD.pubs)) { for (const id in AD.pubs) AD.pubs[id].texto = AD.pubs[id].texto.slice(0, 400); LS.set("adv.pubs", AD.pubs); }
   LS.set("adv.estado", AD.estado); LS.set("adv.meta", AD.meta);
 }
 function slim(it, quem) {
-  return { id: it.id, data: it.data, tribunal: it.tribunal, tipo: it.tipo, docTipo: it.docTipo, processo: it.processo, chave: it.chave, classe: it.classe, orgao: it.orgao, link: it.link, texto: it.texto.slice(0, 1200), dest: it.dest.slice(0, 10), quem, visto: Date.now() };
+  return { id: it.id, data: it.data, tribunal: it.tribunal, tipo: it.tipo, docTipo: it.docTipo, processo: it.processo, chave: it.chave, classe: it.classe, orgao: it.orgao, link: it.link, texto: it.texto.slice(0, 900), dest: it.dest.slice(0, 10), quem, visto: Date.now() };
 }
 const prazoNoTexto = t => { const m = /prazo\s+(?:legal\s+)?(?:de\s+)?(\d{1,3})\s*(?:\([^)]*\)\s*)?(dias|horas|dia|hora)/i.exec(t || ""); return m ? m[1] + " " + m[2].toLowerCase() : ""; };
 
@@ -1025,7 +1108,7 @@ async function advCarregar(dias, silencioso) {
       }
       advDesenhar();
     }
-    AD.meta.ultima = Date.now(); advSalvar();
+    AD.meta.ultima = Date.now(); advSalvar(); if (typeof procsMesclarAdv === "function") procsMesclarAdv();
     st("Atualizado às " + new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) + (novos ? " · " + novos + " publicação(ões) nova(s)" : " · nada novo"));
     if (novos && !primeira) advAvisarNovas(novos);
   } catch (e) { st(""); const [t, err] = erroAmigavel(e); aviso("advMsg", t, err); }
@@ -1071,7 +1154,8 @@ function advCard(p) {
   const pz = prazoNoTexto(p.texto); if (pz) top.appendChild(Object.assign(el("span", "tag warn", "texto cita prazo de " + pz), { title: "Detectado no texto da publicação. Confira o prazo e a contagem no processo." }));
   c.appendChild(top);
   const l2 = el("div", "top"), num = el("span", "num", p.processo), cp = el("button", "copy", "copiar"); cp.type = "button"; cp.onclick = () => copiar(p.processo, cp);
-  l2.append(num, cp); c.appendChild(l2);
+  const bp = el("button", "copy", PROCS.some(x => x.chave === p.chave) ? "abrir pasta" : "criar pasta"); bp.type = "button"; bp.onclick = () => { const ex = PROCS.find(x => x.chave === p.chave); if (ex) abrirPasta(ex.id); else cadastrarRapido(p.processo, {}); };
+  l2.append(num, cp, bp); c.appendChild(l2);
   c.appendChild(Object.assign(el("div", "row"), {})); c.lastChild.append(el("span", "", titulo(p.classe)), el("span", "", p.orgao));
   if (p.dest.length) { const pt = el("div", "partes"); pt.appendChild(el("b", "", "Partes: ")); pt.appendChild(document.createTextNode(p.dest.slice(0, 6).map(d => d.nome + (d.polo === "P" ? " (passivo)" : d.polo === "A" ? " (ativo)" : "")).join("; ") + (p.dest.length > 6 ? " e outros" : ""))); c.appendChild(pt); }
   const ex = el("div", "exc", p.texto || "(sem texto)"); ex.title = "Clique para ver o texto completo"; ex.style.cursor = "pointer"; ex.onclick = () => ex.classList.toggle("open"); c.appendChild(ex);
@@ -1107,6 +1191,354 @@ function advIniciar() {
   // carga inicial / atualização ao abrir o site
   if (!AD.meta.ultima) setTimeout(() => advCarregar(30, true), 800);
   else if (Date.now() - AD.meta.ultima > 10 * 60 * 1000) setTimeout(() => advCarregar(Math.min(30, Math.max(5, Math.ceil((Date.now() - AD.meta.ultima) / 864e5) + 3)), true), 800);
+}
+
+
+/* ===== 35-processos: pastas de processos com cadastro automático pelo número (DJEN), audiências, prazos e tarefas ===== */
+let PROCS = LS.get("procs", []);
+const P = { sel: null, aba: "andamento", rodando: false, ctl: { parar: false }, pasta: "", filtroStatus: "ativo" };
+const salvarProcs = () => LS.set("procs", PROCS);
+const chaveDe = s => String(s || "").replace(/\D/g, "");
+const procPorChave = c => PROCS.find(p => p.chave === c);
+const RESPS = ["Fábio", "Davi", "Equipe"];
+
+// ---------- número CNJ: máscara, dígito verificador, tribunal
+const RE_CNJ = /\d{7}-?\d{2}\.?\d{4}\.?\d\.?\d{2}\.?\d{4}/g;
+const mascara = c => c.slice(0, 7) + "-" + c.slice(7, 9) + "." + c.slice(9, 13) + "." + c.slice(13, 14) + "." + c.slice(14, 16) + "." + c.slice(16, 20);
+function dvCnjOk(c) { if (!/^\d{20}$/.test(c)) return false; const n = BigInt(c.slice(0, 7) + c.slice(9, 20) + "00"); return 98n - n % 97n === BigInt(c.slice(7, 9)); }
+const UF_TR = { "01": "AC", "02": "AL", "03": "AP", "04": "AM", "05": "BA", "06": "CE", "08": "ES", "09": "GO", "10": "MA", "11": "MT", "12": "MS", "13": "MG", "14": "PA", "15": "PB", "16": "PR", "17": "PE", "18": "PI", "19": "RJ", "20": "RN", "21": "RS", "22": "RO", "23": "RR", "24": "SC", "25": "SE", "26": "SP", "27": "TO" };
+function tribunalDe(c) {
+  const j = c[13], tr = c.slice(14, 16);
+  if (j === "8") return tr === "07" ? "TJDFT" : "TJ" + (UF_TR[tr] || tr);
+  if (j === "5") return tr === "00" ? "TST" : "TRT" + (+tr);
+  if (j === "4") return "TRF" + (+tr);
+  if (j === "3") return "STJ"; if (j === "1") return "STF";
+  if (j === "6") return "TRE-" + (UF_TR[tr] || tr);
+  return j === "7" || j === "9" ? "TJM" : "";
+}
+
+// ---------- calendário: estimativa de prazo (dias úteis, feriados nacionais e recesso 20/12–20/01). SEMPRE conferir no tribunal.
+function pascoa(y) { const a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451), mes = Math.floor((h + l - 7 * m + 114) / 31), dia = (h + l - 7 * m + 114) % 31 + 1; return new Date(y, mes - 1, dia, 12); }
+const feriadosCache = {};
+function feriados(y) {
+  if (feriadosCache[y]) return feriadosCache[y];
+  const s = new Set(["01-01", "04-21", "05-01", "09-07", "10-12", "11-02", "11-15", "11-20", "12-25"].map(x => y + "-" + x));
+  const p = pascoa(y); const sx = new Date(p); sx.setDate(p.getDate() - 2); s.add(iso(sx));
+  const cn = new Date(p); cn.setDate(p.getDate() - 47); s.add(iso(cn)); // Carnaval (segunda e terça): suspensão comum nos tribunais
+  const cn2 = new Date(p); cn2.setDate(p.getDate() - 48); s.add(iso(cn2));
+  const cc = new Date(p); cc.setDate(p.getDate() + 60); s.add(iso(cc)); // Corpus Christi
+  return feriadosCache[y] = s;
+}
+function diaUtil(d) {
+  const wd = d.getDay(); if (wd === 0 || wd === 6) return false;
+  const m = d.getMonth() + 1, dia = d.getDate(); if ((m === 12 && dia >= 20) || (m === 1 && dia <= 20)) return false;
+  return !feriados(d.getFullYear()).has(iso(d));
+}
+function proximoUtil(d) { const x = new Date(d); do { x.setDate(x.getDate() + 1); } while (!diaUtil(x)); return x; }
+function estimarFatal(dispIso, dias, corridos) {
+  let pub = proximoUtil(new Date(dispIso + "T12:00:00")); // publicação = 1º dia útil após a disponibilização (CPC, art. 224, §2º)
+  let x = new Date(pub);
+  if (corridos) { x.setDate(x.getDate() + dias); while (!diaUtil(x)) x.setDate(x.getDate() + 1); }
+  else for (let n = 0; n < dias; n++) x = proximoUtil(x);
+  return { publicacao: iso(pub), fatal: iso(x) };
+}
+
+// ---------- consulta ao DJEN por número e montagem da pasta
+async function buscarProcessoDjen(chave, ctl, st) {
+  const { todos } = await buscarTudo({ numeroProcesso: chave }, ctl, mascara(chave), st, 4);
+  return todos.map(i => montarItem(i, "", "", ""));
+}
+const mascarado = n => /^([A-ZÀ-Ú]\.)+$/.test((n || "").trim());
+function aplicarItens(p, itens) {
+  const conhecidos = new Set(p.pubs.map(x => x.id)); let novas = 0;
+  for (const it of itens) { if (conhecidos.has(it.id)) continue; conhecidos.add(it.id); novas++; p.pubs.push({ id: it.id, data: it.data, tipo: it.tipo, docTipo: it.docTipo, link: it.link, texto: it.texto.slice(0, 700), orgao: it.orgao }); }
+  p.pubs.sort((a, b) => b.data.localeCompare(a.data)); p.pubs = p.pubs.slice(0, 150);
+  if (itens.length) {
+    const rec = itens.slice().sort((a, b) => b.data.localeCompare(a.data))[0];
+    if (!p.classeEditada && rec.classe) p.classe = titulo(rec.classe); if (rec.orgao) p.orgao = rec.orgao;
+    const mp = new Map(p.partes.map(d => [norm(d.nome) + "|" + d.polo, d]));
+    for (const it of itens) for (const d of it.dest) if (d.nome && !mp.has(norm(d.nome) + "|" + d.polo)) mp.set(norm(d.nome) + "|" + d.polo, d);
+    p.partes = [...mp.values()].sort((a, b) => (mascarado(a.nome) ? 1 : 0) - (mascarado(b.nome) ? 1 : 0)).slice(0, 40);
+    const ma = new Map(p.advs.map(a => [a.num + "/" + a.uf, a]));
+    for (const it of itens) for (const o of it.oabs) if (o.num && !ma.has(o.num + "/" + o.uf)) ma.set(o.num + "/" + o.uf, o);
+    p.advs = [...ma.values()].slice(0, 20);
+  }
+  return novas;
+}
+function sugerirCliente(p) {
+  for (const n of lerLista()) { const t = " " + norm(n.nome) + " "; if (t.trim() && p.partes.some(x => (" " + norm(x.nome) + " ").includes(t))) return { nome: n.nome }; }
+  return null;
+}
+function poloDoCliente(p) {
+  if (!p.cliente) return ""; const t = " " + norm(p.cliente) + " ", d = p.partes.find(x => (" " + norm(x.nome) + " ").includes(t));
+  return d ? (d.polo === "P" ? "Passivo" : d.polo === "A" ? "Ativo" : "") : "";
+}
+function novaPasta(chave, opc) {
+  return { id: uid(), numero: mascara(chave), chave, tribunal: tribunalDe(chave), cliente: (opc && opc.cliente) || "", resp: (opc && opc.resp) || "Davi", status: "ativo", polo: "", classe: "", orgao: "", linkPasta: "", nota: "", pubs: [], partes: [], advs: [], audiencias: [], prazos: [], ignoradas: [], criado: Date.now(), atualizado: 0, semDjen: false };
+}
+// publicações já carregadas na tela Advogados entram nas pastas sem nova consulta
+function procsMesclarAdv() {
+  let mudou = false;
+  for (const p of PROCS) {
+    const itens = Object.values(AD.pubs).filter(x => x.chave === p.chave && !p.pubs.some(y => y.id === x.id));
+    if (!itens.length) continue;
+    aplicarItens(p, itens.map(x => ({ id: x.id, data: x.data, tipo: x.tipo, docTipo: x.docTipo, link: x.link, texto: x.texto, orgao: x.orgao, classe: x.classe, dest: x.dest || [], oabs: [] })));
+    p.semDjen = false; mudou = true;
+  }
+  if (mudou) { salvarProcs(); if (typeof procDesenhar === "function" && !$("v-processos").hidden) procDesenhar(); }
+}
+
+async function cadastrarNumeros(texto, opc, linha) {
+  const nums = [...new Set((texto.match(RE_CNJ) || []).map(chaveDe))], ids = [];
+  if (!nums.length) { linha("", "Não encontrei nenhum número de processo no formato CNJ (0000000-00.0000.0.00.0000).", "err"); return ids; }
+  P.rodando = true; P.ctl = { parar: false }; $("pBuscar").disabled = true; $("pParar").hidden = false;
+  const st = t => { $("pStatus").textContent = t; };
+  try {
+    for (let k = 0; k < nums.length; k++) {
+      const c = nums[k], rot = mascara(c);
+      if (!dvCnjOk(c)) { linha(rot, "dígito verificador inválido: confira o número digitado.", "err"); continue; }
+      let p = procPorChave(c), novo = !p; if (!p) p = novaPasta(c, opc); else { if (opc.cliente && !p.cliente) p.cliente = opc.cliente; }
+      st("(" + (k + 1) + "/" + nums.length + ") Buscando " + rot + " no DJEN…");
+      let itens;
+      try { itens = await buscarProcessoDjen(c, P.ctl, t => st("(" + (k + 1) + "/" + nums.length + ") " + t)); }
+      catch (e) { if (e && e.parado) { linha(rot, "interrompido.", "warn"); break; } const [m] = erroAmigavel(e); linha(rot, m, "err"); if (e && e.rede) break; continue; }
+      const antes = p.pubs.length, novas = aplicarItens(p, itens); p.atualizado = Date.now(); p.semDjen = !p.pubs.length;
+      if (!p.cliente) { const s = sugerirCliente(p); if (s) p.cliente = s.nome; }
+      p.polo = p.polo || poloDoCliente(p);
+      if (novo) PROCS.push(p); salvarProcs(); ids.push(p.id); procDesenhar();
+      const sug = sugestoes(p), extra = (sug.aud.length ? " · " + sug.aud.length + " audiência(s) detectada(s)" : "") + (sug.prazos.length ? " · " + sug.prazos.length + " prazo(s) citado(s)" : "");
+      if (!p.pubs.length) linha(rot, (novo ? "pasta criada" : "já existia") + " (" + p.tribunal + "), mas o DJEN não tem publicação deste processo (segredo de justiça ou ainda sem publicação). Complete os dados manualmente.", "warn");
+      else linha(rot, (novo ? "pasta criada" : "pasta atualizada, " + novas + " publicação(ões) nova(s)") + " · " + p.tribunal + " · " + (p.classe || "sem classe") + " · " + p.pubs.length + " publicação(ões)" + (p.cliente ? " · cliente: " + p.cliente : " · defina o cliente") + extra, "ok");
+    }
+    st("Concluído às " + new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) + ".");
+  } finally { P.rodando = false; $("pBuscar").disabled = false; $("pParar").hidden = true; }
+  return ids;
+}
+async function atualizarPasta(p, ctl) {
+  const itens = await buscarProcessoDjen(p.chave, ctl || { parar: false }, t => { $("pStatus").textContent = t; });
+  const n = aplicarItens(p, itens); p.atualizado = Date.now(); p.semDjen = !p.pubs.length; p.polo = p.polo || poloDoCliente(p); salvarProcs(); return n;
+}
+async function atualizarTodas() {
+  if (P.rodando) return; const lista = PROCS.filter(p => p.status !== "arquivado");
+  if (!lista.length) return; P.rodando = true; P.ctl = { parar: false }; $("pParar").hidden = false; $("pAtualizarTodas").disabled = true; let novas = 0;
+  try { for (let k = 0; k < lista.length; k++) { $("pStatus").textContent = "Atualizando " + (k + 1) + "/" + lista.length + " · " + lista[k].numero; novas += await atualizarPasta(lista[k], P.ctl); procDesenhar(); } $("pStatus").textContent = "Atualização concluída: " + novas + " publicação(ões) nova(s) em " + lista.length + " processo(s)."; }
+  catch (e) { if (!(e && e.parado)) { const [m] = erroAmigavel(e); $("pStatus").textContent = m; } else $("pStatus").textContent = "Interrompido."; }
+  P.rodando = false; $("pParar").hidden = true; $("pAtualizarTodas").disabled = false; procDesenhar(); atualizarBadges();
+}
+async function cadastrarRapido(numero, opc) {
+  location.hash = "#processos"; P.sel = null; procDesenhar(); $("pNums").value = numero; if (opc && opc.cliente) $("pCli").value = opc.cliente; if (opc && opc.resp) $("pResp").value = opc.resp;
+  const ids = await cadastrarNumeros(numero, { cliente: $("pCli").value.trim(), resp: $("pResp").value }, pLinha);
+  if (ids.length === 1) abrirPasta(ids[0]);
+}
+
+// ---------- sugestões automáticas lidas das publicações (o advogado confirma)
+function sugestoes(p) {
+  const aud = [], prazos = [], visto = new Set(p.audiencias.map(a => a.data));
+  for (const pub of p.pubs) {
+    if (p.ignoradas.includes(pub.id)) continue; const t = pub.texto || "";
+    const re = /audi[eê]ncia/gi; let m;
+    while ((m = re.exec(t))) {
+      const seg = t.slice(m.index, m.index + 200), d = /(\d{2})\/(\d{2})\/(\d{4})/.exec(seg); if (!d) continue;
+      if (!/(design|marc|agend|fixo|intim|compare|para o dia|para dia|data)/i.test(seg.slice(0, d.index))) continue;
+      const data = d[3] + "-" + d[2] + "-" + d[1]; if (visto.has(data)) continue; visto.add(data);
+      const h = /(\d{1,2})\s*(?:[:h]|horas?)\s*(\d{2})?/.exec(seg.slice(d.index + 10, d.index + 40));
+      const hora = h ? String(h[1]).padStart(2, "0") + ":" + (h[2] || "00") : "";
+      const tp = /(inicial|concilia[cç][aã]o|instru[cç][aã]o|una|julgamento|saneamento|justifica[cç][aã]o)/i.exec(seg.slice(0, d.index)); const tipo = tp ? cap(tp[1].toLowerCase().replace("conciliacao", "conciliação").replace("instrucao", "instrução").replace("justificacao", "justificação")) : "";
+      aud.push({ pubId: pub.id, data, hora, tipo, trecho: seg.slice(0, 160), futura: data >= hojeIso() });
+    }
+    if (/intima/i.test(pub.tipo)) { const z = prazoNoTexto(pub.texto); const mm = /(\d{1,3})\s*(dias|dia)/.exec(z); if (mm && /dias?/.test(z)) prazos.push({ pubId: pub.id, dias: +mm[1], disp: pub.data, texto: z }); }
+  }
+  return { aud: aud.filter(a => a.futura).slice(0, 5), prazos: prazos.slice(0, 4) };
+}
+
+// ---------- agenda geral (audiências + prazos + tarefas)
+function agendaItens() {
+  const out = [];
+  for (const p of PROCS) {
+    if (p.status === "arquivado") continue;
+    for (const a of p.audiencias) if (!a.feita) out.push({ tipo: "Audiência", data: a.data, hora: a.hora || "", titulo: (a.tipo ? a.tipo + " · " : "") + p.numero, resp: a.resp || p.resp, procId: p.id });
+    for (const z of p.prazos) if (!z.cumprido) out.push({ tipo: "Prazo", data: z.data, hora: "", titulo: z.desc + " · " + p.numero, resp: z.resp || p.resp, procId: p.id });
+  }
+  for (const t of TAREFAS) if (t.status !== "concluida" && t.prazo) out.push({ tipo: "Tarefa", data: t.prazo, hora: "", titulo: t.titulo, resp: t.resp, tarefaId: t.id });
+  return out.sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora));
+}
+const agendaAtrasada = e => e.tipo !== "Audiência" && e.data < hojeIso();
+function totalAtrasos() { return agendaItens().filter(agendaAtrasada).length; }
+function agendaLi(e) {
+  const li = el("li"), atr = agendaAtrasada(e);
+  li.append(el("b", "", br(e.data) + (e.hora ? " " + e.hora : "")), el("span", "tag" + (atr ? " crit" : e.tipo === "Audiência" ? " dist" : ""), atr ? "Atrasado · " + e.tipo : e.tipo + " · " + e.resp), document.createTextNode(e.titulo));
+  li.style.cursor = "pointer"; li.onclick = () => e.procId ? abrirPasta(e.procId) : abrirTarefa(null, e.tarefaId); return li;
+}
+
+// ---------- telas
+function abrirPasta(id) { P.sel = id; P.aba = "andamento"; if (location.hash !== "#processos") location.hash = "#processos"; else procDesenhar(); }
+function pLinha(rot, msg, tipo) {
+  const ul = $("pRelat"); const li = el("li"); li.append(el("span", "tag " + (tipo === "ok" ? "ok" : tipo === "err" ? "crit" : "warn"), tipo === "ok" ? "ok" : tipo === "err" ? "erro" : "atenção"));
+  if (rot) li.appendChild(el("b", "num", rot)); li.appendChild(document.createTextNode(msg)); ul.appendChild(li);
+}
+function procEventoProximo(p) {
+  const ev = agendaItens().filter(e => e.procId === p.id)[0]; return ev ? ev : null;
+}
+function procDesenhar() {
+  const p = P.sel && PROCS.find(x => x.id === P.sel); if (P.sel && !p) P.sel = null;
+  $("pLista").hidden = !!p; $("pDetalhe").hidden = !p;
+  const dl = $("dlClientes"); dl.textContent = ""; for (const c of new Set([...lerLista().map(n => n.nome), ...PROCS.map(x => x.cliente).filter(Boolean)])) { const o = el("option"); o.value = c; dl.appendChild(o); }
+  if (p) pDetalhe(p); else pLista();
+}
+function pLista() {
+  const q = norm($("pBusca").value), box = $("pTabela"); box.textContent = "";
+  const clientes = [...new Set(PROCS.map(x => x.cliente || ""))].sort((a, b) => a.localeCompare(b, "pt"));
+  const ch = $("pPastas"); ch.textContent = "";
+  const bt = (rot, val, n) => { const b = el("button", "btn sm" + (P.pasta === val ? "" : " sec"), rot + " (" + n + ")"); b.type = "button"; b.onclick = () => { P.pasta = val; pLista(); }; ch.appendChild(b); };
+  bt("Todas as pastas", "", PROCS.length);
+  for (const c of clientes) bt(c || "Sem cliente", c || "§sem", PROCS.filter(x => (x.cliente || "") === c).length);
+  const filtro = x => (!P.pasta || (P.pasta === "§sem" ? !x.cliente : x.cliente === P.pasta)) && (P.filtroStatus === "todos" || (x.status || "ativo") === P.filtroStatus) && (!q || norm(x.numero + " " + x.cliente + " " + x.classe + " " + x.partes.map(d => d.nome).join(" ")).includes(q));
+  const lista = PROCS.filter(filtro).sort((a, b) => { const ea = procEventoProximo(a), eb = procEventoProximo(b); return (ea ? ea.data : "9999").localeCompare(eb ? eb.data : "9999") || (b.pubs[0] ? b.pubs[0].data : "").localeCompare(a.pubs[0] ? a.pubs[0].data : ""); });
+  $("pContagem").textContent = lista.length + " processo(s)";
+  if (!lista.length) { box.appendChild(el("div", "empty", PROCS.length ? "Nenhum processo com estes filtros." : "Nenhum processo cadastrado. Cole os números acima e clique em “Buscar no DJEN e cadastrar”.")); return; }
+  for (const p of lista) {
+    const c = el("article", "card" + (p.polo === "Passivo" ? " passivo" : "")), top = el("div", "top"), num = el("a", "num", p.numero); num.href = "#processos"; num.onclick = e => { e.preventDefault(); abrirPasta(p.id); };
+    const cp = el("button", "copy", "copiar"); cp.type = "button"; cp.onclick = () => copiar(p.numero, cp);
+    top.append(num, cp, el("span", "tag", p.tribunal)); if (p.polo) top.appendChild(el("span", "tag" + (p.polo === "Passivo" ? " crit" : ""), "Cliente no polo " + p.polo.toLowerCase())); if (p.semDjen) top.appendChild(el("span", "tag warn", "sem publicação no DJEN")); if (p.status === "arquivado") top.appendChild(el("span", "tag", "arquivado"));
+    const sg = sugestoes(p), ns = sg.aud.length + sg.prazos.length; if (ns) top.appendChild(el("span", "tag dist", ns + " sugestão(ões)"));
+    c.appendChild(top);
+    const r = el("div", "row"); r.append(el("span", "", p.classe || "classe não informada"), el("span", "", p.orgao || ""), el("span", "", "Cliente: " + (p.cliente || "—")), el("span", "", "Resp.: " + p.resp), el("span", "", p.pubs.length ? "Última publicação: " + br(p.pubs[0].data) : "Sem publicações")); c.appendChild(r);
+    const ev = procEventoProximo(p); if (ev) { const e = el("div", "partes"); e.append(el("b", "", "Próximo: "), document.createTextNode(ev.tipo + " em " + br(ev.data) + (ev.hora ? " às " + ev.hora : "") + (agendaAtrasada(ev) ? " (atrasado)" : ""))); c.appendChild(e); }
+    box.appendChild(c);
+  }
+}
+
+function campo(rot, ctrl) { const l = el("label", "", rot); l.appendChild(ctrl); return l; }
+function pDetalhe(p) {
+  const box = $("pDetalhe"); box.textContent = "";
+  const salvar = () => { salvarProcs(); atualizarBadges(); };
+  // cabeçalho
+  const hd = el("div", "panel"), t1 = el("div", "hd"), tl = el("div"); const vb = el("button", "btn sec sm", "← Todos os processos"); vb.type = "button"; vb.onclick = () => { P.sel = null; procDesenhar(); };
+  const h = el("h2", "num", p.numero); tl.append(h, el("div", "hint", p.tribunal + " · " + (p.classe || "classe não informada") + (p.orgao ? " · " + p.orgao : "")));
+  const ac = el("div", "acts"); const bc = el("button", "btn sec sm", "copiar nº"); bc.type = "button"; bc.onclick = () => copiar(p.numero, bc);
+  const bu = el("button", "btn sm", "Atualizar andamento"); bu.type = "button"; bu.onclick = async () => { if (P.rodando) return; bu.disabled = true; P.rodando = true; let m = "", er = false; try { const n = await atualizarPasta(p, { parar: false }); m = n ? n + " publicação(ões) nova(s) no DJEN." : "Sem publicações novas no DJEN."; } catch (e) { [m, er] = erroAmigavel(e); } P.rodando = false; pDetalhe(p); aviso("pMsg", m, er); };
+  const ba = el("button", "btn sec sm", p.status === "arquivado" ? "Reativar" : "Arquivar"); ba.type = "button"; ba.onclick = () => { p.status = p.status === "arquivado" ? "ativo" : "arquivado"; salvar(); pDetalhe(p); };
+  const bd = el("button", "btn danger sm", "Excluir pasta"); bd.type = "button"; bd.onclick = () => { if (!confirm("Excluir a pasta deste processo (audiências e prazos cadastrados também)? As tarefas do quadro são mantidas.")) return; PROCS = PROCS.filter(x => x.id !== p.id); salvarProcs(); P.sel = null; procDesenhar(); atualizarBadges(); };
+  ac.append(bc, bu, ba, bd); t1.append(tl, ac); hd.append(vb, t1);
+  const msg = el("div", "msg"); msg.id = "pMsg"; msg.hidden = true; hd.appendChild(msg);
+  // dados
+  const g = el("div", "grid");
+  const iCli = el("input"); iCli.type = "text"; iCli.setAttribute("list", "dlClientes"); iCli.value = p.cliente; iCli.onchange = () => { p.cliente = iCli.value.trim(); p.polo = poloDoCliente(p) || p.polo; salvar(); pDetalhe(p); };
+  const sResp = el("select"); for (const r of RESPS) sResp.appendChild(Object.assign(el("option", "", r), { value: r })); sResp.value = p.resp; sResp.onchange = () => { p.resp = sResp.value; salvar(); };
+  const sPolo = el("select"); for (const [v, n] of [["", "Não definido"], ["Passivo", "Passivo (réu, reclamada)"], ["Ativo", "Ativo (autor, reclamante)"]]) sPolo.appendChild(Object.assign(el("option", "", n), { value: v })); sPolo.value = p.polo || ""; sPolo.onchange = () => { p.polo = sPolo.value; salvar(); };
+  const iVal = el("input"); iVal.type = "text"; iVal.inputMode = "decimal"; iVal.placeholder = "R$ 0,00"; const vm = tomarValoresManuais()[p.chave]; iVal.value = typeof vm === "number" ? vm.toLocaleString("pt-BR", { minimumFractionDigits: 2 }) : ""; iVal.onchange = () => { const v = lerValorBR(iVal.value), m = tomarValoresManuais(); if (v == null) delete m[p.chave]; else m[p.chave] = v; LS.set("valores", m); iVal.value = v == null ? "" : v.toLocaleString("pt-BR", { minimumFractionDigits: 2 }); };
+  const iCls = el("input"); iCls.type = "text"; iCls.value = p.classe; iCls.onchange = () => { p.classe = iCls.value.trim(); p.classeEditada = true; salvar(); };
+  const iLink = el("input"); iLink.type = "text"; iLink.placeholder = "https://… (pasta no Drive, rede ou link do processo)"; iLink.value = p.linkPasta; iLink.onchange = () => { p.linkPasta = iLink.value.trim(); salvar(); pDetalhe(p); };
+  const lk = campo("Link da pasta de arquivos", iLink); lk.classList.add("wide");
+  g.append(campo("Cliente (pasta)", iCli), campo("Responsável", sResp), campo("Polo do cliente", sPolo), campo("Valor da causa (R$)", iVal), campo("Classe", iCls), lk);
+  hd.appendChild(g);
+  if (/^https?:\/\//.test(p.linkPasta)) { const a = el("a", "btn sec sm", "Abrir pasta de arquivos"); a.href = p.linkPasta; a.target = "_blank"; a.rel = "noopener noreferrer"; a.style.width = "fit-content"; hd.appendChild(a); }
+  const nt = el("textarea"); nt.placeholder = "Observações do caso"; nt.value = p.nota; nt.onchange = () => { p.nota = nt.value; salvar(); }; hd.appendChild(campo("Observações", nt));
+  box.appendChild(hd);
+  // abas
+  const tarefas = TAREFAS.filter(t => chaveDe(t.proc) === p.chave), sg = sugestoes(p);
+  const abas = [["andamento", "Andamento (" + p.pubs.length + ")"], ["audiencias", "Audiências (" + p.audiencias.length + (sg.aud.length ? " +" + sg.aud.length : "") + ")"], ["prazos", "Prazos (" + p.prazos.length + (sg.prazos.length ? " +" + sg.prazos.length : "") + ")"], ["tarefas", "Tarefas (" + tarefas.length + ")"], ["partes", "Partes e advogados"]];
+  const tabs = el("div", "tabs"); tabs.setAttribute("role", "tablist");
+  for (const [k, n] of abas) { const b = el("button", "", n); b.type = "button"; b.setAttribute("role", "tab"); b.setAttribute("aria-selected", P.aba === k); b.onclick = () => { P.aba = k; pDetalhe(p); }; tabs.appendChild(b); }
+  box.appendChild(tabs);
+  const corpo = el("div", "panel"); box.appendChild(corpo);
+  if (P.aba === "andamento") pAndamento(p, corpo);
+  else if (P.aba === "audiencias") pAudiencias(p, corpo, sg);
+  else if (P.aba === "prazos") pPrazos(p, corpo, sg);
+  else if (P.aba === "tarefas") pTarefas(p, corpo, tarefas);
+  else pPartes(p, corpo);
+}
+function pAndamento(p, c) {
+  if (!p.pubs.length) { c.appendChild(el("div", "empty", "O DJEN não tem publicações deste processo. Pode ser segredo de justiça, processo sem publicação ou número ainda não distribuído. Use as abas para registrar audiências, prazos e tarefas manualmente.")); return; }
+  c.appendChild(el("div", "hint", "Última busca no DJEN: " + (p.atualizado ? new Date(p.atualizado).toLocaleString("pt-BR") : "—") + ". Novas publicações dos dois advogados entram sozinhas na tela Advogados; use “Atualizar andamento” para consultar este processo."));
+  for (const x of p.pubs.slice(0, 60)) {
+    const d = el("div", "pub"), h = el("div", "h"); h.append(el("b", "", br(x.data)), el("span", "tag" + (/intima/i.test(x.tipo) ? " crit" : ""), x.tipo), x.docTipo && x.docTipo !== x.tipo ? el("span", "tag", x.docTipo) : el("span"));
+    if (/^https:\/\//.test(x.link)) { const a = el("a", "", "abrir documento"); a.href = x.link; a.target = "_blank"; a.rel = "noopener noreferrer"; h.appendChild(a); }
+    const pz = prazoNoTexto(x.texto); if (pz) h.appendChild(el("span", "tag warn", "texto cita prazo de " + pz));
+    const ex = el("div", "exc", x.texto || "(sem texto)"); ex.style.cursor = "pointer"; ex.onclick = () => ex.classList.toggle("open");
+    d.append(h, ex); c.appendChild(d);
+  }
+}
+function linhaEvt(titulo, sub, acoes, classe) { const li = el("li"); if (classe) li.className = classe; li.append(el("b", "", titulo), document.createTextNode(sub)); const a = el("span", "acts"); a.style.marginLeft = "auto"; for (const b of acoes) a.appendChild(b); li.appendChild(a); return li; }
+function btn(txt, fn, cls) { const b = el("button", "btn sm " + (cls || "sec"), txt); b.type = "button"; b.onclick = fn; return b; }
+function pAudiencias(p, c, sg) {
+  const top = el("div", "acts"); top.appendChild(btn("Nova audiência", () => abrirAud(p), "")); c.appendChild(top);
+  if (sg.aud.length) { c.appendChild(el("h3", "", "Detectadas nas publicações (confirme antes de adicionar)")); const ul = el("ul", "mini"); for (const s of sg.aud) ul.appendChild(linhaEvt(br(s.data) + (s.hora ? " " + s.hora : ""), " " + (s.tipo ? s.tipo + " — " : "") + "“…" + s.trecho.slice(0, 120) + "…”", [btn("Adicionar", () => abrirAud(p, { data: s.data, hora: s.hora, tipo: s.tipo, pubId: s.pubId })), btn("Ignorar", () => { p.ignoradas.push(s.pubId); salvarProcs(); pDetalhe(p); })])); c.appendChild(ul); }
+  const lista = p.audiencias.slice().sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora));
+  if (!lista.length) c.appendChild(el("div", "hint", "Nenhuma audiência cadastrada."));
+  const ul = el("ul", "mini"); for (const a of lista) ul.appendChild(linhaEvt(br(a.data) + (a.hora ? " " + a.hora : ""), " " + (a.tipo || "Audiência") + (a.local ? " · " + a.local : "") + " · " + (a.resp || p.resp) + (a.feita ? " · realizada" : a.data < hojeIso() ? " · data passada, dê baixa" : "") + (a.obs ? " — " + a.obs : ""), [btn(a.feita ? "Reabrir" : "Realizada", () => { a.feita = !a.feita; salvarProcs(); pDetalhe(p); atualizarBadges(); }), btn("Editar", () => abrirAud(p, a, a.id)), btn("Excluir", () => { if (confirm("Excluir esta audiência?")) { p.audiencias = p.audiencias.filter(x => x.id !== a.id); salvarProcs(); pDetalhe(p); atualizarBadges(); } }, "danger")], a.feita ? "feito" : ""));
+  c.appendChild(ul);
+}
+function pPrazos(p, c, sg) {
+  const top = el("div", "acts"); top.appendChild(btn("Novo prazo", () => abrirPrazo(p), "")); c.appendChild(top);
+  if (sg.prazos.length) { c.appendChild(el("h3", "", "Prazos citados nas intimações (calcule e confirme)")); const ul = el("ul", "mini"); for (const s of sg.prazos) ul.appendChild(linhaEvt("Intimação de " + br(s.disp), " · texto cita prazo de " + s.texto, [btn("Calcular e adicionar", () => abrirPrazo(p, { desc: "Prazo de " + s.dias + " dias (intimação de " + br(s.disp) + ")", disp: s.disp, dias: s.dias, pubId: s.pubId })), btn("Ignorar", () => { p.ignoradas.push(s.pubId); salvarProcs(); pDetalhe(p); })])); c.appendChild(ul); }
+  const lista = p.prazos.slice().sort((a, b) => (a.cumprido ? 1 : 0) - (b.cumprido ? 1 : 0) || a.data.localeCompare(b.data));
+  if (!lista.length) c.appendChild(el("div", "hint", "Nenhum prazo cadastrado."));
+  const ul = el("ul", "mini"); for (const z of lista) ul.appendChild(linhaEvt(br(z.data), " " + z.desc + " · " + (z.resp || p.resp) + (z.cumprido ? " · cumprido" : z.data < hojeIso() ? " · ATRASADO" : "") + (z.obs ? " — " + z.obs : ""), [btn(z.cumprido ? "Reabrir" : "Cumprido", () => { z.cumprido = !z.cumprido; salvarProcs(); pDetalhe(p); atualizarBadges(); }), btn("Criar tarefa", () => abrirTarefa({ titulo: z.desc + " · " + p.numero, proc: p.numero, cli: p.cliente, resp: z.resp || p.resp, prazo: z.data })), btn("Editar", () => abrirPrazo(p, z, z.id)), btn("Excluir", () => { if (confirm("Excluir este prazo?")) { p.prazos = p.prazos.filter(x => x.id !== z.id); salvarProcs(); pDetalhe(p); atualizarBadges(); } }, "danger")], z.cumprido ? "feito" : ""));
+  c.appendChild(ul);
+  c.appendChild(el("div", "hint", "As datas estimadas pela calculadora consideram dias úteis, feriados nacionais, Carnaval, Corpus Christi e o recesso de 20/12 a 20/01. Feriados locais e suspensões do tribunal não entram: confira sempre no processo."));
+}
+function pTarefas(p, c, tarefas) {
+  const top = el("div", "acts"); top.appendChild(btn("Nova tarefa deste processo", () => abrirTarefa({ titulo: "", proc: p.numero, cli: p.cliente, resp: p.resp }), "")); c.appendChild(top);
+  if (!tarefas.length) { c.appendChild(el("div", "hint", "Nenhuma tarefa ligada a este processo. As tarefas aparecem também no quadro da tela Organização.")); return; }
+  const ul = el("ul", "mini"); for (const t of tarefas) ul.appendChild(linhaEvt(t.prazo ? br(t.prazo) : "sem prazo", " " + t.titulo + " · " + t.resp + " · " + (COLS.find(x => x[0] === t.status) || ["", t.status])[1], [btn("Abrir", () => abrirTarefa(null, t.id))], t.status === "concluida" ? "feito" : "")); c.appendChild(ul);
+}
+function pPartes(p, c) {
+  c.appendChild(el("h3", "", "Partes (conforme as publicações do DJEN)"));
+  if (!p.partes.length) c.appendChild(el("div", "hint", "Sem partes informadas."));
+  const ul = el("ul", "mini"); for (const d of p.partes) { const li = el("li"); li.append(el("span", "tag" + (d.polo === "P" ? " crit" : ""), d.polo === "P" ? "Passivo" : d.polo === "A" ? "Ativo" : d.polo || "—"), document.createTextNode(d.nome + (mascarado(d.nome) ? " (nome abreviado pelo tribunal)" : ""))); ul.appendChild(li); } c.appendChild(ul);
+  c.appendChild(el("h3", "", "Advogados citados"));
+  const ua = el("ul", "mini"); for (const a of p.advs) ua.appendChild(Object.assign(el("li", "", a.nome + " · OAB/" + a.uf + " " + a.num))); if (!p.advs.length) ua.appendChild(el("li", "hint", "Nenhum advogado informado.")); c.appendChild(ua);
+}
+
+// ---------- diálogos de audiência e prazo
+let audEd = null, audPub = null, prazoEd = null, prazoPub = null, procDlg = null;
+function abrirAud(p, v, id) {
+  procDlg = p; audEd = id || null; audPub = (v && v.pubId) || null; v = v || {};
+  $("auTipo").value = v.tipo || ""; $("auData").value = v.data || ""; $("auHora").value = v.hora || ""; $("auLocal").value = v.local || ""; $("auResp").value = v.resp || p.resp; $("auObs").value = v.obs || "";
+  $("dlgAud").showModal(); $("auData").focus();
+}
+$("auCancel").onclick = () => $("dlgAud").close();
+$("fAud").addEventListener("submit", e => {
+  e.preventDefault(); const p = procDlg; if (!p) return;
+  const d = { tipo: $("auTipo").value.trim(), data: $("auData").value, hora: $("auHora").value, local: $("auLocal").value.trim(), resp: $("auResp").value, obs: $("auObs").value.trim() }; if (!d.data) return;
+  if (audEd) Object.assign(p.audiencias.find(x => x.id === audEd) || {}, d); else p.audiencias.push(Object.assign({ id: uid() }, d));
+  if (audPub) p.ignoradas.push(audPub);
+  salvarProcs(); $("dlgAud").close(); pDetalhe(p); atualizarBadges();
+});
+function abrirPrazo(p, v, id) {
+  procDlg = p; prazoEd = id || null; prazoPub = (v && v.pubId) || null; v = v || {};
+  $("pzDesc").value = v.desc || ""; $("pzData").value = v.data || ""; $("pzResp").value = v.resp || p.resp; $("pzObs").value = v.obs || "";
+  $("pzDisp").value = v.disp || ""; $("pzDias").value = v.dias || "15"; $("pzTipo").value = "uteis"; $("pzEst").textContent = ""; pzInterno();
+  $("dlgPrazo").showModal(); $(v.disp ? "pzData" : "pzDesc").focus();
+}
+function pzInterno() { const f = $("pzData").value; $("pzInt").textContent = f ? "Sugestão de prazo interno (2 dias úteis antes): " + br(prazoInterno(f)) : ""; }
+$("pzData").addEventListener("change", pzInterno);
+$("pzCalc").onclick = () => {
+  const d = $("pzDisp").value, n = +$("pzDias").value; if (!d || !n) { $("pzEst").textContent = "Informe a data da disponibilização no DJEN e o número de dias."; return; }
+  const r = estimarFatal(d, n, $("pzTipo").value === "corridos"); $("pzData").value = r.fatal; pzInterno();
+  $("pzEst").textContent = "Estimativa: publicação em " + br(r.publicacao) + ", vencimento em " + br(r.fatal) + ". Confira no calendário do tribunal (feriados locais, suspensões).";
+};
+$("pzCancel").onclick = () => $("dlgPrazo").close();
+$("fPrazo").addEventListener("submit", e => {
+  e.preventDefault(); const p = procDlg; if (!p) return;
+  const d = { desc: $("pzDesc").value.trim(), data: $("pzData").value, resp: $("pzResp").value, obs: $("pzObs").value.trim() }; if (!d.desc || !d.data) return;
+  if (prazoEd) Object.assign(p.prazos.find(x => x.id === prazoEd) || {}, d); else p.prazos.push(Object.assign({ id: uid() }, d));
+  if (prazoPub) p.ignoradas.push(prazoPub);
+  salvarProcs(); $("dlgPrazo").close(); pDetalhe(p); atualizarBadges();
+});
+
+function procIniciar() {
+  $("pBuscar").onclick = async () => {
+    const txt = $("pNums").value; $("pRelat").textContent = "";
+    const ids = await cadastrarNumeros(txt, { cliente: $("pCli").value.trim(), resp: $("pResp").value }, pLinha);
+    if (ids.length === 1 && (txt.match(RE_CNJ) || []).length === 1) abrirPasta(ids[0]); else procDesenhar();
+  };
+  $("pParar").onclick = () => { P.ctl.parar = true; };
+  $("pAtualizarTodas").onclick = atualizarTodas;
+  $("pBusca").addEventListener("input", pLista);
+  $("pStatusF").addEventListener("change", () => { P.filtroStatus = $("pStatusF").value; pLista(); });
+  procsMesclarAdv();
 }
 
 
@@ -1155,7 +1587,7 @@ function tkCard(t) {
   if (t.prazo) m.appendChild(el("span", atrasada(t) ? "tag crit" : "tag", (atrasada(t) ? "Atrasada · " : "Prazo ") + br(t.prazo)));
   if (t.cli) m.appendChild(el("span", "", t.cli));
   c.appendChild(m);
-  if (t.proc) c.appendChild(el("div", "m", t.proc));
+  if (t.proc) { const dm = el("div", "m", t.proc + " "), pp = PROCS.find(x => x.chave === chaveDe(t.proc)); if (pp) { const a = el("a", "", "abrir pasta"); a.href = "#processos"; a.onclick = e => { e.preventDefault(); abrirPasta(pp.id); }; dm.appendChild(a); } c.appendChild(dm); }
   const mv = el("div", "mv"), i = COLS.findIndex(x => x[0] === t.status);
   const bt = (txt, d, tit) => { const b = el("button", "btn sec sm", txt); b.type = "button"; b.title = tit; b.onclick = () => { t.status = COLS[i + d][0]; if (t.status === "concluida") t.concluidaEm = Date.now(); salvarTarefas(); orgDesenhar(); }; return b; };
   if (i > 0) mv.appendChild(bt("←", -1, "Mover para " + COLS[i - 1][1])); if (i < COLS.length - 1) mv.appendChild(bt("→", 1, "Mover para " + COLS[i + 1][1]));
@@ -1177,19 +1609,19 @@ function orgDesenhar() {
     board.appendChild(col);
   }
   // indicadores
-  const abertas = TAREFAS.filter(t => t.status !== "concluida"), atr = abertas.filter(atrasada).length, sem7 = abertas.filter(t => t.prazo && t.prazo >= hojeIso() && t.prazo <= somaDias(hojeIso(), 7)).length;
+  const ag = agendaItens(), abertas = TAREFAS.filter(t => t.status !== "concluida"), atr = totalAtrasos(), sem7 = ag.filter(e => e.data >= hojeIso() && e.data <= somaDias(hojeIso(), 7)).length;
   const concl = TAREFAS.filter(t => t.status === "concluida" && t.concluidaEm && Date.now() - t.concluidaEm < 30 * 864e5).length;
   const k = $("kpisOrg"); k.textContent = "";
   const K = (v, l, s) => { const d = el("div", "kpi"); d.append(el("div", "v", v), el("div", "l", l)); if (s) d.appendChild(el("div", "s", s)); return d; };
-  k.append(K(abertas.length, "Tarefas em aberto", "Fábio " + abertas.filter(t => t.resp === "Fábio").length + " · Davi " + abertas.filter(t => t.resp === "Davi").length + " · Equipe " + abertas.filter(t => t.resp === "Equipe").length), K(atr, "Atrasadas", atr ? "Atenção: prazo vencido" : "Nenhuma"), K(sem7, "Prazos nos próximos 7 dias"), K(concl, "Concluídas em 30 dias"));
-  // prazos 14 dias
+  k.append(K(abertas.length, "Tarefas em aberto", "Fábio " + abertas.filter(t => t.resp === "Fábio").length + " · Davi " + abertas.filter(t => t.resp === "Davi").length + " · Equipe " + abertas.filter(t => t.resp === "Equipe").length), K(atr, "Atrasados", atr ? "Atenção: prazo vencido (tarefas e prazos dos processos)" : "Nenhum"), K(sem7, "Agenda dos próximos 7 dias", "audiências, prazos e tarefas"), K(concl, "Concluídas em 30 dias"));
   const pz = $("orgPrazos"); pz.textContent = "";
-  const lista = abertas.filter(t => t.prazo && t.prazo <= somaDias(hojeIso(), 14)).sort((a, b) => a.prazo.localeCompare(b.prazo));
-  if (!lista.length) pz.appendChild(el("div", "hint", "Nenhum prazo cadastrado para os próximos 14 dias."));
-  else { const ul = el("ul", "mini"); for (const t of lista) { const li = el("li"); li.append(el("b", "", br(t.prazo)), el("span", "tag" + (atrasada(t) ? " crit" : ""), atrasada(t) ? "Atrasada" : t.resp), document.createTextNode(t.titulo)); li.style.cursor = "pointer"; li.onclick = () => abrirTarefa(null, t.id); ul.appendChild(li); } pz.appendChild(ul); }
+  const lista = ag.filter(e => e.data <= somaDias(hojeIso(), 14));
+  if (!lista.length) pz.appendChild(el("div", "hint", "Nada agendado para os próximos 14 dias."));
+  else { const ul = el("ul", "mini"); for (const e of lista) ul.appendChild(agendaLi(e)); pz.appendChild(ul); }
+  if (!$("v-processos").hidden) procDesenhar();
   atualizarBadgeOrg(); if (typeof inicioDesenhar === "function") inicioDesenhar();
 }
-function atualizarBadgeOrg() { const n = TAREFAS.filter(atrasada).length, b = $("bdOrg"); b.hidden = !n; b.textContent = n; }
+function atualizarBadgeOrg() { const n = totalAtrasos(), b = $("bdOrg"); b.hidden = !n; b.textContent = n; }
 
 // ---- rotina do escritório (itens reiniciam por dia, semana ou mês)
 const ROTINA = [
@@ -1240,6 +1672,7 @@ function orgIniciar() { $("orgResp").addEventListener("change", orgDesenhar); or
 const VIEWS = {
   inicio: ["Início", "Visão geral do escritório"],
   consulta: ["Consulta DJEN", "Busca por nome da parte no Diário de Justiça Eletrônico Nacional"],
+  processos: ["Processos", "Pastas dos processos: cadastro pelo número, audiências, prazos e tarefas"],
   relatorios: ["Relatórios", "Indicadores e gráficos do cliente pesquisado, prontos para imprimir ou apresentar"],
   advogados: ["Advogados", "Publicações do DJEN em nome de Fábio (OAB/SC 15.044) e Davi (OAB/SC 39.336)"],
   organizacao: ["Organização", "Tarefas, prazos e rotina do escritório"]
@@ -1250,6 +1683,7 @@ function irPara() {
   for (const a of document.querySelectorAll("#nav a")) { if (a.dataset.v === v) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); }
   $("titulo").textContent = VIEWS[v][0]; $("subtitulo").textContent = VIEWS[v][1];
   if (v === "relatorios") relatorioAtualizar();
+  if (v === "processos") procDesenhar();
   if (v === "inicio") inicioDesenhar();
   if (v === "advogados") advDesenhar();
   window.scrollTo(0, 0);
@@ -1266,11 +1700,11 @@ function desenharInicioClientes() {
   }
 }
 function inicioDesenhar() {
-  const novas = Object.values(AD.pubs).filter(ehNova), abertas = TAREFAS.filter(t => t.status !== "concluida"), atr = abertas.filter(atrasada);
+  const novas = Object.values(AD.pubs).filter(ehNova), abertas = TAREFAS.filter(t => t.status !== "concluida"), atr = totalAtrasos();
   const k = $("kpisInicio"); k.textContent = "";
   const K = (v, l, s) => { const d = el("div", "kpi"); d.append(el("div", "v", v), el("div", "l", l)); if (s) d.appendChild(el("div", "s", s)); return d; };
   const proc = E.itens.length ? new Set(E.itens.filter(i => i.exato || !E.termos.length).map(i => i.chave)).size : 0;
-  k.append(K(novas.length, "Publicações novas", "dos dois advogados, ainda não tratadas"), K(abertas.length, "Tarefas em aberto"), K(atr.length, "Tarefas atrasadas", atr.length ? "exigem atenção" : "nenhuma"), K(proc, "Processos na última consulta", E.busca ? E.busca.nomes || "consulta avulsa" : "faça uma consulta"));
+  k.append(K(novas.length, "Publicações novas", "dos dois advogados, ainda não tratadas"), K(abertas.length, "Tarefas em aberto"), K(PROCS.filter(x => x.status !== "arquivado").length, "Pastas de processos", "ativas"), K(atr, "Prazos/tarefas atrasados", atr ? "exigem atenção" : "nenhum"), K(proc, "Processos na última consulta", E.busca ? E.busca.nomes || "consulta avulsa" : "faça uma consulta"));
   const a = $("inAdv"); a.textContent = ""; const ul = el("ul", "mini");
   for (const ad of ADVS) {
     const mine = Object.values(AD.pubs).filter(p => p.quem.includes(ad.id)), n = mine.filter(ehNova).length, ult = mine.reduce((m, p) => p.data > m ? p.data : m, "");
@@ -1278,9 +1712,9 @@ function inicioDesenhar() {
   }
   a.appendChild(ul); if (!AD.meta.ultima) a.appendChild(el("div", "hint", "As publicações são carregadas ao abrir o site."));
   const p = $("inPrazos"); p.textContent = "";
-  const prox = abertas.filter(t => t.prazo).sort((x, y) => x.prazo.localeCompare(y.prazo)).slice(0, 6);
-  if (!prox.length) p.appendChild(el("div", "hint", "Nenhuma tarefa com prazo. Crie tarefas na tela Organização ou a partir das publicações."));
-  else { const u = el("ul", "mini"); for (const t of prox) { const li = el("li"); li.append(el("b", "", br(t.prazo)), el("span", "tag" + (atrasada(t) ? " crit" : ""), atrasada(t) ? "Atrasada" : t.resp), document.createTextNode(t.titulo)); u.appendChild(li); } p.appendChild(u); }
+  const prox = agendaItens().slice(0, 8);
+  if (!prox.length) p.appendChild(el("div", "hint", "Nada agendado. Cadastre processos na tela Processos e registre audiências, prazos e tarefas."));
+  else { const u = el("ul", "mini"); for (const e of prox) u.appendChild(agendaLi(e)); p.appendChild(u); }
 }
 
 // ---- backup dos dados deste navegador
@@ -1304,6 +1738,7 @@ $("bkFile").onchange = async () => {
 iniciarConsulta();
 desenharInicioClientes();
 orgIniciar();
+procIniciar();
 advIniciar();
 irPara();
 
