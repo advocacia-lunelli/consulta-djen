@@ -316,6 +316,19 @@ label.mdlinha{display:flex;flex-direction:row;align-items:center;gap:8px;color:v
 label.mdlinha input{width:auto;flex:none}
 #dlgModelo h3{font-size:14px;margin:10px 0 4px}
 
+/* diálogos de Drive e IA */
+dialog .dlgbody{display:flex;flex-direction:column;gap:10px}
+dialog .dlgbody textarea{width:100%}
+#drLista ul.mini li a{color:var(--ink)}
+.intgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.intpasso{font-size:13px;line-height:1.5}.intpasso ol{margin:4px 0 0 18px;padding:0}
+.intpasso code{background:var(--soft);padding:1px 5px;border-radius:4px;font-size:12px;user-select:all}
+#intCorpo input[type=password]{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 9px;min-width:0;width:100%;color:var(--ink)}
+#intCorpo label{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--muted)}
+#intCorpo label.chk{flex-direction:row;align-items:center;gap:8px;color:var(--ink);font-size:14px}
+#intCorpo label.chk input{width:auto;flex:none}
+#intCorpo .panel{margin-bottom:12px}
+
 </style>
 </head>
 <body>
@@ -334,6 +347,7 @@ label.mdlinha input{width:auto;flex:none}
     <a href="#relatorios" data-v="relatorios"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Relatórios</a>
     <a href="#advogados" data-v="advogados"><svg viewBox="0 0 24 24"><path d="M12 3v18M5 7h14M5 7l-3 7a3 3 0 006 0zM19 7l-3 7a3 3 0 006 0z"/></svg>Advogados<span class="bd" id="bdAdv" hidden></span></a>
     <a href="#organizacao" data-v="organizacao"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="10" rx="1"/><rect x="17" y="4" width="4" height="6" rx="1"/></svg>Organização<span class="bd red" id="bdOrg" hidden></span></a>
+    <a href="#integracoes" data-v="integracoes" hidden><svg viewBox="0 0 24 24"><path d="M7 18a4 4 0 010-8 5.5 5.5 0 0110.6 1.5A3.3 3.3 0 0117 18z"/></svg>Integrações</a>
     <a href="#usuarios" data-v="usuarios" hidden><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.6 3-6 7-6s7 2.4 7 6M17 5a3.5 3.5 0 010 7M22 20c0-2.8-1.8-4.8-4.5-5.6"/></svg>Usuários<span class="bd red" id="bdUsr" hidden></span></a>
   </nav>
   <div class="foot">
@@ -380,6 +394,11 @@ label.mdlinha input{width:auto;flex:none}
   <div class="panel"><h2>Pedidos de acesso pendentes</h2><div id="usPend"></div></div>
   <div class="panel"><h2>Usuários com acesso</h2><div id="usAtivos"></div></div>
   <div class="panel"><h2>Dados antigos deste navegador</h2><div id="usLocais"></div></div>
+</section>
+
+<!-- ===================== INTEGRAÇÕES (Google Drive e IA) ===================== -->
+<section class="view" id="v-integracoes" hidden>
+  <div id="intCorpo"></div>
 </section>
 
 <!-- ===================== INÍCIO ===================== -->
@@ -827,6 +846,33 @@ label.mdlinha input{width:auto;flex:none}
   </form>
 </dialog>
 
+<dialog id="dlgDrive" class="big">
+  <div class="dlgbody">
+    <h2 id="drTitulo">Documentos no Drive</h2>
+    <div class="msg" id="drMsg" hidden></div>
+    <div id="drCorpo" class="dlgbody"></div>
+    <div class="acts" style="justify-content:flex-end"><button class="btn sec" type="button" id="drFechar">Fechar</button></div>
+  </div>
+</dialog>
+
+<dialog id="dlgIA" class="big">
+  <div class="dlgbody">
+    <h2 id="iaTitulo">Assistente de IA</h2>
+    <div class="hint" id="iaProv"></div>
+    <div class="hint">A IA escreve rascunhos: confira fatos, prazos e citações antes de usar. O texto do processo/contato é enviado ao provedor escolhido (Claude ou Gemini); por padrão CPF, CNPJ, telefones e e-mails são mascarados antes do envio. Evite enviar segredo de justiça ou dados sensíveis sem necessidade.</div>
+    <div class="acts" id="iaAcoes"></div>
+    <label>Instrução ou pergunta (opcional nos botões acima; use “Perguntar” para uma pergunta livre)<textarea id="iaPergunta" rows="2" placeholder="Ex.: Redija uma réplica focada na prescrição; ou: explique o que significa esta decisão ao cliente"></textarea></label>
+    <div class="acts"><button class="btn" type="button" id="iaEnviar">Perguntar</button></div>
+    <div class="msg" id="iaStatus" hidden></div>
+    <label>Resposta (rascunho)<textarea id="iaSaida" rows="12"></textarea></label>
+    <div id="iaTarefas"></div>
+    <div class="acts" style="justify-content:space-between">
+      <span class="acts"><button class="btn sec" type="button" id="iaCopiar">Copiar texto</button><button class="btn sec" type="button" id="iaDrive" hidden>Salvar no Drive</button></span>
+      <button class="btn sec" type="button" id="iaFechar">Fechar</button>
+    </div>
+  </div>
+</dialog>
+
 <dialog id="dlgTarefa">
   <form method="dialog" id="fTarefa">
     <h2 id="dlgTitulo">Nova tarefa</h2>
@@ -879,7 +925,7 @@ const LS = {
   set(k, v) { const ok = LS.setLocal(k, v); if (LS.hook && LS.hook.chaves.has(k)) LS.hook.push(k, v); return ok; },
   del(k) { try { localStorage.removeItem("djen." + k); } catch (e) {} }
 };
-function salvar(blob, nome) { const a = el("a"); a.href = URL.createObjectURL(blob); a.download = nome; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000); }
+function salvar(blob, nome) { const a = el("a"); a.href = URL.createObjectURL(blob); a.download = nome; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000); if (typeof driveAposSalvar === "function") driveAposSalvar(blob, nome); }
 
 // ---- advogados do escritório
 const ADVS = [
@@ -1766,7 +1812,7 @@ function agendaItens() {
     for (const a of p.audiencias) if (!a.feita) out.push({ tipo: "Audiência", data: a.data, hora: a.hora || "", titulo: (a.tipo ? a.tipo + " · " : "") + p.numero, resp: a.resp || p.resp, procId: p.id });
     for (const z of p.prazos) if (!z.cumprido) out.push({ tipo: "Prazo", data: z.data, hora: "", titulo: z.desc + " · " + p.numero, resp: z.resp || p.resp, procId: p.id });
   }
-  for (const t of TAREFAS) if (t.status !== "concluida" && t.prazo) out.push({ tipo: "Tarefa", data: t.prazo, hora: "", titulo: t.titulo, resp: t.resp, tarefaId: t.id });
+  for (const t of TAREFAS) if (t.status !== "concluida" && t.prazo) out.push({ tipo: "Tarefa", data: t.prazo, hora: "", titulo: t.titulo, resp: t.resp, tarefaId: t.id, proc: t.proc });
   return out.sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora));
 }
 const agendaAtrasada = e => e.tipo !== "Audiência" && e.data < hojeIso();
@@ -1774,6 +1820,8 @@ function totalAtrasos() { return agendaItens().filter(agendaAtrasada).length; }
 function agendaLi(e) {
   const li = el("li"), atr = agendaAtrasada(e);
   li.append(el("b", "", br(e.data) + (e.hora ? " " + e.hora : "")), el("span", "tag" + (atr ? " crit" : e.tipo === "Audiência" ? " dist" : ""), atr ? "Atrasado · " + e.tipo : e.tipo + " · " + e.resp), document.createTextNode(e.titulo));
+  const pp = e.procId ? PROCS.find(x => x.id === e.procId) : e.proc ? PROCS.find(x => x.chave === chaveDe(e.proc)) : null;
+  if (pp && /^https?:\/\//.test(pp.linkPasta || "")) { const a = el("a", "", "📁 pasta"); a.href = pp.linkPasta; a.target = "_blank"; a.rel = "noopener noreferrer"; a.style.marginLeft = "8px"; a.onclick = ev => ev.stopPropagation(); li.appendChild(a); }
   li.style.cursor = "pointer"; li.onclick = () => e.procId ? abrirPasta(e.procId) : abrirTarefa(null, e.tarefaId); return li;
 }
 
@@ -1842,6 +1890,7 @@ function pDetalhe(p) {
   else g.append(campo("Cliente (pasta)", iCli), campo("Responsável", sResp), campo("Polo do cliente", sPolo), campo("Valor da causa (R$)", iVal), campo("Classe", iCls), lk);
   hd.appendChild(g);
   if (/^https?:\/\//.test(p.linkPasta)) { const a = el("a", "btn sec sm", "Abrir pasta de arquivos"); a.href = p.linkPasta; a.target = "_blank"; a.rel = "noopener noreferrer"; a.style.width = "fit-content"; hd.appendChild(a); }
+  const dr = el("div", "acts"); dr.appendChild(btn("Documentos no Drive", () => driveAbrir(driveAlvo("proc", p)), "")); if (!souSecretaria()) dr.appendChild(btn("Assistente de IA", () => iaProc(p), "")); hd.appendChild(dr);
   const nt = el("textarea"); nt.placeholder = "Observações do caso"; nt.value = p.nota; nt.onchange = () => { p.nota = nt.value; salvar(); }; if (!souSecretaria()) hd.appendChild(campo("Observações", nt));
   if (p._por) hd.appendChild(el("div", "hint", "Última alteração: " + p._por + (p._em ? " em " + new Date(p._em).toLocaleString("pt-BR") : "")));
   box.appendChild(hd);
@@ -1865,6 +1914,7 @@ function pAndamento(p, c) {
     const d = el("div", "pub"), h = el("div", "h"); h.append(el("b", "", br(x.data)), el("span", "tag" + (/intima/i.test(x.tipo) ? " crit" : ""), x.tipo), x.docTipo && x.docTipo !== x.tipo ? el("span", "tag", x.docTipo) : el("span"));
     if (/^https:\/\//.test(x.link)) { const a = el("a", "", "abrir documento"); a.href = x.link; a.target = "_blank"; a.rel = "noopener noreferrer"; h.appendChild(a); }
     const pz = prazoNoTexto(x.texto); if (pz) h.appendChild(el("span", "tag warn", "texto cita prazo de " + pz));
+    if (!souSecretaria()) h.appendChild(btn("Resumir com IA", () => iaResumirPub(p, x)));
     const ex = el("div", "exc", x.texto || "(sem texto)"); ex.style.cursor = "pointer"; ex.onclick = () => ex.classList.toggle("open");
     d.append(h, ex); c.appendChild(d);
   }
@@ -2701,6 +2751,7 @@ function crmFicha(c) {
   if (c.email) { const a = el("a", "btn sec sm", "E-mail"); a.href = "mailto:" + c.email; ac.appendChild(a); }
   ac.append(btn("Registrar contato feito", () => crmAbrirAtiv(null, { contatoId: c.id, feita: true, feitaEm: hojeIso(), titulo: "" })), btn("Agendar atividade", () => crmAbrirAtiv(null, { contatoId: c.id, data: somaDias(hojeIso(), 1) })));
   ac.appendChild(btn("Aplicar modelo de tarefas", () => { $("dlgCrmContato").close(); modeloAbrir({ cli: c.nome, resp: c.resp }); }));
+  ac.appendChild(btn("Documentos no Drive", () => driveAbrir(driveAlvo("contato", c)))); if (!souSecretaria()) ac.appendChild(btn("Assistente de IA", () => iaContato(c)));
   if (crmVeValores()) ac.appendChild(btn("Novo " + T("negocio"), () => { $("dlgCrmContato").close(); crmAbrirNegocio(null, { contatoId: c.id, origem: c.origem }); }, ""));
   box.appendChild(ac);
   if (crmVeValores()) {
@@ -2752,6 +2803,7 @@ function crmNegocioAcoes(n) {
   if (n && n.status === "aberto" || !n) box.append(btn("✔ " + T("ganho"), () => crmNegocioFinal("ganho"), "ok"), btn("✖ Perdido", () => crmNegocioFinal("perdido"), "danger"));
   else box.appendChild(btn("Reabrir " + T("negocio"), () => { const x = crmSalvarNegocioForm(); if (!x) return; crmReabrir(x); $("dlgCrmNegocio").close(); crmRefazer(); }));
   box.append(btn("Copiar texto da proposta", async () => { const x = crmSalvarNegocioForm(true); if (!x) return; const t = crmTextoProposta(x); const ok = await crmCopiar(t); crmAviso(ok ? "Texto da proposta copiado. Cole no e-mail ou WhatsApp." : "Não foi possível copiar automaticamente; o texto foi mostrado para você copiar."); if (!ok) prompt("Copie o texto da proposta:", t); crmNegocioAcoes(x); }), btn("Agendar atividade", () => { const x = crmSalvarNegocioForm(); if (x) crmAbrirAtiv(null, { contatoId: x.contatoId, negocioId: x.id, data: somaDias(hojeIso(), 2) }); }));
+  if (n) box.append(btn("Documentos no Drive", () => driveAbrir(driveAlvo("negocio", n))), btn("Assistente de IA", () => iaNegocio(n)));
 }
 async function crmCopiar(t) {
   try { await navigator.clipboard.writeText(t); return true; } catch (e) {}
@@ -2783,6 +2835,7 @@ function crmNegocioFinal(tipo) {
     const c = crmContato(n.contatoId);
     const m = modeloPorId("m-novo"), nome = c ? c.nome : n.titulo;
     if (confirm("Caso contratado! Criar as " + m.tarefas.length + " tarefas de abertura do caso (modelo “" + m.nome + "”) para " + nome + "?")) { modeloAplicar(m, hojeIso(), { cli: nome, resp: n.resp }); atualizarTudo(); }
+    if (driveAtivo() && !driveIdDe(driveAlvo("negocio", n).pasta) && confirm("Abrir o painel do Drive para criar a pasta do cliente (com subpastas)?")) driveAbrir(driveAlvo("negocio", n));
     return;
   }
   CP.id = n.id; optsSel($("cpMotivo"), crmCfg().motivos); $("dlgCrmPerda").showModal();
@@ -2870,7 +2923,7 @@ function tkCard(t) {
   if (t.prazo) m.appendChild(el("span", atrasada(t) ? "tag crit" : "tag", (atrasada(t) ? "Atrasada · " : "Prazo ") + br(t.prazo)));
   if (t.cli) m.appendChild(el("span", "", t.cli));
   c.appendChild(m);
-  if (t.proc) { const dm = el("div", "m", t.proc + " "), pp = PROCS.find(x => x.chave === chaveDe(t.proc)); if (pp) { const a = el("a", "", "abrir pasta"); a.href = "#processos"; a.onclick = e => { e.preventDefault(); abrirPasta(pp.id); }; dm.appendChild(a); } c.appendChild(dm); }
+  if (t.proc) { const dm = el("div", "m", t.proc + " "), pp = PROCS.find(x => x.chave === chaveDe(t.proc)); if (pp) { const a = el("a", "", "abrir pasta"); a.href = "#processos"; a.onclick = e => { e.preventDefault(); abrirPasta(pp.id); }; dm.appendChild(a); if (/^https?:\/\//.test(pp.linkPasta || "")) { const d = el("a", "", "pasta no Drive"); d.href = pp.linkPasta; d.target = "_blank"; d.rel = "noopener noreferrer"; dm.append(" · ", d); } } c.appendChild(dm); }
   const mv = el("div", "mv"), i = COLS.findIndex(x => x[0] === t.status);
   const bt = (txt, d, tit) => { const b = el("button", "btn sec sm", txt); b.type = "button"; b.title = tit; b.onclick = () => { t.status = COLS[i + d][0]; if (t.status === "concluida") t.concluidaEm = Date.now(); salvarTarefas(); atualizarTudo(); }; return b; };
   if (i > 0) mv.appendChild(bt("←", -1, "Mover para " + COLS[i - 1][1])); if (i < COLS.length - 1) mv.appendChild(bt("→", 1, "Mover para " + COLS[i + 1][1]));
@@ -3122,14 +3175,470 @@ $("fModelos").addEventListener("submit", e => {
 $("orgModelo").onclick = () => modeloAbrir({});
 
 
+/* ===== 42-drive: integração com o Google Drive (uso interno do escritório) =====
+   • Login com o Google (Google Identity Services, janela de autorização) — o token fica só na memória da página.
+   • Pastas por cliente/processo (criação automática), documentos do caso, peças geradas a partir de modelos (Google Docs),
+     publicações do DJEN salvas como documento, backup dos dados e planilhas enviadas ao Google Sheets.
+   • Configuração (ID de cliente e pastas) em crm_config.drive: compartilhada com a equipe pelo Firestore.
+   Escopo "drive": várias pessoas trabalham nas mesmas pastas, então o acesso restrito a arquivos do próprio app não serviria. */
+const DRIVE_ESCOPO = "https://www.googleapis.com/auth/drive";
+const DRIVE_PADRAO = { clientId: "", raizId: "", modelosId: "", backupId: "", planilhasId: "", sheets: false, backupAuto: true, ultimoBackup: "" };
+const driveCfg = () => Object.assign({}, DRIVE_PADRAO, crmCfg().drive || {});
+const driveSalvarCfg = patch => crmSalvarCfg({ drive: Object.assign(driveCfg(), patch) });
+const driveAtivo = () => !!driveCfg().clientId;
+const DRIVE_SUB_PROC = ["01 Petições e peças", "02 Provas e documentos", "03 Decisões e publicações", "04 Contrato e procuração", "05 Cálculos e comprovantes"];
+const DRIVE_SUB_CLI = ["Contrato e procuração", "Documentos do cliente", "Atendimento e propostas"];
+const D3 = "https://www.googleapis.com/drive/v3/files", FLD = "application/vnd.google-apps.folder", GDOC = "application/vnd.google-apps.document", GSHEET = "application/vnd.google-apps.spreadsheet";
+
+const driveIdDe = s => { s = (s || "").trim(); const m = s.match(/\/folders\/([\w-]{10,})/) || s.match(/[?&]id=([\w-]{10,})/) || s.match(/\/d\/([\w-]{10,})/); return m ? m[1] : (/^[\w-]{20,}$/.test(s) ? s : ""); };
+const driveUrlPasta = id => "https://drive.google.com/drive/folders/" + id;
+const nomeArq = s => (String(s || "").replace(/[\\/:*?"<>|]+/g, "-").replace(/\s+/g, " ").trim() || "Sem nome").slice(0, 120);
+const qEsc = s => String(s).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+const qs = o => Object.entries(o).map(([k, v]) => k + "=" + encodeURIComponent(v)).join("&");
+const JSON_H = { "Content-Type": "application/json" };
+
+// ---------- login
+const DR = { token: "", exp: 0, gsi: null, fila: null };
+function carregarGsi() {
+  if (window.google && google.accounts && google.accounts.oauth2) return Promise.resolve(true);
+  return DR.gsi || (DR.gsi = new Promise(res => { const s = el("script"); s.src = "https://accounts.google.com/gsi/client"; s.async = true; s.onload = () => res(!!(window.google && google.accounts)); s.onerror = () => { DR.gsi = null; res(false); }; document.head.appendChild(s); }));
+}
+const driveConectado = () => !!DR.token && Date.now() < DR.exp - 30000;
+// Chame direto de um clique: abre a janela de autorização do Google (se ainda não houver sessão válida).
+function driveConectar() {
+  if (driveConectado()) return Promise.resolve(true);
+  if (DR.fila) return DR.fila;
+  const c = driveCfg(); if (!c.clientId) return Promise.reject(new Error("O Google Drive ainda não foi configurado. Peça a um advogado para preencher o ID de cliente em Integrações."));
+  DR.fila = carregarGsi().then(ok => {
+    if (!ok) throw new Error("Não foi possível carregar o login do Google (sem acesso a accounts.google.com).");
+    return new Promise((res, rej) => {
+      const cli = google.accounts.oauth2.initTokenClient({
+        client_id: c.clientId, scope: DRIVE_ESCOPO,
+        callback: r => { if (r.error) rej(new Error("Google: " + (r.error_description || r.error))); else { DR.token = r.access_token; DR.exp = Date.now() + (+r.expires_in || 3600) * 1000; res(true); setTimeout(driveAposConectar, 50); } },
+        error_callback: e => rej(new Error("Login do Google cancelado ou bloqueado pelo navegador (" + ((e && e.type) || "erro") + ")."))
+      });
+      cli.requestAccessToken({ prompt: "" });
+    });
+  }).finally(() => { DR.fila = null; });
+  return DR.fila;
+}
+function driveDesconectar() { try { if (DR.token && window.google && google.accounts) google.accounts.oauth2.revoke(DR.token, () => {}); } catch (e) {} DR.token = ""; DR.exp = 0; }
+function driveAviso(t, erro) { try { nuvemAviso(t, erro); } catch (e) { if (erro) alert(t); } }
+
+// ---------- chamadas à API (Drive v3, upload e Docs)
+async function driveFetch(url, opt) {
+  if (!driveConectado()) throw new Error("Conecte o Google antes (botão “Conectar ao Google”).");
+  opt = opt || {}; const r = await fetch(url, Object.assign({}, opt, { headers: Object.assign({ Authorization: "Bearer " + DR.token }, opt.headers || {}) }));
+  if (r.status === 401) { DR.token = ""; throw new Error("A sessão do Google expirou. Clique em “Conectar ao Google” e tente de novo."); }
+  if (!r.ok) { let m = ""; try { m = (await r.json()).error.message; } catch (e) {} throw new Error("Google (" + r.status + "): " + (m || r.statusText || "erro")); }
+  return r.status === 204 ? null : r.json();
+}
+async function driveLista(pastaId, extra) {
+  const q = "'" + pastaId + "' in parents and trashed=false" + (extra ? " and " + extra : "");
+  const j = await driveFetch(D3 + "?" + qs({ q, fields: "files(id,name,mimeType,webViewLink,modifiedTime,size)", orderBy: "folder,name", pageSize: 200, supportsAllDrives: true, includeItemsFromAllDrives: true }));
+  return j.files || [];
+}
+const driveInfo = id => driveFetch(D3 + "/" + id + "?" + qs({ fields: "id,name,mimeType,webViewLink", supportsAllDrives: true }));
+const driveCriarPasta = (nome, paiId) => driveFetch(D3 + "?" + qs({ supportsAllDrives: true, fields: "id,name,webViewLink" }), { method: "POST", headers: JSON_H, body: JSON.stringify({ name: nome, mimeType: FLD, parents: [paiId] }) });
+async function driveGarantirPasta(nome, paiId) { const ex = await driveLista(paiId, "mimeType='" + FLD + "' and name='" + qEsc(nome) + "'"); return ex[0] || driveCriarPasta(nome, paiId); }
+function driveEnviar({ nome, blob, mime, paiId, converterPara }) {
+  const meta = { name: nome, parents: [paiId] }; if (converterPara) meta.mimeType = converterPara;
+  const bd = "djen" + uid().replace(/\W/g, "");
+  const body = new Blob(["--" + bd + "\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n" + JSON.stringify(meta) + "\r\n--" + bd + "\r\nContent-Type: " + (mime || blob.type || "application/octet-stream") + "\r\n\r\n", blob, "\r\n--" + bd + "--"]);
+  return driveFetch("https://www.googleapis.com/upload/drive/v3/files?" + qs({ uploadType: "multipart", supportsAllDrives: true, fields: "id,name,webViewLink" }), { method: "POST", headers: { "Content-Type": "multipart/related; boundary=" + bd }, body });
+}
+const driveCopiar = (id, nome, paiId) => driveFetch(D3 + "/" + id + "/copy?" + qs({ supportsAllDrives: true, fields: "id,name,webViewLink" }), { method: "POST", headers: JSON_H, body: JSON.stringify({ name: nome, parents: [paiId] }) });
+function docsSubstituir(docId, mapa) {
+  const requests = Object.entries(mapa).map(([k, v]) => ({ replaceAllText: { containsText: { text: "{{" + k + "}}", matchCase: false }, replaceText: String(v) } }));
+  return requests.length ? driveFetch("https://docs.googleapis.com/v1/documents/" + docId + ":batchUpdate", { method: "POST", headers: JSON_H, body: JSON.stringify({ requests }) }) : Promise.resolve(null);
+}
+
+// ---------- estrutura de pastas por cliente/processo
+async function driveCriarEstrutura(tipo, nomeCliente, numero) {
+  const c = driveCfg(); if (!c.raizId) throw new Error("Defina a pasta raiz dos clientes em Integrações.");
+  const cli = await driveGarantirPasta(nomeArq(nomeCliente || "Sem cliente"), c.raizId);
+  if (tipo === "proc") { const pr = await driveGarantirPasta(nomeArq(numero), cli.id); for (const s of DRIVE_SUB_PROC) await driveGarantirPasta(s, pr.id); return pr; }
+  for (const s of DRIVE_SUB_CLI) await driveGarantirPasta(s, cli.id);
+  return cli;
+}
+// "alvo" = onde a pasta fica guardada: processo (linkPasta), contato ou caso do CRM (pastaDrive)
+function driveAlvo(tipo, obj) {
+  if (tipo === "proc") return { tipo, obj, titulo: obj.numero + (obj.cliente ? " · " + obj.cliente : ""), cliente: obj.cliente || "", get pasta() { return obj.linkPasta || ""; }, set pasta(u) { obj.linkPasta = u; salvarProcs(); } };
+  if (tipo === "contato") return { tipo, obj, titulo: obj.nome, cliente: obj.nome, get pasta() { return obj.pastaDrive || ""; }, set pasta(u) { obj.pastaDrive = u; salvarContatos(); } };
+  const ct = crmContato(obj.contatoId);
+  return { tipo: "negocio", obj, titulo: obj.titulo || "Caso", cliente: ct ? ct.nome : (obj.titulo || ""), get pasta() { return obj.pastaDrive || (ct && ct.pastaDrive) || ""; }, set pasta(u) { obj.pastaDrive = u; salvarNegocios(); } };
+}
+const driveUrlDoProc = numero => { const p = PROCS.find(x => x.chave === chaveDe(numero)); return p && /^https?:\/\//.test(p.linkPasta || "") ? p.linkPasta : ""; };
+async function driveGarantirPastaDoAlvo(alvo) {
+  let id = driveIdDe(alvo.pasta); if (id) return id;
+  const r = await driveCriarEstrutura(alvo.tipo === "proc" ? "proc" : "cli", alvo.cliente, alvo.obj.numero);
+  alvo.pasta = r.webViewLink || driveUrlPasta(r.id); return r.id;
+}
+
+// ---------- campos dos modelos de documento ({{cliente}}, {{processo}}…)
+function driveCampos(alvo) {
+  const cfg = crmCfg(), hoje = new Date(); let ct = null, p = null, n = null;
+  if (alvo.tipo === "proc") { p = alvo.obj; ct = crmAchaContatoPorNome(p.cliente); }
+  else if (alvo.tipo === "contato") ct = alvo.obj;
+  else { n = alvo.obj; ct = crmContato(n.contatoId); }
+  const adv = p && ADVS.find(a => a.curto === p.resp);
+  const v = {
+    escritorio: cfg.escritorio, data: hoje.toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" }), data_curta: br(hojeIso()),
+    cliente: alvo.cliente, cpf_cnpj: ct ? fmtDoc(ct.doc) : "", telefone: ct ? fmtTel(ct.tel) : "", email: ct ? ct.email : "", cidade: ct ? ct.cidade : "", uf: ct ? ct.uf : "", empresa: ct ? ct.empresa : "", nascimento: ct && ct.nasc ? br(ct.nasc) : "",
+    processo: p ? p.numero : "", tribunal: p ? p.tribunal : "", classe: p ? p.classe : "", orgao: p ? p.orgao : "", advogado: adv ? adv.nome : "", oab: adv ? adv.rot : "",
+    servico: n ? (n.titulo || n.area || "") : "", honorarios: n ? brl(n.valor || 0) : "", forma_pagamento: n ? crmFormaPgto(n) : "", proposta: n ? crmTextoProposta(n) : "", validade: n && n.prop && n.prop.validade ? br(n.prop.validade) : ""
+  };
+  return v;
+}
+const DRIVE_CAMPOS_AJUDA = "{{cliente}} {{cpf_cnpj}} {{telefone}} {{email}} {{cidade}} {{uf}} {{empresa}} {{nascimento}} {{processo}} {{tribunal}} {{classe}} {{orgao}} {{advogado}} {{oab}} {{servico}} {{honorarios}} {{forma_pagamento}} {{proposta}} {{validade}} {{data}} {{data_curta}} {{escritorio}}";
+async function driveGerarDoc(alvo, modeloId, nome) {
+  const pastaId = await driveGarantirPastaDoAlvo(alvo);
+  const novo = await driveCopiar(modeloId, nomeArq(nome), pastaId);
+  const mapa = {}; for (const [k, v] of Object.entries(driveCampos(alvo))) if (v !== "" && v != null) mapa[k] = v;
+  await docsSubstituir(novo.id, mapa);
+  return novo;
+}
+
+// ---------- publicações do DJEN como documento na pasta do processo
+const htmlEsc = s => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+async function driveSalvarPubs(p, soEstas) {
+  const lista = (soEstas || p.pubs).filter(x => !x.driveId); if (!lista.length) return 0;
+  const alvo = driveAlvo("proc", p), raiz = await driveGarantirPastaDoAlvo(alvo), sub = await driveGarantirPasta(DRIVE_SUB_PROC[2], raiz);
+  let n = 0;
+  for (const x of lista) {
+    const html = "<html><body><h2>Publicação no DJEN — " + htmlEsc(br(x.data)) + "</h2><p><b>Processo:</b> " + htmlEsc(p.numero) + "<br><b>Tipo:</b> " + htmlEsc(x.tipo) + (x.docTipo ? " · " + htmlEsc(x.docTipo) : "") + "<br><b>Órgão:</b> " + htmlEsc(x.orgao || p.orgao) + "</p>"
+      + (x.link ? "<p><a href=\"" + htmlEsc(x.link) + "\">Abrir o documento original</a></p>" : "") + "<p>" + htmlEsc(x.texto || "(sem texto)").replace(/\n/g, "<br>") + "</p></body></html>";
+    const d = await driveEnviar({ nome: nomeArq(x.data + " DJEN " + (x.tipo || "publicação") + (x.docTipo && x.docTipo !== x.tipo ? " - " + x.docTipo : "")), blob: new Blob([html], { type: "text/html" }), mime: "text/html", paiId: sub.id, converterPara: GDOC });
+    x.driveId = d.id; n++;
+  }
+  salvarProcs(); return n;
+}
+
+// ---------- backup e planilhas
+function driveDadosBackup() {
+  const d = { app: "app-organizacao-lunelli", versao: 2, geradoEm: new Date().toISOString(), procs: PROCS, tarefas: TAREFAS, nomes: lerLista(), valores: LS.get("valores", {}), crm_contatos: CRM_CONTATOS, crm_atividades: CRM_ATIV, crm_config: CRM_CFGS };
+  if (!souSecretaria()) d.crm_negocios = CRM_NEGOCIOS;
+  return d;
+}
+async function driveBackup() {
+  const c = driveCfg(), pasta = c.backupId || c.raizId; if (!pasta) throw new Error("Defina a pasta de backups (ou a pasta raiz) em Integrações.");
+  const f = await driveEnviar({ nome: "backup-app-organizacao-" + hojeIso() + ".json", blob: new Blob([JSON.stringify(driveDadosBackup())], { type: "application/json" }), mime: "application/json", paiId: pasta });
+  if (!souSecretaria()) driveSalvarCfg({ ultimoBackup: hojeIso() });
+  return f;
+}
+// ao conectar: backup automático uma vez por dia (só advogados/administrador)
+function driveAposConectar() {
+  const c = driveCfg(); if (souSecretaria() || !c.backupAuto || c.ultimoBackup === hojeIso() || !(c.backupId || c.raizId)) return;
+  driveBackup().then(() => driveAviso("Backup do dia salvo no Google Drive."), e => driveAviso("Backup automático no Drive falhou: " + e.message, true));
+}
+// chamado por salvar(): se a opção estiver ligada e o Google conectado, envia a planilha exportada como Google Sheets
+async function driveAposSalvar(blob, nome) {
+  const c = driveCfg(); if (!c.sheets || !driveConectado() || !/\.(xlsx|csv)$/i.test(nome) || !(c.planilhasId || c.raizId)) return;
+  try {
+    let b = blob, mime = blob.type;
+    if (/\.csv$/i.test(nome)) { const linhas = csvParse(await blob.text()); b = new Blob(["﻿" + linhas.map(l => l.map(x => '"' + String(x == null ? "" : x).replace(/"/g, '""') + '"').join(",")).join("\r\n")], { type: "text/csv" }); mime = "text/csv"; }
+    const f = await driveEnviar({ nome: nome.replace(/\.(xlsx|csv)$/i, ""), blob: b, mime, paiId: c.planilhasId || c.raizId, converterPara: GSHEET });
+    driveAviso("Planilha enviada ao Google Sheets: " + f.name + (f.webViewLink ? " — " + f.webViewLink : ""));
+  } catch (e) { driveAviso("Não foi possível enviar ao Google Sheets: " + e.message, true); }
+}
+function driveIniciar() { if (driveAtivo()) carregarGsi(); }
+
+// ---------- tela "Documentos no Drive" (diálogo)
+const DRV = { alvo: null, pilha: [], itens: [], msg: "", erro: false, modelos: null };
+function driveMsg(t, erro) { DRV.msg = t; DRV.erro = !!erro; const m = $("drMsg"); if (m) { m.textContent = t || ""; m.className = "msg" + (erro ? " err" : ""); m.hidden = !t; } }
+const driveTam = n => n ? (n > 1048576 ? (n / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(n / 1024)) + " KB") : "";
+function driveAbrir(alvo) {
+  DRV.alvo = alvo; DRV.pilha = []; DRV.itens = []; DRV.modelos = null; driveMsg("");
+  driveDesenhar(); const dlg = $("dlgDrive"); if (!dlg.open) dlg.showModal();
+  if (driveConectado() && driveIdDe(alvo.pasta)) driveCarregar();
+}
+function driveDesenhar() {
+  const a = DRV.alvo, box = $("drCorpo"); box.textContent = ""; $("drTitulo").textContent = "Documentos no Drive — " + a.titulo;
+  const link = el("input"); link.type = "text"; link.placeholder = "https://drive.google.com/drive/folders/…"; link.value = a.pasta;
+  link.onchange = () => { a.pasta = link.value.trim(); DRV.pilha = []; DRV.itens = []; driveDesenhar(); if (driveConectado() && driveIdDe(a.pasta)) driveCarregar(); };
+  const lk = el("label", "wide", "Pasta no Drive (cole o link de uma pasta existente ou crie abaixo)"); lk.appendChild(link); box.appendChild(lk);
+  const ac = el("div", "acts"), id = driveIdDe(a.pasta);
+  if (id) { const o = el("a", "btn sec sm", "Abrir no Drive"); o.href = /^https?:/.test(a.pasta) ? a.pasta : driveUrlPasta(id); o.target = "_blank"; o.rel = "noopener noreferrer"; ac.appendChild(o); }
+  if (!driveAtivo()) { box.appendChild(ac); box.appendChild(el("div", "hint", "Para criar pastas, enviar arquivos e gerar documentos, um advogado precisa configurar o Google em Integrações (ID de cliente e pasta raiz). Enquanto isso, o link acima já funciona como atalho.")); return; }
+  const cx = el("span", "tag" + (driveConectado() ? " dist" : ""), driveConectado() ? "Google conectado" : "Google desconectado"); ac.appendChild(cx);
+  if (!driveConectado()) ac.appendChild(driveBtn("Conectar ao Google", async () => { await driveConectar(); driveDesenhar(); if (driveIdDe(a.pasta)) driveCarregar(); }, ""));
+  else {
+    if (!id) ac.appendChild(driveBtn("Criar pastas no Drive", async () => { await driveGarantirPastaDoAlvo(a); driveMsg("Pastas criadas."); driveDesenhar(); driveCarregar(); }, ""));
+    else {
+      const up = el("input"); up.type = "file"; up.multiple = true; up.hidden = true; up.onchange = async () => { const fs = [...up.files]; up.value = ""; await driveExec(async () => { for (const f of fs) await driveEnviar({ nome: f.name, blob: f, mime: f.type || "application/octet-stream", paiId: DRV.pilha.length ? DRV.pilha[DRV.pilha.length - 1].id : id }); driveMsg(fs.length + " arquivo(s) enviado(s)."); await driveCarregar(); }); };
+      ac.append(up, driveBtn("Enviar arquivos", () => up.click(), ""), driveBtn("Nova subpasta", () => { const n = prompt("Nome da subpasta:"); if (n && n.trim()) driveExec(async () => { await driveCriarPasta(nomeArq(n), DRV.pilha.length ? DRV.pilha[DRV.pilha.length - 1].id : id); await driveCarregar(); }); }), driveBtn("Gerar documento de modelo", driveModeloAbrir, ""), driveBtn("Atualizar", () => driveCarregar()));
+      if (a.tipo === "proc" && a.obj.pubs && a.obj.pubs.length) { const pend = a.obj.pubs.filter(x => !x.driveId).length; ac.appendChild(driveBtn("Salvar publicações do DJEN (" + pend + ")", () => driveExec(async () => { const n = await driveSalvarPubs(a.obj); driveMsg(n + " publicação(ões) salva(s) em “" + DRIVE_SUB_PROC[2] + "”."); driveDesenhar(); await driveCarregar(); }))); }
+    }
+    ac.appendChild(driveBtn("Desconectar", () => { driveDesconectar(); driveDesenhar(); }));
+  }
+  box.appendChild(ac);
+  const mo = el("div"); mo.id = "drModelo"; mo.hidden = true; box.appendChild(mo);
+  const lst = el("div"); lst.id = "drLista"; box.appendChild(lst); driveListaDesenhar();
+}
+function driveBtn(txt, fn, cls) { return btn(txt, () => driveExec(fn), cls); }
+async function driveExec(fn) { driveMsg(""); try { await fn(); } catch (e) { driveMsg(e.message || String(e), true); } }
+async function driveCarregar() {
+  const lst = $("drLista"); if (!lst) return; const id = driveIdDe(DRV.alvo.pasta); if (!id) return;
+  lst.textContent = "Carregando…";
+  try { DRV.itens = await driveLista(DRV.pilha.length ? DRV.pilha[DRV.pilha.length - 1].id : id); driveListaDesenhar(); } catch (e) { lst.textContent = ""; driveMsg(e.message, true); }
+}
+function driveListaDesenhar() {
+  const lst = $("drLista"); if (!lst) return; lst.textContent = ""; if (!driveConectado() || !driveIdDe(DRV.alvo.pasta)) return;
+  const nav = el("div", "hint"); nav.append("Pasta: ");
+  const raiz = el("a", "", "início"); raiz.href = "#"; raiz.onclick = e => { e.preventDefault(); DRV.pilha = []; driveCarregar(); }; nav.appendChild(raiz);
+  DRV.pilha.forEach((s, i) => { nav.append(" / "); const x = el("a", "", s.nome); x.href = "#"; x.onclick = e => { e.preventDefault(); DRV.pilha = DRV.pilha.slice(0, i + 1); driveCarregar(); }; nav.appendChild(x); });
+  lst.appendChild(nav);
+  if (!DRV.itens.length) { lst.appendChild(el("div", "hint", "Esta pasta está vazia.")); return; }
+  const ul = el("ul", "mini");
+  for (const f of DRV.itens) {
+    const li = el("li"), pasta = f.mimeType === FLD, a = el("a", "", (pasta ? "📁 " : "📄 ") + f.name);
+    if (pasta) { a.href = "#"; a.onclick = e => { e.preventDefault(); DRV.pilha.push({ id: f.id, nome: f.name }); driveCarregar(); }; } else { a.href = f.webViewLink || "#"; a.target = "_blank"; a.rel = "noopener noreferrer"; }
+    li.append(a, el("span", "hint", (f.modifiedTime ? " " + br(f.modifiedTime.slice(0, 10)) : "") + (f.size ? " · " + driveTam(+f.size) : ""))); ul.appendChild(li);
+  }
+  lst.appendChild(ul);
+}
+async function driveModeloAbrir() {
+  const mo = $("drModelo"), c = driveCfg(); mo.hidden = false; mo.textContent = "";
+  if (!c.modelosId) { mo.appendChild(el("div", "hint", "Defina a pasta de modelos (Google Docs) em Integrações. Use campos como {{cliente}} e {{processo}} dentro dos documentos modelo.")); return; }
+  mo.appendChild(el("div", "hint", "Carregando modelos…"));
+  const mods = await driveLista(c.modelosId, "mimeType='" + GDOC + "'"); mo.textContent = "";
+  if (!mods.length) { mo.appendChild(el("div", "hint", "A pasta de modelos não tem Google Docs.")); return; }
+  const sel = optsSel(el("select"), mods.map(m => [m.id, m.name])), nome = el("input"); nome.type = "text";
+  const atual = () => { const m = mods.find(x => x.id === sel.value); return m ? m.name + " - " + DRV.alvo.cliente : ""; };
+  nome.value = atual(); sel.onchange = () => { nome.value = atual(); };
+  const l1 = el("label", "", "Modelo"); l1.appendChild(sel); const l2 = el("label", "", "Nome do novo documento"); l2.appendChild(nome);
+  const g = el("div", "grid"); g.append(l1, l2); mo.appendChild(g);
+  mo.appendChild(el("div", "hint", "Os campos do modelo são preenchidos com os dados do cliente, do processo e do caso: " + DRIVE_CAMPOS_AJUDA + ". Campos sem dado ficam como estão, para você completar."));
+  const ac = el("div", "acts"); ac.append(driveBtn("Gerar documento", async () => {
+    const d = await driveGerarDoc(DRV.alvo, sel.value, nome.value || atual()); mo.hidden = true;
+    driveMsg("Documento criado: " + d.name + (d.webViewLink ? " — " + d.webViewLink : "")); await driveCarregar(); if (d.webViewLink) window.open(d.webViewLink, "_blank", "noopener");
+  }, ""), btn("Fechar", () => { mo.hidden = true; })); mo.appendChild(ac);
+}
+$("drFechar").onclick = () => $("dlgDrive").close();
+
+
+/* ===== 43-integracoes: tela de configuração do Google Drive e das IAs (Claude/Gemini) ===== */
+function intCampo(rot, input, dica) { const l = el("label", "", rot); l.appendChild(input); if (dica) l.appendChild(el("span", "hint", dica)); return l; }
+function intTexto(valor, ph, tipo) { const i = el("input"); i.type = tipo || "text"; i.value = valor || ""; i.placeholder = ph || ""; i.autocomplete = "off"; i.spellcheck = false; return i; }
+function intCheck(rot, marcado) { const l = el("label", "chk"), c = el("input"); c.type = "checkbox"; c.checked = !!marcado; l.append(c, document.createTextNode(rot)); return [l, c]; }
+function intMsg(box, t, erro) { box.textContent = t || ""; box.className = "msg" + (erro ? " err" : ""); box.hidden = !t; }
+const INT_PASSOS = [
+  "Entre em console.cloud.google.com com a conta Google do escritório e crie um projeto (ex.: “App Organização”).",
+  "Em “APIs e serviços › Biblioteca”, ative a Google Drive API e a Google Docs API.",
+  "Em “APIs e serviços › Tela de permissão OAuth”, escolha “Externo”, preencha nome do app e e-mail e, em “Públicos / Usuários de teste”, inclua o e-mail Google de cada pessoa que vai usar (Davi, Fábio, secretaria). Pode deixar o app em modo “Teste”.",
+  "Em “Credenciais › Criar credenciais › ID do cliente OAuth”, tipo “Aplicativo da Web”. Em “Origens JavaScript autorizadas” coloque exatamente: "
+];
+function intDesenhar() {
+  const box = $("intCorpo"); box.textContent = "";
+  // ---------------- Google Drive
+  const pd = el("div", "panel"), hd = el("div", "hd"); hd.append(el("h2", "", "Google Drive"), el("span", "tag" + (driveConectado() ? " ok" : driveAtivo() ? " dist" : " warn"), driveConectado() ? "conectado" : driveAtivo() ? "configurado · desconectado" : "não configurado")); pd.appendChild(hd);
+  pd.appendChild(el("div", "hint", "Pastas por cliente e processo, documentos do caso, peças geradas a partir de modelos do Google Docs, publicações do DJEN salvas como documento, backup diário e planilhas no Google Sheets. A configuração abaixo é compartilhada com a equipe; o login do Google é de cada pessoa, a cada sessão."));
+  const c = driveCfg(), msg = el("div", "msg"); msg.hidden = true;
+  const iCli = intTexto(c.clientId, "123456789-abc….apps.googleusercontent.com"), iRaiz = intTexto(c.raizId ? driveUrlPasta(c.raizId) : "", "Link da pasta “Clientes” no Drive"), iMod = intTexto(c.modelosId ? driveUrlPasta(c.modelosId) : "", "Link da pasta com os modelos (Google Docs)"),
+    iBk = intTexto(c.backupId ? driveUrlPasta(c.backupId) : "", "Link da pasta de backups (opcional: usa a raiz)"), iPl = intTexto(c.planilhasId ? driveUrlPasta(c.planilhasId) : "", "Link da pasta de planilhas (opcional: usa a raiz)");
+  const [lSh, cSh] = intCheck("Enviar também ao Google Sheets as planilhas que eu exportar neste site (Excel/CSV)", c.sheets), [lBk, cBk] = intCheck("Backup diário automático ao conectar o Google (1 vez por dia, só advogados)", c.backupAuto);
+  const g = el("div", "intgrid");
+  g.append(intCampo("ID do cliente OAuth (Google Cloud)", iCli), intCampo("Pasta raiz dos clientes", iRaiz, "As pastas “Cliente › Processo › subpastas” são criadas aqui."), intCampo("Pasta de modelos de documentos", iMod, "Documentos do Google Docs com campos como {{cliente}} e {{processo}}."), intCampo("Pasta de backups", iBk), intCampo("Pasta de planilhas", iPl));
+  pd.append(g, lSh, lBk);
+  const ac = el("div", "acts");
+  const idDe = (i, nome) => { const v = i.value.trim(); if (!v) return ""; const id = driveIdDe(v); if (!id) throw new Error("O link de “" + nome + "” não parece uma pasta do Drive."); return id; };
+  const salvar = () => { driveSalvarCfg({ clientId: iCli.value.trim(), raizId: idDe(iRaiz, "pasta raiz"), modelosId: idDe(iMod, "modelos"), backupId: idDe(iBk, "backups"), planilhasId: idDe(iPl, "planilhas"), sheets: cSh.checked, backupAuto: cBk.checked }); };
+  const exec = fn => async () => { intMsg(msg, ""); try { const t = await fn(); if (t) intMsg(msg, t); } catch (e) { intMsg(msg, e.message || String(e), true); } };
+  ac.append(
+    btn("Salvar configuração", exec(async () => { salvar(); setTimeout(intDesenhar, 1500); return "Configuração salva e compartilhada com a equipe."; }), ""),
+    btn("Conectar ao Google", exec(async () => { salvar(); await driveConectar(); setTimeout(intDesenhar, 1500); return "Conectado ao Google."; })),
+    btn("Testar pastas", exec(async () => { const cf = driveCfg(); if (!cf.raizId) throw new Error("Salve a configuração com a pasta raiz dos clientes antes de testar."); await driveConectar(); const r = await driveInfo(cf.raizId); let t = "Pasta raiz: “" + r.name + "”"; if (cf.modelosId) { const m = await driveLista(cf.modelosId, "mimeType='" + GDOC + "'"); t += " · modelos: " + m.length + " documento(s)"; } return t; })),
+    btn("Fazer backup agora", exec(async () => { await driveConectar(); const f = await driveBackup(); return "Backup salvo: " + f.name + (f.webViewLink ? " — " + f.webViewLink : ""); })),
+    btn("Desconectar", () => { driveDesconectar(); intDesenhar(); })
+  );
+  pd.append(ac, msg);
+  if (c.ultimoBackup) pd.appendChild(el("div", "hint", "Último backup no Drive: " + br(c.ultimoBackup) + "."));
+  const det = el("details"); det.appendChild(el("summary", "", "Como criar o ID do cliente do Google (passo a passo)"));
+  const ol = el("ol"); INT_PASSOS.forEach((t, i) => { const li = el("li", "", t); if (i === INT_PASSOS.length - 1) { const k = el("code", "", location.origin); li.appendChild(k); li.append(". Clique em criar e copie o “ID do cliente” para o campo acima."); } ol.appendChild(li); });
+  ol.appendChild(el("li", "", "Crie no Drive as pastas “Clientes” (raiz), “Modelos” e “Backups”, abra cada uma e copie o endereço da barra do navegador para os campos acima. Quem for usar precisa ter acesso a essas pastas (compartilhe com o e-mail Google de cada um)."));
+  ol.appendChild(el("li", "", "Clique em “Conectar ao Google”. Como o app está em modo “Teste”, o Google mostra um aviso de “app não verificado”: use “Avançado › continuar”. A permissão é de acesso ao Drive (necessária para ver as pastas compartilhadas da equipe)."));
+  const d = el("div", "intpasso"); d.appendChild(ol); d.appendChild(el("div", "hint", "Campos disponíveis nos modelos: " + DRIVE_CAMPOS_AJUDA)); det.appendChild(d); pd.appendChild(det);
+  box.appendChild(pd);
+
+  // ---------------- IA
+  const pi = el("div", "panel"), h2 = el("div", "hd"), ia = iaCfg(); h2.append(el("h2", "", "Assistentes de IA (Claude e Gemini)"), el("span", "tag" + (iaPronta() ? " ok" : " warn"), iaPronta() ? "chave neste navegador" : "sem chave")); pi.appendChild(h2);
+  pi.appendChild(el("div", "hint", "Resumir andamentos, sugerir tarefas e prazos a conferir a partir das publicações, redigir mensagens ao cliente e minutas. Cada pessoa cola a própria chave de API: ela fica guardada só neste navegador (não vai para a nuvem do app nem para os backups). Tudo é rascunho para revisão do advogado."));
+  const sP = el("select"); optsSel(sP, [["claude", "Claude (Anthropic)"], ["gemini", "Gemini (Google)"]]); sP.value = ia.prov;
+  const kC = intTexto(ia.chaveClaude, "sk-ant-…", "password"), kG = intTexto(ia.chaveGemini, "AIza…", "password"), mC = intTexto(ia.modeloClaude), mG = intTexto(ia.modeloGemini);
+  const [lMa, cMa] = intCheck("Mascarar CPF, CNPJ, telefones e e-mails antes de enviar à IA (recomendado)", ia.mascara);
+  const g2 = el("div", "intgrid"); g2.append(intCampo("Provedor usado", sP), intCampo("Chave do Claude (console.anthropic.com)", kC), intCampo("Modelo do Claude", mC), intCampo("Chave do Gemini (aistudio.google.com)", kG), intCampo("Modelo do Gemini", mG, "Se o Google renomear o modelo, edite aqui."));
+  const m2 = el("div", "msg"), ac2 = el("div", "acts"); m2.hidden = true;
+  const sv = () => iaSalvarCfg({ prov: sP.value, chaveClaude: kC.value.trim(), chaveGemini: kG.value.trim(), modeloClaude: mC.value.trim() || IA_PADRAO.modeloClaude, modeloGemini: mG.value.trim() || IA_PADRAO.modeloGemini, mascara: cMa.checked });
+  ac2.append(btn("Salvar neste navegador", () => { sv(); intMsg(m2, "Salvo. Esta chave fica só neste navegador."); setTimeout(intDesenhar, 1200); }, ""), btn("Testar a IA", async () => { sv(); intMsg(m2, "Testando…"); try { const r = await iaPerguntar("Responda em uma frase curta.", [{ role: "user", content: "Diga apenas: IA conectada ao App Organização." }], 60); intMsg(m2, "Resposta: " + r.trim().slice(0, 200)); } catch (e) { intMsg(m2, e.message, true); } }));
+  pi.append(g2, lMa, ac2, m2);
+  const dv = el("details"); dv.appendChild(el("summary", "", "Privacidade e custos (leia antes de usar com dados de clientes)"));
+  const ul = el("ul", "intpasso"); for (const t of [
+    "O texto enviado (andamentos, dados do cliente, proposta) sai do seu navegador direto para a Anthropic ou para o Google. Sigilo profissional: use com critério e evite segredo de justiça.",
+    "Claude: a API da Anthropic é paga por uso (cartão no console) e, pelos termos comerciais, não usa os dados da API para treinar modelos. Gemini: o plano gratuito do Google AI Studio pode usar os dados para melhorar os produtos; prefira o plano pago ou o Claude para dados de clientes.",
+    "A IA pode errar e inventar. Prazos, datas, fundamentos legais e jurisprudência devem ser sempre conferidos. As tarefas sugeridas entram marcadas como “Sugerida pela IA”.",
+    "A chave é pessoal: não a compartilhe nem a cole em mensagens. Se vazar, revogue no console do provedor."
+  ]) ul.appendChild(el("li", "", t)); dv.appendChild(ul); pi.appendChild(dv);
+  box.appendChild(pi);
+}
+
+
+/* ===== 44-ia: assistentes de IA (Claude e Gemini) =====
+   Cada pessoa cola a própria chave de API em Integrações; ela fica só neste navegador (nunca vai para a nuvem do app nem para o backup).
+   As chamadas saem direto do navegador para a Anthropic ou para o Google. Por padrão, CPF/CNPJ, telefones e e-mails são mascarados antes do envio.
+   Tudo que a IA produz é rascunho para revisão do advogado. Só advogados/administrador usam (a secretaria não vê os botões). */
+const IA_PADRAO = { prov: "claude", chaveClaude: "", chaveGemini: "", modeloClaude: "claude-sonnet-5-5", modeloGemini: "gemini-2.5-flash", mascara: true };
+const iaCfg = () => Object.assign({}, IA_PADRAO, LS.get("ia", {}));
+const iaSalvarCfg = p => LS.setLocal("ia", Object.assign(iaCfg(), p));
+const iaPronta = () => { const c = iaCfg(); return !!(c.prov === "gemini" ? c.chaveGemini : c.chaveClaude); };
+const iaDisponivel = () => !souSecretaria();
+const IA_SISTEMA = "Você é um assistente de um escritório de advocacia brasileiro (Advocacia Lunelli), usado por advogados. Responda em português do Brasil, de forma objetiva e prática. Tudo o que você produz é rascunho para revisão de um advogado: não invente fatos, números de processo, dispositivos legais nem jurisprudência; quando não tiver certeza, diga e indique o que conferir. Prazos processuais devem sempre ser conferidos no processo (contagem em dias úteis, CPC e CLT). Dados pessoais podem aparecer mascarados ([CPF], [TELEFONE]); mantenha os marcadores.";
+
+function iaMascara(t) {
+  t = String(t == null ? "" : t); if (!iaCfg().mascara) return t;
+  const guarda = []; t = t.replace(/\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}/g, m => { guarda.push(m); return "\u0001" + (guarda.length - 1) + "\u0002"; });
+  t = t.replace(/\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b/g, "[CPF]").replace(/\b\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}\b/g, "[CNPJ]")
+    .replace(/(?:\(\d{2}\)\s?|\b\d{2}\s)?\b9?\d{4}-\d{4}\b/g, "[TELEFONE]").replace(/\(\d{2}\)\s?9?\d{8,9}\b/g, "[TELEFONE]").replace(/[\w.+-]+@[\w-]+\.[\w.-]+/g, "[E-MAIL]");
+  return t.replace(/\u0001(\d+)\u0002/g, (m, i) => guarda[+i]);
+}
+async function iaPerguntar(sistema, mensagens, max) {
+  const c = iaCfg(); if (!iaPronta()) throw new Error("Cole a chave do Claude ou do Gemini em Integrações.");
+  const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 120000); let r, j;
+  try {
+    if (c.prov === "gemini") {
+      r = await fetch("https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(c.modeloGemini) + ":generateContent?key=" + encodeURIComponent(c.chaveGemini), { method: "POST", signal: ctl.signal, headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ systemInstruction: { parts: [{ text: sistema }] }, contents: mensagens.map(m => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] })), generationConfig: { maxOutputTokens: max || 2000 } }) });
+      j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error("Gemini (" + r.status + "): " + ((j.error && j.error.message) || r.statusText));
+      const txt = ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || "").join(""); if (!txt) throw new Error("O Gemini não devolveu texto" + (j.promptFeedback && j.promptFeedback.blockReason ? " (bloqueado: " + j.promptFeedback.blockReason + ")" : "") + ".");
+      return txt;
+    }
+    r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", signal: ctl.signal, headers: { "content-type": "application/json", "x-api-key": c.chaveClaude, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
+      body: JSON.stringify({ model: c.modeloClaude, max_tokens: max || 2000, system: sistema, messages: mensagens }) });
+    j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error("Claude (" + r.status + "): " + ((j.error && j.error.message) || r.statusText));
+    const txt = (j.content || []).filter(b => b.type === "text").map(b => b.text).join(""); if (!txt) throw new Error("O Claude não devolveu texto."); return txt;
+  } catch (e) { throw e.name === "AbortError" ? new Error("A IA demorou demais para responder. Tente de novo.") : e; } finally { clearTimeout(t); }
+}
+
+// ---------- contextos (o que a IA recebe sobre o processo, o contato ou o caso)
+const iaLim = (s, n) => { s = String(s || ""); return s.length > n ? s.slice(0, n) + "…" : s; };
+function iaCtxProc(p) {
+  const l = ["PROCESSO " + p.numero + " — " + (p.tribunal || "") + " · " + (p.classe || "classe não informada") + (p.orgao ? " · " + p.orgao : ""),
+    "Cliente: " + (p.cliente || "—") + " · Polo do cliente: " + (p.polo || "não definido") + " · Responsável: " + (p.resp || "—") + " · Situação: " + (p.status || "ativo")];
+  if (p.nota) l.push("Observações do escritório: " + iaLim(p.nota, 600));
+  if (p.partes && p.partes.length) l.push("Partes: " + p.partes.slice(0, 10).map(d => d.nome + " (" + (d.polo === "P" ? "passivo" : d.polo === "A" ? "ativo" : d.polo || "?") + ")").join("; "));
+  const aud = (p.audiencias || []).slice(0, 5).map(a => br(a.data) + (a.hora ? " " + a.hora : "") + " " + (a.tipo || "audiência")), pz = (p.prazos || []).filter(z => !z.cumprido).slice(0, 8).map(z => br(z.data) + " " + z.desc);
+  if (aud.length) l.push("Audiências cadastradas: " + aud.join("; ")); if (pz.length) l.push("Prazos em aberto cadastrados: " + pz.join("; "));
+  l.push("Publicações do DJEN (mais recentes primeiro):"); for (const x of (p.pubs || []).slice(0, 8)) l.push("- " + br(x.data) + " · " + x.tipo + (x.docTipo ? " · " + x.docTipo : "") + ": " + iaLim(x.texto, 700));
+  if (!(p.pubs || []).length) l.push("(nenhuma publicação carregada)");
+  return iaMascara(l.join("\n"));
+}
+function iaCtxContato(c) {
+  const l = ["CONTATO: " + c.nome + " · " + rotDe(CRM_STATUS, c.status) + (c.empresa ? " · " + c.empresa : "") + (c.cidade ? " · " + c.cidade + "/" + (c.uf || "") : ""),
+    "Origem: " + (c.origem || "—") + " · Áreas: " + ((c.areas || []).join(", ") || "—") + " · Responsável: " + (c.resp || "—") + " · Último contato: " + (crmUltimoContato(c.id) ? br(crmUltimoContato(c.id)) : "—")];
+  if (c.obs) l.push("Observações: " + iaLim(c.obs, 600));
+  for (const n of crmNegociosDoContato(c.id).slice(0, 6)) l.push("Caso: " + n.titulo + " · " + ((crmEtapaDe(n) || {}).nome || "") + " · " + (n.status === "ganho" ? "contratado" : n.status === "perdido" ? "perdido" : "em aberto") + " · honorários " + brl(n.valor || 0));
+  for (const a of crmAtivsDoContato(c.id).sort((x, y) => (y.data || "").localeCompare(x.data || "")).slice(0, 10)) l.push("- " + br(a.data) + " " + rotDe(CRM_ATIV_TIPOS, a.tipo) + (a.feita ? " (feita)" : " (pendente)") + ": " + a.titulo + (a.nota ? " — " + iaLim(a.nota, 300) : ""));
+  return iaMascara(l.join("\n"));
+}
+function iaCtxNegocio(n) {
+  const c = crmContato(n.contatoId), p = n.prop || {};
+  const l = ["CASO: " + n.titulo + " · área " + (n.area || "—") + " · etapa " + ((crmEtapaDe(n) || {}).nome || "") + " · " + (n.status === "ganho" ? "contratado" : n.status === "perdido" ? "perdido (" + (n.motivo || "sem motivo") + ")" : "em aberto") + " · criado em " + br(n.criado),
+    "Cliente/contato: " + (c ? c.nome : "—") + " · Honorários estimados: " + brl(n.valor || 0) + " · Previsão de fechamento: " + (n.previsto ? br(n.previsto) : "—"),
+    "Proposta: " + rotDe(CRM_PROP_TIPOS, p.tipo) + " · " + crmFormaPgto(n) + " · situação " + rotDe(CRM_PROP_STATUS, p.status) + (p.enviadaEm ? " (enviada em " + br(p.enviadaEm) + ")" : "")];
+  if (n.obs) l.push("Observações: " + iaLim(n.obs, 600));
+  l.push("Texto atual da proposta:\n" + crmTextoProposta(n));
+  for (const a of CRM_ATIV.filter(x => x.negocioId === n.id).sort((x, y) => (y.data || "").localeCompare(x.data || "")).slice(0, 8)) l.push("- " + br(a.data) + " " + rotDe(CRM_ATIV_TIPOS, a.tipo) + ": " + a.titulo + (a.nota ? " — " + iaLim(a.nota, 300) : ""));
+  return iaMascara(l.join("\n"));
+}
+
+// ---------- diálogo do assistente
+const IA = { ctx: "", acoes: [], dest: null, alvoDrive: null, hist: [], ocupado: false, pub: null };
+function iaStatus(t, erro) { const s = $("iaStatus"); s.textContent = t || ""; s.className = "msg" + (erro ? " err" : ""); s.hidden = !t; }
+function iaOcupar(b) { IA.ocupado = b; for (const x of $("dlgIA").querySelectorAll("button.ia-bt, #iaEnviar")) x.disabled = b; }
+function iaAbrir(o) {
+  Object.assign(IA, { ctx: o.ctx, acoes: o.acoes || [], dest: o.dest || null, alvoDrive: o.alvoDrive || null, hist: [], pub: null });
+  $("iaTitulo").textContent = "Assistente de IA — " + o.titulo; $("iaSaida").value = ""; $("iaTarefas").textContent = ""; $("iaPergunta").value = ""; iaStatus("");
+  const c = iaCfg(); $("iaProv").textContent = (c.prov === "gemini" ? "Gemini · " + c.modeloGemini : "Claude · " + c.modeloClaude) + (c.mascara ? " · dados pessoais mascarados" : " · sem máscara de dados pessoais");
+  const box = $("iaAcoes"); box.textContent = ""; for (const a of IA.acoes) { const b = btn(a.rot, () => iaRodar(a.prompt), ""); b.classList.add("ia-bt"); box.appendChild(b); }
+  $("iaDrive").hidden = !(IA.alvoDrive && driveAtivo()); $("iaCopiar").textContent = "Copiar texto";
+  if (!iaPronta()) iaStatus("Falta a chave da IA. Abra Integrações, cole a chave do Claude ou do Gemini e volte aqui.", true);
+  const dlg = $("dlgIA"); if (!dlg.open) dlg.showModal();
+}
+async function iaRodar(prompt, livre) {
+  if (IA.ocupado) return; const extra = $("iaPergunta").value.trim();
+  const texto = iaMascara(livre ? prompt : prompt + (extra ? "\n\nInstrução adicional do advogado: " + extra : ""));
+  const msgs = IA.hist.concat([{ role: "user", content: IA.hist.length ? texto : "CONTEXTO:\n" + IA.ctx + "\n\nPEDIDO:\n" + texto }]);
+  iaOcupar(true); iaStatus("Consultando a IA…"); $("iaTarefas").textContent = "";
+  try { const r = await iaPerguntar(IA_SISTEMA, msgs); IA.hist = msgs.concat([{ role: "assistant", content: r }]); $("iaSaida").value = r; iaStatus(""); if (livre) $("iaPergunta").value = ""; }
+  catch (e) { iaStatus(e.message || String(e), true); } finally { iaOcupar(false); }
+}
+$("iaEnviar").onclick = () => { const t = $("iaPergunta").value.trim(); if (!t) { iaStatus("Escreva a pergunta ou a instrução.", true); return; } iaRodar(t, true); };
+$("iaCopiar").onclick = async () => { const ok = await crmCopiar($("iaSaida").value); $("iaCopiar").textContent = ok ? "Copiado ✔" : "Não foi possível copiar"; setTimeout(() => { $("iaCopiar").textContent = "Copiar texto"; }, 2500); };
+$("iaFechar").onclick = () => $("dlgIA").close();
+$("iaDrive").onclick = async () => {
+  const txt = $("iaSaida").value.trim(); if (!txt || !IA.alvoDrive) { iaStatus("Não há texto para salvar.", true); return; }
+  try {
+    await driveConectar(); const pasta = await driveGarantirPastaDoAlvo(IA.alvoDrive), html = "<html><body>" + htmlEsc(txt).replace(/\n/g, "<br>") + "</body></html>";
+    const f = await driveEnviar({ nome: nomeArq("Rascunho IA " + hojeIso() + " - " + IA.alvoDrive.titulo), blob: new Blob([html], { type: "text/html" }), mime: "text/html", paiId: pasta, converterPara: GDOC });
+    iaStatus("Rascunho salvo no Drive: " + f.name + (f.webViewLink ? " — " + f.webViewLink : "")); if (f.webViewLink) window.open(f.webViewLink, "_blank", "noopener");
+  } catch (e) { iaStatus(e.message, true); }
+};
+
+// ---------- pontos de entrada
+const IA_ACOES_PROC = [
+  { rot: "Resumir o andamento", prompt: "Resuma o andamento deste processo em linguagem simples (até 8 linhas): situação atual, o que aconteceu de mais importante nas últimas publicações e o que está pendente." },
+  { rot: "Próximos passos e prazos a conferir", prompt: "Liste os próximos passos práticos para o escritório e os prazos que precisam ser conferidos, com a justificativa de cada um. Não afirme datas finais: indique a contagem a verificar." },
+  { rot: "Mensagem ao cliente", prompt: "Redija uma mensagem curta e clara de WhatsApp ao cliente informando o andamento do processo, sem juridiquês e sem prometer resultado." },
+  { rot: "Minuta de peça (informe os fatos)", prompt: "Redija a minuta (rascunho) da peça indicada na instrução adicional do advogado, com estrutura formal (endereçamento, fatos, fundamentos, pedidos). Deixe marcadores [CONFERIR] onde faltar informação ou onde for preciso pesquisar jurisprudência." }
+];
+const IA_ACOES_CONTATO = [
+  { rot: "Mensagem de retorno (WhatsApp)", prompt: "Redija uma mensagem curta e cordial de WhatsApp para retomar contato com este contato, considerando o histórico." },
+  { rot: "Sugerir próxima ação", prompt: "Com base no histórico e nos casos, sugira a próxima melhor ação comercial/relacional e quando fazê-la. Seja específico (até 6 linhas)." },
+  { rot: "Resumo do relacionamento", prompt: "Resuma o relacionamento com este contato: quem é, o que já foi tratado, casos e pendências." }
+];
+const IA_ACOES_NEGOCIO = [
+  { rot: "Reescrever a proposta", prompt: "Reescreva o texto da proposta de honorários em tom profissional, claro e persuasivo, mantendo exatamente os valores, a forma de pagamento e a validade. Não invente condições." },
+  { rot: "Mensagem de acompanhamento", prompt: "Redija uma mensagem curta de acompanhamento da proposta (WhatsApp ou e-mail), sem pressionar, retomando os pontos principais e oferecendo esclarecimentos." },
+  { rot: "Argumentos para o fechamento", prompt: "Liste de 4 a 6 argumentos honestos para apresentar ao contato e prováveis objeções (principalmente honorários) com sugestões de resposta." }
+];
+const iaProc = p => iaAbrir({ titulo: p.numero, ctx: iaCtxProc(p), acoes: IA_ACOES_PROC, alvoDrive: driveAlvo("proc", p), dest: { proc: p.numero, cli: p.cliente, resp: p.resp } });
+const iaContato = c => iaAbrir({ titulo: c.nome, ctx: iaCtxContato(c), acoes: IA_ACOES_CONTATO, alvoDrive: driveAlvo("contato", c) });
+const iaNegocio = n => iaAbrir({ titulo: n.titulo || "caso", ctx: iaCtxNegocio(n), acoes: IA_ACOES_NEGOCIO, alvoDrive: driveAlvo("negocio", n) });
+
+// resumo estruturado de uma publicação, com tarefas sugeridas
+const IA_PROMPT_PUB = 'Analise a publicação marcada como "PUBLICAÇÃO EM ANÁLISE" e responda SOMENTE com um JSON válido, sem texto fora dele, neste formato: {"resumo":"2 a 4 frases em linguagem simples","tipo":"intimação|sentença|despacho|decisão|ato ordinatório|outro","prazo":{"indicado":true,"dias":15,"dias_uteis":true,"observacao":"texto curto"},"tarefas":[{"titulo":"ação prática","dias":2,"prioridade":"alta|normal|baixa"}]}. Se o texto não indicar prazo, use "indicado": false e "dias": null. "dias" das tarefas = dias corridos a partir de hoje. No máximo 5 tarefas, práticas e específicas.';
+function iaJson(t) { const a = t.indexOf("{"), b = t.lastIndexOf("}"); if (a < 0 || b < a) throw new Error("A IA não devolveu o formato esperado."); return JSON.parse(t.slice(a, b + 1)); }
+async function iaResumirPub(p, x) {
+  iaAbrir({ titulo: "publicação de " + br(x.data) + " · " + p.numero, ctx: iaCtxProc(p) + "\n\nPUBLICAÇÃO EM ANÁLISE:\n" + iaMascara(br(x.data) + " · " + x.tipo + (x.docTipo ? " · " + x.docTipo : "") + "\n" + (x.texto || "")), acoes: [], alvoDrive: driveAlvo("proc", p), dest: { proc: p.numero, cli: p.cliente, resp: p.resp } });
+  IA.pub = x; if (!iaPronta()) return;
+  iaOcupar(true); iaStatus("Analisando a publicação…");
+  try {
+    const msgs = [{ role: "user", content: "CONTEXTO:\n" + IA.ctx + "\n\nPEDIDO:\n" + IA_PROMPT_PUB }], r = await iaPerguntar(IA_SISTEMA, msgs, 1500); IA.hist = msgs.concat([{ role: "assistant", content: r }]);
+    const j = iaJson(r), pz = j.prazo || {};
+    $("iaSaida").value = "Resumo: " + (j.resumo || "—") + "\nTipo: " + (j.tipo || "—") + "\nPrazo: " + (pz.indicado ? (pz.dias != null ? pz.dias + (pz.dias_uteis ? " dias úteis" : " dias") : "indicado") + (pz.observacao ? " — " + pz.observacao : "") + "  (CONFIRA a contagem no processo)" : "o texto não indica prazo") + "\n\nSugestões geradas por IA: revise antes de usar.";
+    const box = $("iaTarefas"); box.textContent = ""; const ts = (j.tarefas || []).filter(t => t && t.titulo).slice(0, 5);
+    if (ts.length) {
+      box.appendChild(el("h3", "", "Tarefas sugeridas")); const chk = [];
+      ts.forEach(t => { const l = el("label", "chk mdlinha"), cb = el("input"); cb.type = "checkbox"; cb.checked = true; chk.push(cb); l.append(cb, el("span", "tag", "em " + (+t.dias || 0) + " dia(s)"), el("span", "", t.titulo)); if (t.prioridade === "alta") l.appendChild(el("span", "tag crit", "alta")); box.appendChild(l); });
+      const bc = btn("Criar tarefas selecionadas", () => {
+        let n = 0; ts.forEach((t, i) => { if (!chk[i].checked) return; TAREFAS.push({ id: uid(), criada: hojeIso(), titulo: String(t.titulo).slice(0, 200) + (p.cliente ? " — " + p.cliente : ""), proc: p.numero, cli: p.cliente || "", resp: p.resp || "Equipe", prazo: somaDias(hojeIso(), Math.max(0, +t.dias || 0)), prio: t.prioridade === "alta" ? "alta" : t.prioridade === "baixa" ? "baixa" : "normal", status: "fazer", nota: "Sugerida pela IA a partir da publicação de " + br(x.data) + " (conferir)" }); n++; });
+        if (n) { salvarTarefas(); atualizarTudo(); bc.disabled = true; } iaStatus(n + " tarefa(s) criada(s) no quadro da Organização.");
+      }, ""); box.appendChild(bc);
+    }
+    iaStatus("");
+  } catch (e) { iaStatus(e.message || String(e), true); } finally { iaOcupar(false); }
+}
+
+
 /* ===== 45-nuvem: login (Firebase Auth), dados compartilhados (Firestore) e perfis de acesso =====
    Sem NUVEM_CFG o site continua no modo local (sem login). Com NUVEM_CFG: tela de login, aprovação pelo administrador,
    pastas/tarefas/clientes/valores compartilhados entre todos, e telas por perfil (advogado, secretaria, administrador). */
 const NV = { ativo: !!NUVEM_CFG, user: null, perfil: null, papel: "local", advId: null, db: null, auth: null, unsubs: [], mapas: {}, sessao: false, cadastrando: false, users: [] };
 const ACESSO = {
-  local: ["inicio", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "organizacao"],
-  admin: ["meu", "inicio", "secretaria", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "organizacao", "usuarios"],
-  advogado: ["meu", "inicio", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "organizacao"],
+  local: ["inicio", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "organizacao", "integracoes"],
+  admin: ["meu", "inicio", "secretaria", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "organizacao", "integracoes", "usuarios"],
+  advogado: ["meu", "inicio", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "organizacao", "integracoes"],
   secretaria: ["secretaria", "audiencias", "processos", "crm"]
 };
 const PAPEL_ROT = { admin: "Administrador", advogado: "Advogado(a)", secretaria: "Secretaria", local: "" };
@@ -3481,6 +3990,7 @@ const VIEWS = {
   relatorios: ["Relatórios", "Indicadores e gráficos do cliente pesquisado, prontos para imprimir ou apresentar"],
   advogados: ["Advogados", "Publicações do DJEN em nome de Fábio (OAB/SC 15.044) e Davi (OAB/SC 39.336)"],
   organizacao: ["Organização", "Tarefas, prazos e rotina do escritório"],
+  integracoes: ["Integrações", "Google Drive (pastas, modelos, backup) e assistentes de IA (Claude e Gemini)"],
   usuarios: ["Usuários", "Pedidos de acesso e perfis de cada pessoa"]
 };
 function vistaAtual() { const v = (location.hash || "").replace("#", ""); return VIEWS[v] && podeVer(v) ? v : homeDoPapel(); }
@@ -3494,6 +4004,7 @@ function desenharVista(v) {
   if (v === "organizacao") orgDesenhar();
   if (v === "meu") meuDesenhar();
   if (v === "secretaria") secDesenhar();
+  if (v === "integracoes") intDesenhar();
   if (v === "usuarios") usuariosAtualizar();
 }
 function atualizarTudo() { desenharVista(vistaAtual()); atualizarBadges(); }
@@ -3536,7 +4047,7 @@ function inicioDesenhar() {
 
 // ---- backup dos dados deste navegador
 $("bkExp").onclick = () => {
-  const dados = {}; try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k.startsWith("djen.") && k !== "djen.ultima") dados[k] = localStorage.getItem(k); } } catch (e) {}
+  const dados = {}; try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k.startsWith("djen.") && k !== "djen.ultima" && k !== "djen.ia") dados[k] = localStorage.getItem(k); } } catch (e) {}
   salvar(new Blob([JSON.stringify({ app: "radar-djen-lunelli", versao: 1, geradoEm: new Date().toISOString(), dados })], { type: "application/json" }), "backup-app-organizacao-" + hojeIso() + ".json");
 };
 $("bkImp").onclick = () => $("bkFile").click();
@@ -3555,7 +4066,7 @@ $("bkFile").onchange = async () => {
 let appIniciado = false;
 function iniciarApp() {
   if (appIniciado) return; appIniciado = true;
-  iniciarConsulta(); desenharInicioClientes(); orgIniciar(); procIniciar(); audIniciar(); crmIniciar(); telasIniciar(); advIniciar(); irPara();
+  iniciarConsulta(); desenharInicioClientes(); orgIniciar(); procIniciar(); audIniciar(); crmIniciar(); telasIniciar(); advIniciar(); driveIniciar(); irPara();
 }
 if (!NV.ativo) { aplicarPapel(); iniciarApp(); }
 
