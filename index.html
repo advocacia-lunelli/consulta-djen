@@ -1023,6 +1023,7 @@ const NUVEM_CFG = {
   firebase: { apiKey: "...", authDomain: "SEU-PROJETO.firebaseapp.com", projectId: "SEU-PROJETO", appId: "..." },
   admin: "e-mail do administrador (quem aprova os pedidos de acesso)",
   adminAdvId: "davi",                                    // painel de advogado do administrador (fabio | davi)
+  admins: [{ email: "outro@exemplo.com", advId: "fabio" }],   // opcional: outros administradores (também nas regras do Firestore)
   org: "lunelli",                                        // identificador do escritório no CRM (dados em orgs/lunelli/…)
   emailjs: { service: "service_xxx", template: "template_xxx", key: "chave pública" }   // opcional: aviso por e-mail
 };
@@ -1038,6 +1039,7 @@ const NUVEM_CFG = {
   },
   admin: "davilubertoli@gmail.com",
   adminAdvId: "davi",
+  admins: [{ email: "advocacia.lunelli@outlook.com", advId: "fabio" }], // outros administradores (também precisam constar nas regras do Firestore)
   org: "lunelli" // identificador do escritório no CRM (dados em orgs/lunelli/…)
   // emailjs: { service: "service_xxx", template: "template_xxx", key: "chave pública" }   // opcional: aviso por e-mail
 };
@@ -3184,13 +3186,15 @@ async function nuvemIniciar() {
   NV.auth.onAuthStateChanged(onAuth);
 }
 function limparOuvintes() { NV.unsubs.forEach(f => { try { f(); } catch (e) {} }); NV.unsubs = []; }
-const ehAdminEmail = u => !!u && (u.email || "").toLowerCase() === (NUVEM_CFG.admin || "").toLowerCase();
+// administradores: o principal (admin/adminAdvId) e os extras (admins: [{email, advId}])
+const adminDe = u => { const e = u && (u.email || "").toLowerCase(); return e ? [{ email: NUVEM_CFG.admin, advId: NUVEM_CFG.adminAdvId }].concat(NUVEM_CFG.admins || []).find(a => (a.email || "").toLowerCase() === e) : null; };
+const ehAdminEmail = u => !!adminDe(u);
 function onAuth(user) {
   limparOuvintes(); NV.user = user; NV.perfil = null;
   if (!user) { if (NV.sessao) { location.reload(); return; } msgLogin(""); mostrarLogin("entrar"); return; }
   if (ehAdminEmail(user)) {
     if (!user.emailVerified) { esperaPainel("Confirme seu e-mail", "Enviamos um link de confirmação para " + user.email + ". Clique nele e depois em “Já confirmei meu e-mail”. (Olhe também o spam.)", ["ja", "reenviar", "sair"]); return; }
-    entrar({ papel: "admin", advId: NUVEM_CFG.adminAdvId || "davi", nome: user.displayName || "Administrador", email: user.email, status: "ativo" }); return;
+    entrar({ papel: "admin", advId: adminDe(user).advId || "davi", nome: user.displayName || "Administrador", email: user.email, status: "ativo" }); return;
   }
   NV.unsubs.push(NV.db.collection("users").doc(user.uid).onSnapshot(d => {
     if (!d.exists) { if (!NV.cadastrando) esperaPainel("Cadastro incompleto", "Seu acesso existe, mas o pedido de aprovação não foi registrado. Clique para enviá-lo ao administrador.", ["pedido", "sair"]); return; }
