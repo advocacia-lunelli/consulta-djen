@@ -271,6 +271,47 @@ details.sec-res .grid{margin-bottom:8px}
 h3.audDia{margin:14px 0 4px;font-size:14px;text-transform:capitalize;color:var(--muted)}
 .card.feito{opacity:.75}
 
+/* ===== CRM ===== */
+#v-crm{display:flex;flex-direction:column;gap:12px}
+#v-crm[hidden]{display:none}
+.crmbarra input,.crmbarra select{width:auto;min-width:0}
+.crmbarra input[type=text]{min-width:220px}
+.crmbarra label.chk{display:flex;flex-direction:row;align-items:center;gap:6px;color:var(--ink);font-size:14px}
+.crmbarra label.chk input{width:auto}
+.crmboard{align-items:start}
+.crmboard .col{min-height:160px}
+.crmc{cursor:pointer;gap:5px}
+.crmc:hover,.crmc:focus-visible{border-color:var(--accent)}
+.crmc[draggable=true]{cursor:grab}
+.crmtop{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.crmav{flex:none;width:22px;height:22px;border-radius:50%;background:var(--soft);color:var(--accent);font-size:12px;font-weight:700;display:grid;place-items:center}
+.crmtags{display:flex;flex-wrap:wrap;gap:4px}
+.crmgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.tblwrap{overflow-x:auto}
+.crmtbl{width:100%;border-collapse:collapse;font-size:14px}
+.crmtbl th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:6px 10px;border-bottom:2px solid var(--line);white-space:nowrap}
+.crmtbl td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.crmtbl tbody tr{cursor:pointer}
+.crmtbl tbody tr:hover,.crmtbl tbody tr:focus-visible{background:var(--soft);outline:0}
+.crmtbl td .tag{margin:0 3px 3px 0;display:inline-block}
+.crmbar{display:grid;grid-template-columns:minmax(100px,1fr) minmax(70px,1fr) minmax(100px,1.3fr);gap:10px;align-items:center;font-size:13px}
+.crmbar .t{height:10px;background:var(--soft);border-radius:5px;overflow:hidden}
+.crmbar .t i{display:block;height:100%;background:var(--accent);border-radius:0 5px 5px 0}
+.crmbar .v{color:var(--muted);text-align:right}
+@media (max-width:560px){.crmbar{grid-template-columns:1fr 1fr}.crmbar .t{grid-column:1/3;order:3}}
+.crmetapas{display:flex;flex-direction:column;gap:8px}
+.crmetapas input[type=text]{flex:1;min-width:160px}
+.crmchips{flex-direction:row!important;flex-wrap:wrap;gap:4px 14px}
+#dlgCrmContato h3,#dlgCrmNegocio h3{font-size:14px;margin:10px 0 2px}
+#ccFicha{display:flex;flex-direction:column;gap:6px}
+.btn.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+#v-crm .kpi{padding:10px 12px}
+#v-crm .kpi .v{font-size:24px}
+#v-crm .kpis{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.crmbarra select{font-size:14px;padding:6px 8px}
+.crmbarra input[type=text]{font-size:14px;padding:6px 10px}
+.crmboard .col h3{flex-wrap:wrap;gap:0 8px;font-size:12px}
+
 </style>
 </head>
 <body>
@@ -285,6 +326,7 @@ h3.audDia{margin:14px 0 4px;font-size:14px;text-transform:capitalize;color:var(-
     <a href="#consulta" data-v="consulta"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>Consulta</a>
     <a href="#processos" data-v="processos"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Processos<span class="bd" id="bdProc" hidden></span></a>
     <a href="#audiencias" data-v="audiencias"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 15h3"/></svg>Audiências</a>
+    <a href="#crm" data-v="crm"><svg viewBox="0 0 24 24"><path d="M3 5h18l-7 8v6l-4-2v-4z"/></svg>CRM<span class="bd red" id="bdCrm" hidden></span></a>
     <a href="#relatorios" data-v="relatorios"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Relatórios</a>
     <a href="#advogados" data-v="advogados"><svg viewBox="0 0 24 24"><path d="M12 3v18M5 7h14M5 7l-3 7a3 3 0 006 0zM19 7l-3 7a3 3 0 006 0z"/></svg>Advogados<span class="bd" id="bdAdv" hidden></span></a>
     <a href="#organizacao" data-v="organizacao"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="10" rx="1"/><rect x="17" y="4" width="4" height="6" rx="1"/></svg>Organização<span class="bd red" id="bdOrg" hidden></span></a>
@@ -450,6 +492,14 @@ h3.audDia{margin:14px 0 4px;font-size:14px;text-transform:capitalize;color:var(-
     <div class="list" id="audLista"></div>
   </div>
 </section>
+
+<!-- ===================== CRM ===================== -->
+<section class="view" id="v-crm" hidden>
+  <div class="tabs" role="tablist" id="crmTabs"></div>
+  <div class="acts crmbarra" id="crmBarra"></div>
+  <div id="crmLista"></div>
+</section>
+<datalist id="crmDlContatos"></datalist><datalist id="crmDlEmpresas"></datalist>
 
 <!-- ===================== RELATÓRIOS ===================== -->
 <section class="view" id="v-relatorios" hidden>
@@ -635,6 +685,104 @@ h3.audDia{margin:14px 0 4px;font-size:14px;text-transform:capitalize;color:var(-
     <div class="hint" id="pzInt"></div>
     <label>Observações <textarea id="pzObs"></textarea></label>
     <div class="acts" style="justify-content:flex-end"><button class="btn sec" type="button" id="pzCancel">Cancelar</button><button class="btn" type="submit">Salvar</button></div>
+  </form>
+</dialog>
+
+<dialog id="dlgCrmContato" class="big">
+  <form method="dialog" id="fCrmC">
+    <h2 id="ccTitulo">Novo contato</h2>
+    <div class="grid">
+      <label>Tipo <select id="ccTipo"><option value="PF">Pessoa física</option><option value="PJ">Pessoa jurídica</option></select></label>
+      <label class="wide">Nome / razão social <input type="text" id="ccNome" required autocomplete="off"></label>
+      <label>CPF / CNPJ <input type="text" id="ccDoc" autocomplete="off"></label>
+      <label>Telefone / WhatsApp <input type="text" id="ccTel" autocomplete="off"></label>
+      <label>Telefone 2 <input type="text" id="ccTel2" autocomplete="off"></label>
+      <label>E-mail <input type="text" id="ccEmail" autocomplete="off"></label>
+      <label>Cidade <input type="text" id="ccCidade" autocomplete="off"></label>
+      <label>UF <input type="text" id="ccUf" maxlength="2" autocomplete="off"></label>
+      <label>Empresa <input type="text" id="ccEmpresa" list="crmDlEmpresas" autocomplete="off"></label>
+      <label>Cargo <input type="text" id="ccCargo" autocomplete="off"></label>
+      <label>Situação <select id="ccStatus"></select></label>
+      <label>Origem <select id="ccOrigem"></select></label>
+      <label>Indicado por <input type="text" id="ccIndic" list="crmDlContatos" autocomplete="off"></label>
+      <label>Responsável <select id="ccResp"></select></label>
+      <label>Nascimento / aniversário <input type="date" id="ccNasc"></label>
+    </div>
+    <fieldset class="calc"><legend>Áreas de interesse</legend><div id="ccAreas" class="envbox"></div></fieldset>
+    <fieldset class="calc"><legend>Tags</legend><div id="ccTags" class="envbox"></div><div class="acts"><input type="text" id="ccTagNova" placeholder="Nova tag" autocomplete="off" style="width:auto"><button type="button" class="btn sec sm" id="ccTagAdd">Adicionar tag</button></div></fieldset>
+    <label class="chk"><input type="checkbox" id="ccLgpd"> Titular ciente e de acordo com o tratamento dos seus dados (LGPD) <span class="hint" id="ccLgpdEm"></span></label>
+    <label>Observações <textarea id="ccObs"></textarea></label>
+    <div id="ccFicha"></div>
+    <div class="acts" style="justify-content:space-between">
+      <span><button class="btn danger" type="button" id="ccDel" hidden>Excluir</button></span>
+      <span class="acts"><button class="btn sec" type="button" id="ccCancel">Fechar</button><button class="btn" type="submit" id="ccSave">Salvar</button></span>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlgCrmNegocio" class="big">
+  <form method="dialog" id="fCrmN">
+    <h2 id="cnTitulo2">Novo caso</h2>
+    <div class="grid">
+      <label class="wide">Título do caso <input type="text" id="cnTit" autocomplete="off" placeholder="Ex.: Defesa trabalhista — Empresa X"></label>
+      <label class="wide">Contato <input type="text" id="cnContato" list="crmDlContatos" autocomplete="off" placeholder="Digite para buscar ou criar"></label>
+      <label>Área <select id="cnArea"></select></label>
+      <label>Honorários estimados (R$) <input type="text" id="cnValor" autocomplete="off" placeholder="0,00"></label>
+      <label>Etapa <select id="cnEtapa"></select></label>
+      <label>Probabilidade (%) <input type="number" id="cnProb" min="0" max="100"></label>
+      <label>Previsão de fechamento <input type="date" id="cnPrev"></label>
+      <label>Responsável <select id="cnResp"></select></label>
+      <label>Origem <select id="cnOrigem"></select></label>
+    </div>
+    <fieldset class="calc"><legend>Proposta de honorários</legend>
+      <div class="grid">
+        <label>Modelo <select id="cnPTipo"></select></label>
+        <label>Entrada (R$) <input type="text" id="cnPEntrada" autocomplete="off"></label>
+        <label>Parcelas / meses <input type="number" id="cnPParc" min="0"></label>
+        <label>Êxito (%) <input type="number" id="cnPExito" min="0" max="100" step="0.5"></label>
+        <label>Validade <input type="date" id="cnPValid"></label>
+        <label>Situação <select id="cnPStatus"></select></label>
+      </div>
+    </fieldset>
+    <label>Observações <textarea id="cnObs"></textarea></label>
+    <div class="acts" id="cnAcoes"></div>
+    <div class="hint" id="cnAviso" role="status"></div>
+    <h3>Atividades deste caso</h3>
+    <div id="cnAtivs"></div>
+    <div class="acts" style="justify-content:space-between">
+      <span><button class="btn danger" type="button" id="cnDel">Excluir</button></span>
+      <span class="acts"><button class="btn sec" type="button" id="cnCancel">Fechar</button><button class="btn" type="submit" id="cnSave">Salvar</button></span>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlgCrmAtiv">
+  <form method="dialog" id="fCrmA">
+    <h2>Nova atividade</h2>
+    <div class="grid">
+      <label>Tipo <select id="caTipo"></select></label>
+      <label class="wide">Título <input type="text" id="caTitulo" autocomplete="off" placeholder="Ex.: Retornar sobre a proposta"></label>
+      <label>Data <input type="date" id="caData"></label>
+      <label>Hora <input type="time" id="caHora"></label>
+      <label>Responsável <select id="caResp"></select></label>
+      <label class="wide">Contato <input type="text" id="caContato" list="crmDlContatos" autocomplete="off"></label>
+    </div>
+    <div class="hint" id="caCaso"></div>
+    <label>Anotação <textarea id="caNota"></textarea></label>
+    <label class="chk"><input type="checkbox" id="caFeita"> Já realizada (registrar no histórico)</label>
+    <div class="acts" style="justify-content:space-between">
+      <span><button class="btn danger" type="button" id="caDel" hidden>Excluir</button></span>
+      <span class="acts"><button class="btn sec" type="button" id="caCancel">Cancelar</button><button class="btn" type="submit" id="caSave">Salvar</button></span>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlgCrmPerda">
+  <form method="dialog" id="fCrmP">
+    <h2>Por que o caso foi perdido?</h2>
+    <label>Motivo <select id="cpMotivo"></select></label>
+    <div class="hint">O motivo alimenta o painel e ajuda a melhorar a captação.</div>
+    <div class="acts" style="justify-content:flex-end"><button class="btn sec" type="button" id="cpCancel">Cancelar</button><button class="btn danger" type="submit" id="cpSave">Marcar como perdido</button></div>
   </form>
 </dialog>
 
@@ -833,7 +981,8 @@ async function copiar(txt, btn) {
 const NUVEM_CFG = {
   firebase: { apiKey: "...", authDomain: "SEU-PROJETO.firebaseapp.com", projectId: "SEU-PROJETO", appId: "..." },
   admin: "e-mail do administrador (quem aprova os pedidos de acesso)",
-  adminAdvId: "davi",                                  // painel de advogado do administrador (fabio | davi)
+  adminAdvId: "davi",                                    // painel de advogado do administrador (fabio | davi)
+  org: "lunelli",                                        // identificador do escritório no CRM (dados em orgs/lunelli/…)
   emailjs: { service: "service_xxx", template: "template_xxx", key: "chave pública" }   // opcional: aviso por e-mail
 };
 */
@@ -847,7 +996,8 @@ const NUVEM_CFG = {
     appId: "1:135578537228:web:1a91a9f143ac3bbc324d29"
   },
   admin: "davilubertoli@gmail.com",
-  adminAdvId: "davi"
+  adminAdvId: "davi",
+  org: "lunelli" // identificador do escritório no CRM (dados em orgs/lunelli/…)
   // emailjs: { service: "service_xxx", template: "template_xxx", key: "chave pública" }   // opcional: aviso por e-mail
 };
 
@@ -1385,6 +1535,7 @@ function atualizarBadges() {
   b.hidden = !n; b.textContent = n > 99 ? "99+" : n;
   document.title = (n ? "(" + (n > 99 ? "99+" : n) + ") " : "") + TITULO_BASE;
   if (typeof atualizarBadgeOrg === "function") atualizarBadgeOrg();
+  if (typeof crmBadge === "function") crmBadge();
   if (typeof badgesPapel === "function") badgesPapel();
 }
 function advIniciar() {
@@ -1989,6 +2140,648 @@ function audIniciar() {
 }
 
 
+/* ===== 38-crm-dados: CRM jurídico — modelo de dados, configuração e regras de negócio (sem tela) =====
+   Módulo isolado, pensado para virar produto: dados por escritório (orgs/{CRM_ORG}/crm_*), termos em um dicionário (CRM_TERMOS),
+   listas e funil configuráveis (crm_config). Inspirado em Pipedrive (funil, atividades, casos parados), HubSpot (contatos, empresas,
+   linha do tempo, painéis) e clieent (tags, propostas, pós-venda, aniversariantes, lembretes). */
+const CRM_ORG = (NUVEM_CFG && NUVEM_CFG.org) || "lunelli";
+const CRM_COLS = ["crm_contatos", "crm_negocios", "crm_atividades", "crm_config"];
+let CRM_CONTATOS = LS.get("crm_contatos", []), CRM_NEGOCIOS = LS.get("crm_negocios", []), CRM_ATIV = LS.get("crm_atividades", []), CRM_CFGS = LS.get("crm_config", []);
+const salvarContatos = () => LS.set("crm_contatos", CRM_CONTATOS), salvarNegocios = () => LS.set("crm_negocios", CRM_NEGOCIOS), salvarAtiv = () => LS.set("crm_atividades", CRM_ATIV);
+
+// Dicionário de termos: para outro nicho (clínica, contabilidade…) basta trocar aqui.
+const CRM_TERMOS = { negocio: "caso", negocios: "casos", contato: "contato", contatos: "contatos", ganho: "Contratado", perdido: "Perdido", proposta: "Proposta de honorários", valor: "Honorários", cliente: "cliente" };
+const T = k => CRM_TERMOS[k] || k;
+const Tc = k => cap(T(k));
+
+const CRM_STATUS = [["lead", "Lead"], ["cliente", "Cliente"], ["ex", "Ex-cliente"], ["parceiro", "Parceiro / indicador"], ["outro", "Outro"]];
+const CRM_ATIV_TIPOS = [["ligacao", "Ligação"], ["whatsapp", "WhatsApp"], ["email", "E-mail"], ["reuniao", "Reunião / consulta"], ["tarefa", "Tarefa"], ["nota", "Anotação"]];
+const CRM_PROP_TIPOS = [["", "A definir"], ["fixo", "Valor fixo"], ["mensal", "Mensal (partido/contínuo)"], ["exito", "Só êxito"], ["misto", "Fixo + êxito"]];
+const CRM_PROP_STATUS = [["", "Sem proposta"], ["rascunho", "Rascunho"], ["enviada", "Enviada"], ["aceita", "Aceita"], ["recusada", "Recusada"]];
+const rotDe = (lista, k) => (lista.find(x => x[0] === k) || [k, k || ""])[1];
+
+const CRM_PADRAO = {
+  id: "geral",
+  etapas: [{ id: "e1", nome: "Novo contato", prob: 10 }, { id: "e2", nome: "Qualificação", prob: 20 }, { id: "e3", nome: "Consulta agendada", prob: 40 }, { id: "e4", nome: "Proposta enviada", prob: 60 }, { id: "e5", nome: "Negociação", prob: 80 }],
+  origens: ["Indicação de cliente", "Indicação de colega / parceiro", "Site", "Instagram", "LinkedIn", "Google", "WhatsApp", "Evento / palestra", "Cliente antigo", "Outro"],
+  areas: ["Trabalhista", "Cível", "Empresarial", "Tributário", "Contratos", "Consumidor", "Família e sucessões", "Previdenciário", "Imobiliário", "Outro"],
+  tags: ["VIP", "Empresa", "Recorrente", "Parceiro", "Urgente"],
+  motivos: ["Honorários", "Escolheu outro escritório", "Desistiu do caso", "Sem retorno", "Fora da nossa área", "Conflito de interesses", "Prescrição / inviável", "Outro"],
+  diasSemContato: 90, diasParado: 15, escritorio: "Lunelli Advocacia",
+  modelo: "Prezado(a) {cliente},\n\nObrigado pela confiança. Segue a proposta de honorários do {escritorio} para {servico}.\n\nHonorários: {valor}\nForma de pagamento: {forma}\nValidade desta proposta: {validade}\n\n{obs}\nFicamos à disposição para esclarecer qualquer ponto.\n\nAtenciosamente,\n{escritorio}"
+};
+function crmCfg() { const s = CRM_CFGS.find(x => x.id === "geral") || {}; return Object.assign({}, CRM_PADRAO, s); }
+function crmSalvarCfg(patch) {
+  let s = CRM_CFGS.find(x => x.id === "geral"); if (!s) { s = { id: "geral" }; CRM_CFGS.push(s); }
+  Object.assign(s, JSON.parse(JSON.stringify(patch))); LS.set("crm_config", CRM_CFGS);
+}
+
+// ---------- utilidades
+const crmContato = id => CRM_CONTATOS.find(c => c.id === id) || null;
+const crmNegocio = id => CRM_NEGOCIOS.find(n => n.id === id) || null;
+const diasEntre = (a, b) => Math.round((new Date(b + "T12:00:00") - new Date(a + "T12:00:00")) / 864e5);
+const soDigitos = s => (s || "").replace(/\D/g, "");
+function fmtDoc(s) {
+  const d = soDigitos(s);
+  if (d.length === 11) return d.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+  if (d.length === 14) return d.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
+  return (s || "").trim();
+}
+function fmtTel(s) {
+  let d = soDigitos(s); if (d.length >= 12 && d.startsWith("55")) d = d.slice(2);
+  if (d.length === 11) return d.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+  if (d.length === 10) return d.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+  return (s || "").trim();
+}
+const linkWhats = s => { let d = soDigitos(s); if (d.length === 10 || d.length === 11) d = "55" + d; return d.length >= 12 ? "https://wa.me/" + d : ""; };
+const crmNum = s => { if (s == null || s === "") return 0; if (typeof s === "number") return s; const n = lerValorBR(String(s)); return n == null || isNaN(n) ? 0 : n; };
+const numBR = n => n ? n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "";
+const crmSigla = nome => (nome || "?").trim().charAt(0).toUpperCase();
+
+// ---------- contatos
+function crmNomeContato(id) { const c = crmContato(id); return c ? c.nome : ""; }
+function crmAchaContatoPorNome(nome) { const k = norm(nome); return k ? CRM_CONTATOS.find(c => norm(c.nome) === k) || null : null; }
+function crmDuplicado(c) { // outro contato com o mesmo CPF/CNPJ, e-mail ou nome
+  const d = soDigitos(c.doc), e = (c.email || "").trim().toLowerCase(), n = norm(c.nome);
+  return CRM_CONTATOS.find(x => x.id !== c.id && ((d.length >= 11 && soDigitos(x.doc) === d) || (e && (x.email || "").trim().toLowerCase() === e) || (n && norm(x.nome) === n))) || null;
+}
+function crmNovoContato(d) {
+  const c = Object.assign({ id: uid(), criado: hojeIso(), tipo: "PF", nome: "", doc: "", tel: "", tel2: "", email: "", cidade: "", uf: "", empresa: "", cargo: "", status: "lead", origem: "", indicadoPor: "", resp: respPadrao(), tags: [], areas: [], nasc: "", lgpd: false, lgpdEm: "", obs: "" }, d || {});
+  CRM_CONTATOS.push(c); return c;
+}
+const crmAtivsDoContato = id => CRM_ATIV.filter(a => a.contatoId === id);
+const crmNegociosDoContato = id => CRM_NEGOCIOS.filter(n => n.contatoId === id);
+function crmUltimoContato(id) { // data da última atividade concluída (ou do cadastro)
+  let u = ""; for (const a of CRM_ATIV) if (a.contatoId === id && a.feita && a.tipo !== "tarefa") { const d = (a.feitaEm || a.data || ""); if (d > u) u = d; }
+  const c = crmContato(id); return u || (c && c.criado) || "";
+}
+const crmPastasDoContato = c => PROCS.filter(p => p.cliente && norm(p.cliente) === norm(c.nome));
+function crmAniversario(c, ref) { // próxima data de aniversário a partir de ref (iso) ou ""
+  if (!c.nasc || !/^\d{4}-\d{2}-\d{2}$/.test(c.nasc)) return "";
+  const y = +ref.slice(0, 4); let d = y + c.nasc.slice(4); if (d < ref) d = (y + 1) + c.nasc.slice(4); return d;
+}
+
+// ---------- casos (oportunidades)
+const crmEtapaDe = n => { const e = crmCfg().etapas; return e.find(x => x.id === n.etapa) || e[0]; };
+function crmProb(n) { if (n.status === "ganho") return 100; if (n.status === "perdido") return 0; return n.prob !== "" && n.prob != null && !isNaN(n.prob) ? +n.prob : (crmEtapaDe(n) || { prob: 0 }).prob; }
+const crmPonderado = n => (n.valor || 0) * crmProb(n) / 100;
+const crmParadoDias = n => { const ref = n.etapaEm || n.criado; return ref ? Math.max(0, diasEntre(ref, hojeIso())) : 0; };
+const crmAtivsAbertas = filtro => CRM_ATIV.filter(a => !a.feita && (!filtro || filtro(a)));
+function crmProxAtiv(filtro) { return crmAtivsAbertas(filtro).sort((a, b) => ((a.data || "9999") + (a.hora || "")).localeCompare((b.data || "9999") + (b.hora || "")))[0] || null; }
+function crmNovoNegocio(d) {
+  const cfg = crmCfg(), n = Object.assign({ id: uid(), criado: hojeIso(), titulo: "", contatoId: "", etapa: cfg.etapas[0].id, etapaEm: hojeIso(), area: "", valor: 0, prob: "", previsto: "", resp: respPadrao(), origem: "", status: "aberto", fechadoEm: "", motivo: "", obs: "", prop: { tipo: "", entrada: 0, parcelas: 0, exito: 0, validade: "", status: "", enviadaEm: "" }, hist: [] }, d || {});
+  if (!n.hist.length) n.hist.push({ e: n.etapa, em: n.etapaEm });
+  CRM_NEGOCIOS.push(n); return n;
+}
+function crmMover(n, etapaId) {
+  if (n.etapa === etapaId && n.status === "aberto") return;
+  n.etapa = etapaId; n.etapaEm = hojeIso(); n.hist = (n.hist || []).concat([{ e: etapaId, em: n.etapaEm }]);
+  if (n.status !== "aberto") { n.status = "aberto"; n.fechadoEm = ""; n.motivo = ""; }
+  salvarNegocios();
+}
+function crmGanhar(n) {
+  n.status = "ganho"; n.fechadoEm = hojeIso(); n.motivo = ""; if (n.prop && n.prop.status && n.prop.status !== "aceita") n.prop.status = "aceita";
+  const c = crmContato(n.contatoId); if (c && c.status !== "cliente") { c.status = "cliente"; salvarContatos(); }
+  salvarNegocios();
+}
+function crmPerder(n, motivo) { n.status = "perdido"; n.fechadoEm = hojeIso(); n.motivo = motivo || ""; salvarNegocios(); }
+function crmReabrir(n) { n.status = "aberto"; n.fechadoEm = ""; n.motivo = ""; n.etapaEm = hojeIso(); salvarNegocios(); }
+function crmExcluirNegocio(id) { CRM_NEGOCIOS = CRM_NEGOCIOS.filter(n => n.id !== id); CRM_ATIV = CRM_ATIV.filter(a => a.negocioId !== id); salvarNegocios(); salvarAtiv(); }
+function crmExcluirContato(id) {
+  CRM_CONTATOS = CRM_CONTATOS.filter(c => c.id !== id);
+  for (const n of CRM_NEGOCIOS) if (n.contatoId === id) n.contatoId = "";
+  CRM_ATIV = CRM_ATIV.filter(a => a.contatoId !== id || a.negocioId);
+  for (const a of CRM_ATIV) if (a.contatoId === id) a.contatoId = "";
+  salvarContatos(); salvarNegocios(); salvarAtiv();
+}
+function crmFormaPgto(n) {
+  const p = n.prop || {}, v = n.valor || 0, ex = p.exito ? numBR(+p.exito) + "% sobre o proveito econômico obtido (êxito)" : "";
+  if (p.tipo === "exito") return ex || "somente no êxito";
+  let base = "";
+  if (p.tipo === "mensal") base = brl(v) + " por mês" + (p.parcelas > 0 ? ", por " + p.parcelas + " meses" : "");
+  else if (p.parcelas > 1) { const ent = p.entrada || 0, resto = Math.max(0, v - ent); base = (ent ? "entrada de " + brl(ent) + " + " : "") + p.parcelas + " parcelas de " + brl(resto / p.parcelas) + " (total " + brl(v) + ")"; }
+  else base = brl(v) + " à vista";
+  return p.tipo === "misto" && ex ? base + " + " + ex : base;
+}
+function crmTextoProposta(n) {
+  const cfg = crmCfg(), c = crmContato(n.contatoId), p = n.prop || {};
+  const valor = p.tipo === "exito" ? "somente no êxito" : brl(n.valor || 0);
+  return cfg.modelo.replace(/\{cliente\}/g, c ? c.nome : "cliente").replace(/\{escritorio\}/g, cfg.escritorio).replace(/\{servico\}/g, n.titulo || n.area || "os serviços jurídicos acordados")
+    .replace(/\{valor\}/g, valor).replace(/\{forma\}/g, crmFormaPgto(n)).replace(/\{validade\}/g, p.validade ? br(p.validade) : "15 dias a contar do envio").replace(/\{obs\}/g, (n.obs || "").trim()).replace(/\n{3,}/g, "\n\n");
+}
+
+// ---------- atividades
+function crmNovaAtiv(d) { const a = Object.assign({ id: uid(), criada: hojeIso(), tipo: "ligacao", titulo: "", contatoId: "", negocioId: "", data: hojeIso(), hora: "", resp: respPadrao(), nota: "", feita: false, feitaEm: "" }, d || {}); CRM_ATIV.push(a); return a; }
+function crmConcluir(a) { a.feita = true; a.feitaEm = hojeIso(); salvarAtiv(); }
+const crmAtrasada = a => !a.feita && a.data && a.data < hojeIso();
+const crmMeusResp = () => { const r = [respPadrao(), "Equipe"]; if (souSecretaria()) r.push("Secretaria"); return r; };
+
+// ---------- indicadores
+function crmStats() {
+  const hoje = hojeIso(), mes = hoje.slice(0, 7), cfg = crmCfg(), N = CRM_NEGOCIOS;
+  const ab = N.filter(n => n.status === "aberto"), ga = N.filter(n => n.status === "ganho"), pe = N.filter(n => n.status === "perdido");
+  const soma = (l, f) => l.reduce((s, n) => s + f(n), 0);
+  const por = (lista, chave) => { const m = {}; for (const n of lista) { const k = chave(n) || "—"; (m[k] = m[k] || []).push(n); } return m; };
+  const origem = Object.entries(por(N, n => n.origem)).map(([k, l]) => ({ k, qtd: l.length, ganhos: l.filter(n => n.status === "ganho").length, valor: soma(l.filter(n => n.status === "ganho"), n => n.valor || 0), enc: l.filter(n => n.status !== "aberto").length })).sort((a, b) => b.valor - a.valor || b.qtd - a.qtd);
+  const area = Object.entries(por(N, n => n.area)).map(([k, l]) => ({ k, qtd: l.length, ganhos: l.filter(n => n.status === "ganho").length, valor: soma(l.filter(n => n.status === "ganho"), n => n.valor || 0) })).sort((a, b) => b.valor - a.valor || b.qtd - a.qtd);
+  const motivos = Object.entries(por(pe, n => n.motivo)).map(([k, l]) => ({ k, qtd: l.length, valor: soma(l, n => n.valor || 0) })).sort((a, b) => b.qtd - a.qtd);
+  const indic = Object.entries(por(N.filter(n => { const c = crmContato(n.contatoId); return c && c.indicadoPor; }), n => crmContato(n.contatoId).indicadoPor)).map(([k, l]) => ({ k, qtd: l.length, ganhos: l.filter(n => n.status === "ganho").length, valor: soma(l.filter(n => n.status === "ganho"), n => n.valor || 0) })).sort((a, b) => b.valor - a.valor || b.qtd - a.qtd);
+  const etapas = cfg.etapas.map(e => { const l = ab.filter(n => crmEtapaDe(n).id === e.id); return { id: e.id, nome: e.nome, qtd: l.length, valor: soma(l, n => n.valor || 0), pond: soma(l, crmPonderado) }; });
+  const previsao = {}; let semData = 0;
+  for (const n of ab) { if (!n.previsto) { semData += crmPonderado(n); continue; } const m = n.previsto.slice(0, 7); previsao[m] = (previsao[m] || 0) + crmPonderado(n); }
+  const ciclos = ga.filter(n => n.criado && n.fechadoEm).map(n => diasEntre(n.criado, n.fechadoEm));
+  const semContato = CRM_CONTATOS.filter(c => c.status === "cliente").map(c => ({ c, dias: diasEntre(crmUltimoContato(c.id) || c.criado || hoje, hoje) })).filter(x => x.dias >= cfg.diasSemContato && !crmAtivsAbertas(a => a.contatoId === x.c.id).length).sort((a, b) => b.dias - a.dias);
+  const aniv = CRM_CONTATOS.map(c => ({ c, d: crmAniversario(c, hoje) })).filter(x => x.d && diasEntre(hoje, x.d) <= 30).sort((a, b) => a.d.localeCompare(b.d));
+  return {
+    abertos: ab.length, valorAberto: soma(ab, n => n.valor || 0), ponderado: soma(ab, crmPonderado),
+    ganhosMes: ga.filter(n => (n.fechadoEm || "").startsWith(mes)), valorGanhosMes: soma(ga.filter(n => (n.fechadoEm || "").startsWith(mes)), n => n.valor || 0),
+    ganhos: ga.length, perdidos: pe.length, conversao: ga.length + pe.length ? ga.length / (ga.length + pe.length) : null,
+    ticket: ga.length ? soma(ga, n => n.valor || 0) / ga.length : null, ciclo: ciclos.length ? ciclos.reduce((a, b) => a + b, 0) / ciclos.length : null,
+    parados: ab.filter(n => crmParadoDias(n) >= cfg.diasParado).length, semAtiv: ab.filter(n => !crmAtivsAbertas(a => a.negocioId === n.id).length).length,
+    atrasadas: CRM_ATIV.filter(crmAtrasada).length, etapas, origem, area, motivos, indic, previsao, semDataPond: semData, semContato, aniv
+  };
+}
+
+// ---------- importação / exportação (CSV com ; e BOM, como o Excel brasileiro espera)
+const csvQ = v => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"';
+const csvTexto = (cab, linhas) => "﻿" + [cab].concat(linhas).map(l => l.map(csvQ).join(";")).join("\r\n");
+function csvParse(txt) {
+  txt = (txt || "").replace(/^﻿/, ""); const prim = txt.split(/\r?\n/)[0] || "", sep = (prim.match(/;/g) || []).length >= (prim.match(/,/g) || []).length ? ";" : ",";
+  const linhas = []; let l = [], c = "", asp = false;
+  for (let i = 0; i < txt.length; i++) {
+    const ch = txt[i];
+    if (asp) { if (ch === '"') { if (txt[i + 1] === '"') { c += '"'; i++; } else asp = false; } else c += ch; }
+    else if (ch === '"') asp = true;
+    else if (ch === sep) { l.push(c); c = ""; }
+    else if (ch === "\n" || ch === "\r") { if (ch === "\r" && txt[i + 1] === "\n") i++; l.push(c); c = ""; if (l.some(x => x.trim() !== "")) linhas.push(l); l = []; }
+    else c += ch;
+  }
+  l.push(c); if (l.some(x => x.trim() !== "")) linhas.push(l);
+  return linhas;
+}
+const CRM_CAMPOS_CSV = [["nome", "Nome"], ["tipo", "Tipo (PF/PJ)"], ["doc", "CPF/CNPJ"], ["tel", "Telefone"], ["tel2", "Telefone 2"], ["email", "E-mail"], ["cidade", "Cidade"], ["uf", "UF"], ["empresa", "Empresa"], ["cargo", "Cargo"], ["status", "Situação"], ["origem", "Origem"], ["indicadoPor", "Indicado por"], ["resp", "Responsável"], ["tags", "Tags"], ["areas", "Áreas"], ["nasc", "Nascimento"], ["obs", "Observações"]];
+function crmDataBR(s) { s = (s || "").trim(); const m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(s); if (m) return m[3] + "-" + m[2].padStart(2, "0") + "-" + m[1].padStart(2, "0"); return /^\d{4}-\d{2}-\d{2}$/.test(s) ? s : ""; }
+function crmImportarCsv(txt) { // devolve {novos, atualizados, ignorados}
+  const L = csvParse(txt); if (L.length < 2) return { novos: 0, atualizados: 0, ignorados: 0, erro: "Arquivo vazio ou sem cabeçalho." };
+  const cab = L[0].map(h => norm(h)), col = {};
+  const acha = (...ks) => cab.findIndex(h => ks.some(k => h === norm(k) || h.includes(norm(k))));
+  const idx = { nome: acha("nome"), tipo: acha("tipo"), doc: acha("cpf", "cnpj", "documento"), tel: acha("telefone", "celular", "whatsapp", "fone"), tel2: acha("telefone 2", "tel 2"), email: acha("e-mail", "email"), cidade: acha("cidade"), uf: cab.findIndex(h => h === "UF"), empresa: acha("empresa"), cargo: acha("cargo"), status: acha("situacao", "status"), origem: acha("origem"), indicadoPor: acha("indicado"), resp: acha("responsavel"), tags: acha("tags", "etiquetas"), areas: acha("areas", "area"), nasc: acha("nascimento", "aniversario"), obs: acha("observ") };
+  if (idx.nome < 0) return { novos: 0, atualizados: 0, ignorados: 0, erro: "Não encontrei a coluna “Nome” no cabeçalho." };
+  let novos = 0, atu = 0, ign = 0; const lista = s => (s || "").split(/[,|]/).map(x => x.trim()).filter(Boolean);
+  for (const r of L.slice(1)) {
+    const g = k => idx[k] >= 0 ? (r[idx[k]] || "").trim() : ""; if (!g("nome")) { ign++; continue; }
+    const st = CRM_STATUS.find(s => norm(s[1]) === norm(g("status")) || s[0] === norm(g("status")).toLowerCase());
+    const d = { nome: g("nome"), tipo: /^(pj|juridica|empresa)/i.test(norm(g("tipo")).toLowerCase()) || soDigitos(g("doc")).length === 14 ? "PJ" : "PF", doc: fmtDoc(g("doc")), tel: fmtTel(g("tel")), tel2: fmtTel(g("tel2")), email: g("email").toLowerCase(), cidade: g("cidade"), uf: g("uf").toUpperCase().slice(0, 2), empresa: g("empresa"), cargo: g("cargo"), status: st ? st[0] : "lead", origem: g("origem"), indicadoPor: g("indicadoPor"), tags: lista(g("tags")), areas: lista(g("areas")), nasc: crmDataBR(g("nasc")), obs: g("obs") };
+    if (g("resp")) d.resp = g("resp");
+    const dup = crmDuplicado(d);
+    if (dup) { for (const k in d) if (d[k] && (dup[k] == null || dup[k] === "" || (Array.isArray(dup[k]) && !dup[k].length))) dup[k] = d[k]; atu++; }
+    else { crmNovoContato(d); novos++; }
+  }
+  salvarContatos(); return { novos, atualizados: atu, ignorados: ign };
+}
+function crmLinhaContato(c) { return CRM_CAMPOS_CSV.map(([k]) => k === "tags" || k === "areas" ? (c[k] || []).join(", ") : k === "nasc" ? (c.nasc ? br(c.nasc) : "") : (c[k] || "")); }
+const crmCabContato = () => CRM_CAMPOS_CSV.map(x => x[1]);
+const crmCabNegocio = () => ["Caso", "Contato", "Etapa", "Situação", "Área", "Honorários (R$)", "Probabilidade (%)", "Ponderado (R$)", "Previsão", "Responsável", "Origem", "Criado em", "Fechado em", "Motivo da perda", "Proposta", "Forma de pagamento"];
+const crmLinhaNegocio = n => [n.titulo, crmNomeContato(n.contatoId), (crmEtapaDe(n) || {}).nome || "", n.status === "ganho" ? Tc("ganho") : n.status === "perdido" ? "Perdido" : "Em aberto", n.area || "", n.valor || 0, crmProb(n), Math.round(crmPonderado(n)), n.previsto ? br(n.previsto) : "", n.resp || "", n.origem || "", br(n.criado), n.fechadoEm ? br(n.fechadoEm) : "", n.motivo || "", rotDe(CRM_PROP_STATUS, (n.prop || {}).status), crmFormaPgto(n)];
+
+
+/* ===== 39-crm-ui: telas do CRM — Funil (kanban), Contatos, Atividades, Painel e Ajustes ===== */
+const CRMUI = { aba: "funil", barra: null, ajOk: false, f: { busca: "", resp: "", area: "", enc: false }, c: { busca: "", status: "", tag: "", origem: "", resp: "", ord: "nome", lim: 150 }, a: { resp: "", tipo: "", busca: "", concl: false } };
+const crmAbas = () => souSecretaria() ? [["contatos", "Contatos"], ["ativ", "Atividades"]] : [["funil", "Funil"], ["contatos", "Contatos"], ["ativ", "Atividades"], ["painel", "Painel"], ["ajustes", "Ajustes"]];
+const crmVeValores = () => !souSecretaria();
+function optsSel(sel, lista, vazio) {
+  sel.textContent = ""; if (vazio != null) { const o = el("option", "", vazio); o.value = ""; sel.appendChild(o); }
+  for (const x of lista) { const v = Array.isArray(x) ? x[0] : x, n = Array.isArray(x) ? x[1] : x; const o = el("option", "", n); o.value = v; sel.appendChild(o); }
+  return sel;
+}
+const selFiltro = (rot, lista, vazio, atual, fn) => { const s = optsSel(el("select"), lista, vazio); s.setAttribute("aria-label", rot); s.value = atual || ""; s.onchange = () => fn(s.value); return s; };
+function buscaInput(ph, atual, fn) { const i = el("input"); i.type = "text"; i.placeholder = ph; i.setAttribute("aria-label", ph); i.value = atual || ""; i.oninput = () => fn(i.value); return i; }
+const respOpcoes = () => { const r = RESPS.slice(); for (const x of [...CRM_CONTATOS, ...CRM_NEGOCIOS, ...CRM_ATIV]) if (x.resp && !r.includes(x.resp)) r.push(x.resp); return r; };
+function kpiEl(v, l, s) { const d = el("div", "kpi"); d.append(el("div", "v", v), el("div", "l", l)); if (s) d.appendChild(el("div", "s", s)); return d; }
+const dataCurta = d => d ? br(d).slice(0, 5) : "";
+
+// ---------- estrutura da tela
+function crmDesenhar() {
+  const abas = crmAbas(); if (!abas.some(a => a[0] === CRMUI.aba)) CRMUI.aba = abas[0][0];
+  const tb = $("crmTabs"); tb.textContent = "";
+  for (const [k, n] of abas) { const b = el("button", "", n); b.type = "button"; b.dataset.t = k; b.setAttribute("role", "tab"); b.setAttribute("aria-selected", k === CRMUI.aba); tb.appendChild(b); }
+  crmDatalists();
+  if (CRMUI.barra !== CRMUI.aba) { CRMUI.barra = CRMUI.aba; CRMUI.ajOk = false; crmBarra(); }
+  crmLista(); crmBadge();
+}
+function crmDatalists() {
+  const dc = $("crmDlContatos"); dc.textContent = ""; for (const c of CRM_CONTATOS.slice().sort((a, b) => a.nome.localeCompare(b.nome, "pt"))) { const o = el("option"); o.value = c.nome; dc.appendChild(o); }
+  const de = $("crmDlEmpresas"); de.textContent = ""; const emp = new Set([...CRM_CONTATOS.filter(c => c.tipo === "PJ").map(c => c.nome), ...CRM_CONTATOS.map(c => c.empresa).filter(Boolean)]);
+  for (const n of [...emp].sort((a, b) => a.localeCompare(b, "pt"))) { const o = el("option"); o.value = n; de.appendChild(o); }
+}
+function crmBarra() {
+  const b = $("crmBarra"); b.textContent = ""; const cfg = crmCfg();
+  if (CRMUI.aba === "funil") {
+    const f = CRMUI.f;
+    b.append(buscaInput("Buscar caso ou contato…", f.busca, v => { f.busca = v; crmLista(); }), selFiltro("Responsável", respOpcoes(), "Todos os responsáveis", f.resp, v => { f.resp = v; crmLista(); }),
+      selFiltro("Área", cfg.areas, "Todas as áreas", f.area, v => { f.area = v; crmLista(); }));
+    const l = el("label", "chk"), cb = el("input"); cb.type = "checkbox"; cb.checked = f.enc; cb.onchange = () => { f.enc = cb.checked; crmLista(); }; l.append(cb, document.createTextNode(" Mostrar encerrados")); b.appendChild(l);
+    b.append(btn("Novo " + T("negocio"), () => crmAbrirNegocio(null), ""), btn("Exportar", () => crmExportar("negocios")));
+  } else if (CRMUI.aba === "contatos") {
+    const c = CRMUI.c, tags = [...new Set([...cfg.tags, ...CRM_CONTATOS.flatMap(x => x.tags || [])])].sort((x, y) => x.localeCompare(y, "pt"));
+    b.append(buscaInput("Buscar nome, CPF/CNPJ, telefone, e-mail…", c.busca, v => { c.busca = v; c.lim = 150; crmLista(); }), selFiltro("Situação", CRM_STATUS, "Todas as situações", c.status, v => { c.status = v; crmLista(); }),
+      selFiltro("Tag", tags, "Todas as tags", c.tag, v => { c.tag = v; crmLista(); }), selFiltro("Origem", cfg.origens, "Todas as origens", c.origem, v => { c.origem = v; crmLista(); }),
+      selFiltro("Ordenar", [["nome", "Ordem alfabética"], ["recente", "Mais recentes"], ["contato", "Mais tempo sem contato"]], null, c.ord, v => { c.ord = v; crmLista(); }));
+    b.append(btn("Novo contato", () => crmAbrirContato(null), ""), btn("Exportar", () => crmExportar("contatos")), btn("Importar CSV", crmImportar));
+  } else if (CRMUI.aba === "ativ") {
+    const a = CRMUI.a;
+    b.append(buscaInput("Buscar atividade…", a.busca, v => { a.busca = v; crmLista(); }), selFiltro("Responsável", respOpcoes(), "Todos", a.resp, v => { a.resp = v; crmLista(); }), selFiltro("Tipo", CRM_ATIV_TIPOS, "Todos os tipos", a.tipo, v => { a.tipo = v; crmLista(); }));
+    const l = el("label", "chk"), cb = el("input"); cb.type = "checkbox"; cb.checked = a.concl; cb.onchange = () => { a.concl = cb.checked; crmLista(); }; l.append(cb, document.createTextNode(" Mostrar concluídas")); b.appendChild(l);
+    b.append(btn("Nova atividade", () => crmAbrirAtiv(null), ""));
+  }
+}
+function crmLista() {
+  const box = $("crmLista");
+  if (CRMUI.aba === "ajustes") { if (CRMUI.ajOk) return; CRMUI.ajOk = true; box.textContent = ""; crmAjustes(box); return; }
+  box.textContent = "";
+  if (CRMUI.aba === "funil") crmFunil(box); else if (CRMUI.aba === "contatos") crmContatos(box); else if (CRMUI.aba === "ativ") crmAtividades(box); else if (CRMUI.aba === "painel") crmPainel(box);
+}
+function crmBadge() {
+  const b = $("bdCrm"); if (!b) return; const eu = crmMeusResp(), n = CRM_ATIV.filter(a => crmAtrasada(a) && eu.includes(a.resp)).length;
+  b.hidden = !n; b.textContent = n > 99 ? "99+" : n; b.title = n + " atividade(s) atrasada(s) do CRM";
+}
+
+// ---------- funil (kanban)
+function crmFiltrarNegocios() {
+  const f = CRMUI.f, q = norm(f.busca);
+  return CRM_NEGOCIOS.filter(n => (!f.resp || n.resp === f.resp) && (!f.area || n.area === f.area) && (!q || norm(n.titulo + " " + crmNomeContato(n.contatoId) + " " + (n.obs || "")).includes(q)));
+}
+function crmCardNegocio(n, arrasta) {
+  const cfg = crmCfg(), c = el("div", "card crmc" + (n.status !== "aberto" ? " feito" : "")); c.tabIndex = 0; c.dataset.id = n.id;
+  const ct = crmContato(n.contatoId), prox = crmProxAtiv(a => a.negocioId === n.id), parado = crmParadoDias(n), hoje = hojeIso();
+  const top = el("div", "crmtop"); top.append(el("b", "", n.titulo || "(sem título)"), el("span", "crmav", crmSigla(n.resp))); top.lastChild.title = n.resp || "";
+  c.append(top, el("div", "hint", ct ? ct.nome : "Sem contato"));
+  const t = el("div", "crmtags");
+  if (n.valor) t.appendChild(el("span", "tag", brlCurto(n.valor)));
+  if (n.status === "ganho") t.appendChild(el("span", "tag ok", Tc("ganho")));
+  if (n.status === "perdido") t.appendChild(el("span", "tag crit", "Perdido" + (n.motivo ? " · " + n.motivo : "")));
+  if (n.status === "aberto") {
+    if (n.previsto) t.appendChild(el("span", "tag" + (n.previsto < hoje ? " crit" : ""), "prev. " + dataCurta(n.previsto)));
+    if (parado >= cfg.diasParado) t.appendChild(el("span", "tag warn", "parado há " + parado + " d"));
+    t.appendChild(prox ? el("span", "tag" + (crmAtrasada(prox) ? " crit" : ""), "↻ " + (prox.data ? dataCurta(prox.data) : "sem data")) : el("span", "tag warn", "sem atividade"));
+    if (n.prop && n.prop.status === "enviada") t.appendChild(el("span", "tag", "proposta enviada"));
+  }
+  c.appendChild(t);
+  c.onclick = () => crmAbrirNegocio(n.id); c.onkeydown = e => { if (e.key === "Enter") crmAbrirNegocio(n.id); };
+  if (arrasta) { c.draggable = true; c.addEventListener("dragstart", e => { e.dataTransfer.setData("text/plain", n.id); e.dataTransfer.effectAllowed = "move"; }); }
+  return c;
+}
+function crmFunil(box) {
+  const cfg = crmCfg(), todos = crmFiltrarNegocios(), ab = todos.filter(n => n.status === "aberto");
+  const soma = (l, f) => l.reduce((s, n) => s + f(n), 0);
+  const k = el("div", "kpis"); k.append(kpiEl(ab.length, Tc("negocios") + " em aberto"), kpiEl(brlCurto(soma(ab, n => n.valor || 0)), T("valor") + " em aberto"), kpiEl(brlCurto(soma(ab, crmPonderado)), "Previsão ponderada", "valor × probabilidade da etapa"),
+    kpiEl(ab.filter(n => crmParadoDias(n) >= cfg.diasParado).length, "Parados", "há " + cfg.diasParado + "+ dias na mesma etapa"), kpiEl(ab.filter(n => !crmAtivsAbertas(a => a.negocioId === n.id).length).length, "Sem próxima atividade"));
+  box.appendChild(k);
+  const board = el("div", "board crmboard"); board.style.gridTemplateColumns = "repeat(" + cfg.etapas.length + ",minmax(185px,1fr))";
+  for (const e of cfg.etapas) {
+    const itens = ab.filter(n => crmEtapaDe(n).id === e.id).sort((a, b) => (a.previsto || "9999").localeCompare(b.previsto || "9999") || a.criado.localeCompare(b.criado));
+    const col = el("div", "col"), h = el("h3"); h.append(el("span", "", e.nome + " · " + itens.length), el("span", "", brlCurto(soma(itens, n => n.valor || 0)))); h.title = "Probabilidade da etapa: " + e.prob + "%";
+    col.appendChild(h); for (const n of itens) col.appendChild(crmCardNegocio(n, true));
+    if (!itens.length) col.appendChild(el("div", "hint", "Arraste os cartões para cá."));
+    col.addEventListener("dragover", ev => { ev.preventDefault(); col.classList.add("over"); }); col.addEventListener("dragleave", () => col.classList.remove("over"));
+    col.addEventListener("drop", ev => { ev.preventDefault(); col.classList.remove("over"); const n = crmNegocio(ev.dataTransfer.getData("text/plain")); if (n && (n.etapa !== e.id || n.status !== "aberto")) { crmMover(n, e.id); crmLista(); } });
+    board.appendChild(col);
+  }
+  box.appendChild(board);
+  if (!CRM_NEGOCIOS.length) box.appendChild(el("div", "empty", "Nenhum " + T("negocio") + " ainda. Use “Novo " + T("negocio") + "” para registrar uma oportunidade de captação (consulta, proposta, indicação…)."));
+  if (CRMUI.f.enc) {
+    const enc = todos.filter(n => n.status !== "aberto").sort((a, b) => (b.fechadoEm || "").localeCompare(a.fechadoEm || ""));
+    const p = el("div", "panel"); p.appendChild(el("h2", "", "Encerrados (" + enc.length + ")")); const l = el("div", "crmgrid"); for (const n of enc) l.appendChild(crmCardNegocio(n, false));
+    if (!enc.length) l.appendChild(el("div", "hint", "Nenhum " + T("negocio") + " encerrado com estes filtros.")); p.appendChild(l); box.appendChild(p);
+  }
+}
+
+// ---------- contatos
+function crmContatosFiltrados() {
+  const c = CRMUI.c, q = norm(c.busca), qd = soDigitos(c.busca);
+  let l = CRM_CONTATOS.filter(x => (!c.status || x.status === c.status) && (!c.tag || (x.tags || []).includes(c.tag)) && (!c.origem || x.origem === c.origem) && (!c.resp || x.resp === c.resp) &&
+    (!q || norm([x.nome, x.empresa, x.email, x.cidade, x.obs].join(" ")).includes(q) || (qd.length >= 3 && soDigitos([x.doc, x.tel, x.tel2].join(" ")).includes(qd))));
+  if (c.ord === "recente") l.sort((a, b) => (b.criado || "").localeCompare(a.criado || "")); else if (c.ord === "contato") l.sort((a, b) => (crmUltimoContato(a.id) || "").localeCompare(crmUltimoContato(b.id) || "")); else l.sort((a, b) => a.nome.localeCompare(b.nome, "pt"));
+  return l;
+}
+function crmContatos(box) {
+  const l = crmContatosFiltrados(), cfg = crmCfg(), hoje = hojeIso(), c = CRMUI.c;
+  const p = el("div", "panel"); p.appendChild(el("h2", "", Tc("contatos") + " (" + l.length + (l.length !== CRM_CONTATOS.length ? " de " + CRM_CONTATOS.length : "") + ")"));
+  if (!l.length) { p.appendChild(el("div", "empty", CRM_CONTATOS.length ? "Nenhum contato com estes filtros." : "Nenhum contato ainda. Use “Novo contato” ou “Importar CSV” (planilha do Excel salva como CSV).")); box.appendChild(p); return; }
+  const w = el("div", "tblwrap"), t = el("table", "crmtbl"), cab = el("tr");
+  for (const h of ["Nome", "Contato", "Situação", "Origem", "Tags", "Resp.", "Último contato"].concat(crmVeValores() ? [Tc("negocios")] : [])) cab.appendChild(el("th", "", h));
+  t.appendChild(el("thead")).appendChild(cab); const tb = el("tbody");
+  for (const x of l.slice(0, c.lim)) {
+    const tr = el("tr"); tr.tabIndex = 0; tr.onclick = () => crmAbrirContato(x.id); tr.onkeydown = e => { if (e.key === "Enter") crmAbrirContato(x.id); };
+    const n = el("td"); n.append(el("b", "", x.nome), el("div", "hint", [x.tipo === "PJ" ? "Pessoa jurídica" : (x.empresa || ""), x.cidade ? x.cidade + (x.uf ? "/" + x.uf : "") : ""].filter(Boolean).join(" · "))); tr.appendChild(n);
+    const ct = el("td"); ct.append(el("div", "", x.tel || ""), el("div", "hint", x.email || "")); tr.appendChild(ct);
+    const st = el("td"); st.appendChild(el("span", "tag" + (x.status === "cliente" ? " ok" : x.status === "lead" ? " warn" : ""), rotDe(CRM_STATUS, x.status))); tr.appendChild(st);
+    tr.appendChild(el("td", "", x.origem || ""));
+    const tg = el("td"); for (const g of x.tags || []) tg.appendChild(el("span", "tag", g)); tr.appendChild(tg);
+    tr.appendChild(el("td", "", x.resp || ""));
+    const uc = crmUltimoContato(x.id), dias = uc ? diasEntre(uc, hoje) : null, td = el("td");
+    td.appendChild(el("span", "tag" + (x.status === "cliente" && dias != null && dias >= cfg.diasSemContato ? " warn" : ""), dias == null ? "—" : dias === 0 ? "hoje" : dias + " d")); tr.appendChild(td);
+    if (crmVeValores()) { const ab = crmNegociosDoContato(x.id).filter(y => y.status === "aberto").length; tr.appendChild(el("td", "", ab ? String(ab) : "")); }
+    tb.appendChild(tr);
+  }
+  t.appendChild(tb); w.appendChild(t); p.appendChild(w);
+  if (l.length > c.lim) p.appendChild(btn("Mostrar mais " + Math.min(150, l.length - c.lim), () => { c.lim += 150; crmLista(); }));
+  box.appendChild(p);
+}
+
+// ---------- atividades
+function crmLinhaAtiv(a, comContato) {
+  const li = el("li"), ct = crmContato(a.contatoId), n = crmNegocio(a.negocioId);
+  li.append(el("span", "tag", rotDe(CRM_ATIV_TIPOS, a.tipo)), el("b", "", a.titulo || rotDe(CRM_ATIV_TIPOS, a.tipo)));
+  const info = [a.data ? br(a.data) + (a.hora ? " " + a.hora : "") : "sem data", a.resp].filter(Boolean).join(" · ");
+  li.appendChild(el("span", "hint", info));
+  if (comContato && ct) { const lk = el("a", "", ct.nome); lk.href = "#"; lk.onclick = e => { e.preventDefault(); crmAbrirContato(ct.id); }; li.appendChild(lk); }
+  if (comContato && n && crmVeValores()) { const lk = el("a", "", "· " + n.titulo); lk.href = "#"; lk.onclick = e => { e.preventDefault(); crmAbrirNegocio(n.id); }; li.appendChild(lk); }
+  if (a.nota) li.appendChild(el("span", "hint", "— " + a.nota));
+  const ac = el("span", "acts");
+  if (!a.feita) { ac.appendChild(btn("Concluir", () => { crmConcluir(a); crmRefazer(); })); ac.appendChild(btn("Concluir e agendar próxima", () => { crmConcluir(a); crmRefazer(); crmAbrirAtiv(null, { contatoId: a.contatoId, negocioId: a.negocioId, tipo: a.tipo, data: somaDias(hojeIso(), 2), resp: a.resp }); })); }
+  else ac.appendChild(btn("Reabrir", () => { a.feita = false; a.feitaEm = ""; salvarAtiv(); crmRefazer(); }));
+  ac.appendChild(btn("Editar", () => crmAbrirAtiv(a.id))); li.appendChild(ac);
+  if (a.feita) li.classList.add("feito"); return li;
+}
+function crmAtividades(box) {
+  const f = CRMUI.a, q = norm(f.busca), hoje = hojeIso();
+  const l = CRM_ATIV.filter(a => (!f.resp || a.resp === f.resp) && (!f.tipo || a.tipo === f.tipo) && (!q || norm(a.titulo + " " + a.nota + " " + crmNomeContato(a.contatoId)).includes(q)));
+  const ordem = (x, y) => ((x.data || "9999") + (x.hora || "")).localeCompare((y.data || "9999") + (y.hora || ""));
+  const ab = l.filter(a => !a.feita).sort(ordem), grupos = [["Atrasadas", ab.filter(a => a.data && a.data < hoje), "crit"], ["Hoje", ab.filter(a => a.data === hoje)], ["Próximas", ab.filter(a => a.data > hoje)], ["Sem data", ab.filter(a => !a.data)]];
+  if (f.concl) grupos.push(["Concluídas (últimas 50)", l.filter(a => a.feita).sort((x, y) => (y.feitaEm || "").localeCompare(x.feitaEm || "")).slice(0, 50)]);
+  const k = el("div", "kpis"); k.append(kpiEl(grupos[0][1].length, "Atrasadas"), kpiEl(grupos[1][1].length, "Para hoje"), kpiEl(grupos[2][1].length, "Próximas"));
+  box.appendChild(k);
+  let algum = false;
+  for (const [nome, itens, cls] of grupos) {
+    if (!itens.length) continue; algum = true;
+    const p = el("div", "panel"), h = el("h2"); h.append(nome + " ", el("span", "tag" + (cls ? " " + cls : ""), String(itens.length))); p.appendChild(h);
+    const ul = el("ul", "mini"); for (const a of itens) ul.appendChild(crmLinhaAtiv(a, true)); p.appendChild(ul); box.appendChild(p);
+  }
+  if (!algum) box.appendChild(el("div", "empty", CRM_ATIV.length ? "Nada pendente com estes filtros. 🎉" : "Nenhuma atividade ainda. Agende ligações, retornos de WhatsApp, reuniões e lembretes ligados a cada contato ou caso."));
+}
+function crmRefazer() { crmLista(); crmBadge(); if (typeof atualizarBadges === "function") atualizarBadges(); }
+
+// ---------- painel
+function crmBarraEl(rot, v, max, txt) {
+  const r = el("div", "crmbar"), t = el("span", "t"), i = el("i"); i.style.width = (max ? Math.max(v > 0 ? 3 : 0, v / max * 100) : 0) + "%"; t.appendChild(i);
+  r.append(el("span", "l", rot), t, el("span", "v", txt)); return r;
+}
+function crmPainel(box) {
+  const s = crmStats(), cfg = crmCfg(), hoje = hojeIso(), pct = x => x == null ? "—" : Math.round(x * 100) + "%";
+  const k = el("div", "kpis");
+  k.append(kpiEl(s.abertos, Tc("negocios") + " em aberto", brl(s.valorAberto)), kpiEl(brlCurto(s.ponderado), "Previsão ponderada"), kpiEl(s.ganhosMes.length, Tc("ganho") + " no mês", brl(s.valorGanhosMes)),
+    kpiEl(pct(s.conversao), "Taxa de conversão", s.ganhos + " contratados · " + s.perdidos + " perdidos"), kpiEl(s.ticket == null ? "—" : brlCurto(s.ticket), "Ticket médio"), kpiEl(s.ciclo == null ? "—" : Math.round(s.ciclo) + " d", "Ciclo médio", "do 1º contato à contratação"));
+  box.appendChild(k);
+  const cols = el("div", "cols2"), painel = (tit, sub) => { const p = el("div", "panel"); p.appendChild(el("h2", "", tit)); if (sub) p.appendChild(el("div", "hint", sub)); cols.appendChild(p); return p; };
+  let p = painel("Funil por etapa", "casos em aberto"); const mx = Math.max(1, ...s.etapas.map(e => e.qtd));
+  for (const e of s.etapas) p.appendChild(crmBarraEl(e.nome, e.qtd, mx, e.qtd + " · " + brlCurto(e.valor)));
+  p = painel("Previsão de receita", "valor ponderado pela probabilidade, por mês previsto"); const meses = Object.keys(s.previsao).sort(), mp = Math.max(1, ...Object.values(s.previsao), s.semDataPond);
+  for (const m of meses) p.appendChild(crmBarraEl(m.slice(5) + "/" + m.slice(0, 4), s.previsao[m], mp, brlCurto(s.previsao[m])));
+  if (s.semDataPond) p.appendChild(crmBarraEl("Sem data prevista", s.semDataPond, mp, brlCurto(s.semDataPond))); if (!meses.length && !s.semDataPond) p.appendChild(el("div", "hint", "Sem casos em aberto."));
+  p = painel("Origem dos casos", "qual canal traz clientes que contratam");
+  const mo = Math.max(1, ...s.origem.map(o => o.qtd)); for (const o of s.origem.slice(0, 10)) p.appendChild(crmBarraEl(o.k, o.qtd, mo, o.qtd + " caso(s) · " + o.ganhos + " contratado(s)" + (o.valor ? " · " + brlCurto(o.valor) : "")));
+  if (!s.origem.length) p.appendChild(el("div", "hint", "Informe a origem nos casos e contatos."));
+  p = painel("Áreas do direito", "casos por área e honorários contratados"); const ma = Math.max(1, ...s.area.map(o => o.qtd));
+  for (const o of s.area.slice(0, 10)) p.appendChild(crmBarraEl(o.k, o.qtd, ma, o.qtd + " · " + (o.valor ? brlCurto(o.valor) : "R$ 0")));
+  if (!s.area.length) p.appendChild(el("div", "hint", "Informe a área nos casos."));
+  p = painel("Motivos de perda", "por que não contrataram"); const mm = Math.max(1, ...s.motivos.map(o => o.qtd));
+  for (const o of s.motivos) p.appendChild(crmBarraEl(o.k, o.qtd, mm, o.qtd + " · " + brlCurto(o.valor))); if (!s.motivos.length) p.appendChild(el("div", "hint", "Nenhum caso perdido registrado."));
+  p = painel("Quem mais indica", "contatos indicadores e o que geraram"); const mi = Math.max(1, ...s.indic.map(o => o.qtd));
+  for (const o of s.indic.slice(0, 10)) p.appendChild(crmBarraEl(o.k, o.qtd, mi, o.qtd + " caso(s) · " + o.ganhos + " contratado(s)" + (o.valor ? " · " + brlCurto(o.valor) : ""))); if (!s.indic.length) p.appendChild(el("div", "hint", "Preencha “Indicado por” nos contatos."));
+  box.appendChild(cols);
+  const pv = el("div", "cols2");
+  const sc = el("div", "panel"); sc.appendChild(el("h2", "", "Pós-atendimento: clientes sem contato")); sc.appendChild(el("div", "hint", "Clientes há " + cfg.diasSemContato + "+ dias sem interação registrada e sem atividade agendada — hora de um retorno."));
+  const ul = el("ul", "mini"); for (const x of s.semContato.slice(0, 12)) { const li = el("li"); li.append(el("b", "", x.c.nome), el("span", "hint", x.dias + " dias"), el("span", "acts")); li.lastChild.append(btn("Abrir", () => crmAbrirContato(x.c.id)), btn("Agendar retorno", () => crmAbrirAtiv(null, { contatoId: x.c.id, titulo: "Retorno ao cliente", data: somaDias(hoje, 1) }))); ul.appendChild(li); }
+  if (!s.semContato.length) ul.appendChild(el("li", "", "Nenhum cliente esquecido. 👍")); sc.appendChild(ul); pv.appendChild(sc);
+  const an = el("div", "panel"); an.appendChild(el("h2", "", "Aniversariantes dos próximos 30 dias")); const ul2 = el("ul", "mini");
+  for (const x of s.aniv) { const li = el("li"), d = diasEntre(hoje, x.d); li.append(el("b", "", x.c.nome), el("span", "hint", br(x.d).slice(0, 5) + (d === 0 ? " · hoje" : " · em " + d + " d")), el("span", "acts")); li.lastChild.appendChild(btn("Abrir", () => crmAbrirContato(x.c.id))); ul2.appendChild(li); }
+  if (!s.aniv.length) ul2.appendChild(el("li", "", "Sem aniversários cadastrados no período. Preencha “Nascimento” nos contatos.")); an.appendChild(ul2); pv.appendChild(an);
+  box.appendChild(pv);
+}
+
+// ---------- ajustes
+function crmListaEditavel(titulo, ajuda, chave, rotulo) {
+  const cfg = crmCfg(), p = el("div", "panel"), ta = el("textarea"); ta.rows = 6; ta.value = cfg[chave].join("\n"); ta.setAttribute("aria-label", titulo);
+  p.append(el("h2", "", titulo), el("div", "hint", ajuda), ta, btn("Salvar " + rotulo, () => { crmSalvarCfg({ [chave]: [...new Set(ta.value.split("\n").map(x => x.trim()).filter(Boolean))] }); CRMUI.barra = null; CRMUI.ajOk = false; crmDesenhar(); }, ""));
+  return p;
+}
+function crmAjustes(box) {
+  const cfg = crmCfg(); let et = cfg.etapas.map(e => Object.assign({}, e));
+  const pe = el("div", "panel"); pe.append(el("h2", "", "Etapas do funil"), el("div", "hint", "Defina as etapas do seu processo de captação e a probabilidade de contratação em cada uma (usada na previsão ponderada). “Contratado” e “Perdido” são encerramentos e não precisam estar na lista."));
+  const lst = el("div", "crmetapas");
+  const draw = () => {
+    lst.textContent = "";
+    et.forEach((e, i) => {
+      const r = el("div", "acts"), nm = el("input"), pr = el("input"); nm.type = "text"; pr.type = "number"; nm.value = e.nome; pr.value = e.prob; pr.min = 0; pr.max = 100; pr.style.width = "80px"; nm.setAttribute("aria-label", "Nome da etapa"); pr.setAttribute("aria-label", "Probabilidade %");
+      nm.oninput = () => { e.nome = nm.value; }; pr.oninput = () => { e.prob = Math.min(100, Math.max(0, +pr.value || 0)); };
+      r.append(nm, pr, el("span", "hint", "%"), btn("↑", () => { if (i) { [et[i - 1], et[i]] = [et[i], et[i - 1]]; draw(); } }), btn("↓", () => { if (i < et.length - 1) { [et[i + 1], et[i]] = [et[i], et[i + 1]]; draw(); } }), btn("Remover", () => { if (et.length > 1) { et.splice(i, 1); draw(); } }, "danger"));
+      lst.appendChild(r);
+    });
+  };
+  draw();
+  pe.append(lst, el("div", "acts")); pe.lastChild.append(btn("Adicionar etapa", () => { et.push({ id: "e" + uid(), nome: "Nova etapa", prob: 50 }); draw(); }), btn("Salvar etapas", () => {
+    et = et.map(e => ({ id: e.id, nome: (e.nome || "").trim(), prob: +e.prob || 0 })).filter(e => e.nome); if (!et.length) { alert("Mantenha ao menos uma etapa."); return; }
+    const ids = new Set(et.map(e => e.id)), orf = CRM_NEGOCIOS.filter(n => n.status === "aberto" && !ids.has(n.etapa));
+    if (orf.length && !confirm(orf.length + " caso(s) estão em etapas removidas e irão para “" + et[0].nome + "”. Continuar?")) return;
+    for (const n of orf) { n.etapa = et[0].id; n.etapaEm = hojeIso(); } if (orf.length) salvarNegocios();
+    crmSalvarCfg({ etapas: et }); CRMUI.ajOk = false; crmDesenhar();
+  }, ""));
+  box.appendChild(pe);
+  const g = el("div", "cols2"); g.append(crmListaEditavel("Origens", "De onde vêm os contatos (uma por linha).", "origens", "origens"), crmListaEditavel("Áreas do direito", "Uma por linha.", "areas", "áreas"), crmListaEditavel("Tags", "Etiquetas para segmentar contatos (uma por linha).", "tags", "tags"), crmListaEditavel("Motivos de perda", "Opções ao marcar um caso como perdido.", "motivos", "motivos"));
+  box.appendChild(g);
+  const pc = el("div", "panel"), d1 = el("input"), d2 = el("input"), es = el("input"); d1.type = d2.type = "number"; es.type = "text"; d1.value = cfg.diasSemContato; d2.value = cfg.diasParado; es.value = cfg.escritorio; d1.min = d2.min = 1;
+  const lab = (t, i) => { const l = el("label"); l.append(t, i); return l; };
+  const gr = el("div", "grid"); gr.append(lab("Alertar cliente sem contato após (dias)", d1), lab("Caso “parado” após (dias na mesma etapa)", d2), lab("Nome do escritório (usado na proposta)", es));
+  pc.append(el("h2", "", "Alertas e identificação"), gr, btn("Salvar", () => { crmSalvarCfg({ diasSemContato: Math.max(1, +d1.value || 90), diasParado: Math.max(1, +d2.value || 15), escritorio: es.value.trim() || CRM_PADRAO.escritorio }); CRMUI.ajOk = false; crmDesenhar(); }, ""));
+  box.appendChild(pc);
+  const pm = el("div", "panel"), tm = el("textarea"); tm.rows = 12; tm.value = cfg.modelo; tm.setAttribute("aria-label", "Modelo de proposta");
+  pm.append(el("h2", "", "Modelo do texto da proposta"), el("div", "hint", "Campos automáticos: {cliente} {escritorio} {servico} {valor} {forma} {validade} {obs}. O botão “Copiar proposta” do caso usa este texto."), tm,
+    el("div", "acts")); pm.lastChild.append(btn("Salvar modelo", () => { crmSalvarCfg({ modelo: tm.value }); CRMUI.ajOk = false; crmDesenhar(); }, ""), btn("Restaurar modelo padrão", () => { tm.value = CRM_PADRAO.modelo; }));
+  box.appendChild(pm);
+  const pd = el("div", "panel"); pd.append(el("h2", "", "Dados"), el("div", "hint", "Escritório (espaço de dados): " + CRM_ORG + ". Os dados do CRM ficam separados dos demais módulos e podem ser exportados a qualquer momento. Lembre: a captação de clientes deve respeitar o Código de Ética da OAB e o Provimento 205/2021 (publicidade), e o tratamento de dados pessoais, a LGPD."), el("div", "acts"));
+  pd.lastChild.append(btn("Exportar contatos (CSV)", () => crmExportar("contatos")), btn("Exportar casos (CSV)", () => crmExportar("negocios")), btn("Exportar tudo (Excel)", () => crmExportar("excel")), btn("Importar contatos (CSV)", crmImportar));
+  box.appendChild(pd);
+}
+
+// ---------- exportar / importar
+async function crmExportar(qual) {
+  const nome = "crm-" + (qual === "excel" ? "completo" : qual) + "-" + hojeIso(), contatos = () => [crmCabContato(), CRM_CONTATOS.map(crmLinhaContato)], negocios = () => [crmCabNegocio(), (crmVeValores() ? CRM_NEGOCIOS : []).map(crmLinhaNegocio)];
+  if (qual === "excel" && (await carregarExcel())) {
+    const wb = new ExcelJS.Workbook(); wb.creator = "Advocacia Lunelli"; wb.created = new Date();
+    for (const [aba, [cab, linhas]] of [["Contatos", contatos()], ["Casos", negocios()]]) {
+      const ws = wb.addWorksheet(aba, { views: [{ state: "frozen", ySplit: 1, showGridLines: false }] }); ws.columns = cab.map(c => ({ header: c, width: Math.max(14, Math.min(34, c.length + 8)) }));
+      const h = ws.getRow(1); h.eachCell(c => { c.font = { bold: true, color: { argb: "FFFFFFFF" } }; c.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF000065" } }; });
+      for (const l of linhas) ws.addRow(l); ws.autoFilter = { from: { row: 1, column: 1 }, to: { row: 1, column: cab.length } };
+    }
+    salvar(new Blob([await wb.xlsx.writeBuffer()], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }), nome + ".xlsx"); return;
+  }
+  const [cab, linhas] = qual === "negocios" ? negocios() : contatos();
+  if (!linhas.length) { alert("Nada para exportar."); return; }
+  salvar(new Blob([csvTexto(cab, linhas)], { type: "text/csv;charset=utf-8" }), (qual === "excel" ? "crm-contatos-" + hojeIso() : nome) + ".csv");
+}
+function crmImportar() {
+  const f = el("input"); f.type = "file"; f.accept = ".csv,text/csv,text/plain";
+  f.onchange = async () => {
+    if (!f.files[0]) return; const buf = await f.files[0].arrayBuffer(); let txt; try { txt = new TextDecoder("utf-8", { fatal: true }).decode(buf); } catch (e) { txt = new TextDecoder("windows-1252").decode(buf); }
+    const r = crmImportarCsv(txt); if (r.erro) { alert(r.erro); return; }
+    alert("Importação concluída: " + r.novos + " novo(s), " + r.atualizados + " já existente(s) completado(s)" + (r.ignorados ? ", " + r.ignorados + " linha(s) sem nome ignorada(s)" : "") + ".");
+    crmDesenhar();
+  };
+  f.click();
+}
+
+// ---------- diálogo: contato
+const CC = { id: null, tags: [], areas: [] };
+function chkGrupo(box, lista, marcados, aoMudar) {
+  box.textContent = ""; box.classList.add("crmchips");
+  for (const x of lista) { const l = el("label", "chk"), c = el("input"); c.type = "checkbox"; c.checked = marcados.includes(x); c.onchange = () => { const i = marcados.indexOf(x); if (c.checked && i < 0) marcados.push(x); if (!c.checked && i >= 0) marcados.splice(i, 1); if (aoMudar) aoMudar(); }; l.append(c, document.createTextNode(" " + x)); box.appendChild(l); }
+}
+function crmAbrirContato(id, preset) {
+  const cfg = crmCfg(), c = id ? crmContato(id) : null, v = c || Object.assign({ tipo: "PF", nome: "", doc: "", tel: "", tel2: "", email: "", cidade: "", uf: "", empresa: "", cargo: "", status: "lead", origem: "", indicadoPor: "", resp: respPadrao(), tags: [], areas: [], nasc: "", lgpd: false, lgpdEm: "", obs: "" }, preset || {});
+  CC.id = c ? c.id : null; CC.tags = (v.tags || []).slice(); CC.areas = (v.areas || []).slice();
+  $("ccTitulo").textContent = c ? c.nome : "Novo contato";
+  optsSel($("ccStatus"), CRM_STATUS); optsSel($("ccOrigem"), cfg.origens, "—"); optsSel($("ccResp"), respOpcoes());
+  const set = (k, x) => { $(k).value = x == null ? "" : x; };
+  set("ccTipo", v.tipo); set("ccNome", v.nome); set("ccDoc", v.doc); set("ccTel", v.tel); set("ccTel2", v.tel2); set("ccEmail", v.email); set("ccCidade", v.cidade); set("ccUf", v.uf); set("ccEmpresa", v.empresa); set("ccCargo", v.cargo);
+  set("ccStatus", v.status); if (v.origem && !cfg.origens.includes(v.origem)) { const o = el("option", "", v.origem); o.value = v.origem; $("ccOrigem").appendChild(o); } set("ccOrigem", v.origem); set("ccIndic", v.indicadoPor); set("ccResp", v.resp); set("ccNasc", v.nasc); set("ccObs", v.obs);
+  $("ccLgpd").checked = !!v.lgpd; $("ccLgpdEm").textContent = v.lgpd && v.lgpdEm ? "em " + br(v.lgpdEm) : "";
+  chkGrupo($("ccAreas"), [...new Set([...cfg.areas, ...CC.areas])], CC.areas);
+  const pintaTags = () => chkGrupo($("ccTags"), [...new Set([...cfg.tags, ...CC.tags])], CC.tags); pintaTags(); CC.pintaTags = pintaTags;
+  $("ccTagNova").value = ""; $("ccDel").hidden = !c; crmFicha(c); crmDatalists();
+  const dlg = $("dlgCrmContato"); if (!dlg.open) dlg.showModal(); $("ccNome").focus();
+}
+function crmFicha(c) {
+  const box = $("ccFicha"); box.textContent = ""; if (!c) { box.appendChild(el("div", "hint", "Salve o contato para registrar o histórico, criar casos e agendar atividades.")); return; }
+  const ac = el("div", "acts");
+  const wa = linkWhats(c.tel); if (wa) { const a = el("a", "btn sec sm", "WhatsApp"); a.href = wa; a.target = "_blank"; a.rel = "noopener noreferrer"; ac.appendChild(a); }
+  if (c.email) { const a = el("a", "btn sec sm", "E-mail"); a.href = "mailto:" + c.email; ac.appendChild(a); }
+  ac.append(btn("Registrar contato feito", () => crmAbrirAtiv(null, { contatoId: c.id, feita: true, feitaEm: hojeIso(), titulo: "" })), btn("Agendar atividade", () => crmAbrirAtiv(null, { contatoId: c.id, data: somaDias(hojeIso(), 1) })));
+  if (crmVeValores()) ac.appendChild(btn("Novo " + T("negocio"), () => { $("dlgCrmContato").close(); crmAbrirNegocio(null, { contatoId: c.id, origem: c.origem }); }, ""));
+  box.appendChild(ac);
+  if (crmVeValores()) {
+    const ns = crmNegociosDoContato(c.id); box.appendChild(el("h3", "", Tc("negocios") + " (" + ns.length + ")"));
+    const ul = el("ul", "mini"); for (const n of ns) { const li = el("li"); li.append(el("b", "", n.titulo), el("span", "tag" + (n.status === "ganho" ? " ok" : n.status === "perdido" ? " crit" : ""), n.status === "ganho" ? Tc("ganho") : n.status === "perdido" ? "Perdido" : (crmEtapaDe(n) || {}).nome), el("span", "hint", brl(n.valor))); li.appendChild(el("span", "acts")).appendChild(btn("Abrir", () => { $("dlgCrmContato").close(); crmAbrirNegocio(n.id); })); ul.appendChild(li); }
+    if (!ns.length) ul.appendChild(el("li", "hint", "Nenhum caso registrado.")); box.appendChild(ul);
+  }
+  const pastas = crmPastasDoContato(c);
+  box.appendChild(el("h3", "", "Pastas de processos (" + pastas.length + ")"));
+  const up = el("ul", "mini"); for (const p of pastas) { const li = el("li"); li.append(el("b", "num", p.numero), el("span", "hint", [p.tribunal, p.orgao].filter(Boolean).join(" · "))); li.appendChild(el("span", "acts")).appendChild(btn("Abrir pasta", () => { $("dlgCrmContato").close(); abrirPasta(p.id); })); up.appendChild(li); }
+  if (!pastas.length) up.appendChild(el("li", "hint", "Nenhuma pasta com este nome de cliente em Processos.")); box.appendChild(up);
+  const hist = crmAtivsDoContato(c.id).sort((a, b) => ((b.feita ? b.feitaEm : b.data) || "").localeCompare((a.feita ? a.feitaEm : a.data) || ""));
+  box.appendChild(el("h3", "", "Histórico e atividades (" + hist.length + ")"));
+  const uh = el("ul", "mini"); for (const a of hist) uh.appendChild(crmLinhaAtiv(a, false)); if (!hist.length) uh.appendChild(el("li", "hint", "Sem interações registradas.")); box.appendChild(uh);
+}
+$("ccTagAdd").onclick = () => { const t = $("ccTagNova").value.trim(); if (!t) return; if (!CC.tags.includes(t)) CC.tags.push(t); const cfg = crmCfg(); if (!cfg.tags.includes(t)) crmSalvarCfg({ tags: cfg.tags.concat(t) }); $("ccTagNova").value = ""; CC.pintaTags(); };
+$("ccTagNova").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); $("ccTagAdd").click(); } });
+$("ccCancel").onclick = () => $("dlgCrmContato").close();
+$("ccDoc").addEventListener("blur", () => { const e = $("ccDoc"); e.value = fmtDoc(e.value); if (soDigitos(e.value).length === 14) $("ccTipo").value = "PJ"; });
+$("ccTel").addEventListener("blur", () => { $("ccTel").value = fmtTel($("ccTel").value); }); $("ccTel2").addEventListener("blur", () => { $("ccTel2").value = fmtTel($("ccTel2").value); });
+$("ccDel").onclick = () => { const c = crmContato(CC.id); if (!c || !confirm("Excluir o contato “" + c.nome + "”? Os casos dele ficam sem contato e o histórico de atividades do contato é removido.")) return; crmExcluirContato(c.id); $("dlgCrmContato").close(); crmDesenhar(); };
+$("fCrmC").addEventListener("submit", e => {
+  e.preventDefault(); const ex = CC.id ? crmContato(CC.id) : null, g = k => $(k).value.trim();
+  const d = { tipo: g("ccTipo"), nome: g("ccNome"), doc: fmtDoc(g("ccDoc")), tel: fmtTel(g("ccTel")), tel2: fmtTel(g("ccTel2")), email: g("ccEmail").toLowerCase(), cidade: g("ccCidade"), uf: g("ccUf").toUpperCase(), empresa: g("ccEmpresa"), cargo: g("ccCargo"), status: g("ccStatus"), origem: g("ccOrigem"), indicadoPor: g("ccIndic"), resp: g("ccResp"), nasc: g("ccNasc"), obs: g("ccObs"), tags: CC.tags.slice(), areas: CC.areas.slice(), lgpd: $("ccLgpd").checked };
+  if (!d.nome) return;
+  const dup = crmDuplicado(Object.assign({ id: CC.id }, d)); if (dup && !confirm("Já existe o contato “" + dup.nome + "” com o mesmo nome, documento ou e-mail. Salvar mesmo assim (ficará duplicado)?")) return;
+  d.lgpdEm = d.lgpd ? ((ex && ex.lgpd && ex.lgpdEm) || hojeIso()) : "";
+  if (ex) Object.assign(ex, d); else crmNovoContato(d);
+  salvarContatos(); $("dlgCrmContato").close(); crmDesenhar(); atualizarBadges();
+});
+
+// ---------- diálogo: caso (oportunidade)
+const CN = { id: null };
+function crmAbrirNegocio(id, preset) {
+  const cfg = crmCfg(), n = id ? crmNegocio(id) : null, v = n || Object.assign({ titulo: "", contatoId: "", etapa: cfg.etapas[0].id, area: "", valor: 0, prob: "", previsto: "", resp: respPadrao(), origem: "", obs: "", status: "aberto", prop: { tipo: "", entrada: 0, parcelas: 0, exito: 0, validade: "", status: "" } }, preset || {});
+  CN.id = n ? n.id : null; const p = v.prop || {};
+  $("cnTitulo2").textContent = n ? (n.titulo || "Caso") : "Novo " + T("negocio");
+  optsSel($("cnEtapa"), cfg.etapas.map(e => [e.id, e.nome + " (" + e.prob + "%)"])); optsSel($("cnArea"), cfg.areas, "—"); optsSel($("cnResp"), respOpcoes()); optsSel($("cnOrigem"), cfg.origens, "—");
+  optsSel($("cnPTipo"), CRM_PROP_TIPOS); optsSel($("cnPStatus"), CRM_PROP_STATUS);
+  for (const [k, lista, val] of [["cnArea", cfg.areas, v.area], ["cnOrigem", cfg.origens, v.origem]]) if (val && !lista.includes(val)) { const o = el("option", "", val); o.value = val; $(k).appendChild(o); }
+  const set = (k, x) => { $(k).value = x == null ? "" : x; };
+  set("cnTit", v.titulo); set("cnContato", crmNomeContato(v.contatoId)); set("cnArea", v.area); set("cnValor", v.valor ? numBR(v.valor) : ""); set("cnEtapa", (crmEtapaDe(v) || cfg.etapas[0]).id); set("cnProb", v.prob); $("cnProb").placeholder = "da etapa"; set("cnPrev", v.previsto); set("cnResp", v.resp); set("cnOrigem", v.origem); set("cnObs", v.obs);
+  set("cnPTipo", p.tipo); set("cnPEntrada", p.entrada ? numBR(p.entrada) : ""); set("cnPParc", p.parcelas || ""); set("cnPExito", p.exito || ""); set("cnPValid", p.validade); set("cnPStatus", p.status);
+  $("cnEtapa").disabled = !!(n && n.status !== "aberto"); crmDatalists(); crmNegocioAcoes(n); crmNegocioAtivs(n);
+  const dlg = $("dlgCrmNegocio"); if (!dlg.open) dlg.showModal(); $("cnTit").focus();
+}
+function crmNegocioAcoes(n) {
+  const box = $("cnAcoes"); box.textContent = "";
+  if (n && n.status === "aberto" || !n) box.append(btn("✔ " + T("ganho"), () => crmNegocioFinal("ganho"), "ok"), btn("✖ Perdido", () => crmNegocioFinal("perdido"), "danger"));
+  else box.appendChild(btn("Reabrir " + T("negocio"), () => { const x = crmSalvarNegocioForm(); if (!x) return; crmReabrir(x); $("dlgCrmNegocio").close(); crmRefazer(); }));
+  box.append(btn("Copiar texto da proposta", async () => { const x = crmSalvarNegocioForm(true); if (!x) return; const t = crmTextoProposta(x); const ok = await crmCopiar(t); crmAviso(ok ? "Texto da proposta copiado. Cole no e-mail ou WhatsApp." : "Não foi possível copiar automaticamente; o texto foi mostrado para você copiar."); if (!ok) prompt("Copie o texto da proposta:", t); crmNegocioAcoes(x); }), btn("Agendar atividade", () => { const x = crmSalvarNegocioForm(); if (x) crmAbrirAtiv(null, { contatoId: x.contatoId, negocioId: x.id, data: somaDias(hojeIso(), 2) }); }));
+}
+async function crmCopiar(t) {
+  try { await navigator.clipboard.writeText(t); return true; } catch (e) {}
+  try { const ta = el("textarea"); ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); const ok = document.execCommand("copy"); ta.remove(); return ok; } catch (e) { return false; }
+}
+function crmAviso(msg) { const a = $("cnAviso"); a.textContent = msg; clearTimeout(crmAviso.t); crmAviso.t = setTimeout(() => { a.textContent = ""; }, 5000); }
+function crmNegocioAtivs(n) {
+  const box = $("cnAtivs"); box.textContent = ""; if (!n) { box.appendChild(el("div", "hint", "Salve o caso para agendar atividades.")); return; }
+  const l = CRM_ATIV.filter(a => a.negocioId === n.id).sort((a, b) => (a.feita - b.feita) || ((a.data || "9999").localeCompare(b.data || "9999")));
+  const ul = el("ul", "mini"); for (const a of l) ul.appendChild(crmLinhaAtiv(a, false)); if (!l.length) ul.appendChild(el("li", "hint", "Sem atividades neste caso.")); box.appendChild(ul);
+}
+function crmSalvarNegocioForm(silencioso) { // grava o formulário (cria o caso se for novo) e devolve o objeto; null se faltar dado
+  const g = k => $(k).value.trim(); let nomeC = g("cnContato"), titulo = g("cnTit");
+  if (!titulo && !nomeC) { alert("Informe o título do caso ou o contato."); return null; }
+  let ct = nomeC ? crmAchaContatoPorNome(nomeC) : null;
+  if (nomeC && !ct) { ct = crmNovoContato({ nome: nomeC, origem: g("cnOrigem"), areas: g("cnArea") ? [g("cnArea")] : [] }); salvarContatos(); }
+  if (!titulo) titulo = (g("cnArea") ? g("cnArea") + " — " : "") + ct.nome;
+  const prop = { tipo: g("cnPTipo"), entrada: crmNum(g("cnPEntrada")), parcelas: Math.max(0, parseInt(g("cnPParc"), 10) || 0), exito: crmNum(g("cnPExito")), validade: g("cnPValid"), status: g("cnPStatus"), enviadaEm: "" };
+  const d = { titulo, contatoId: ct ? ct.id : "", area: g("cnArea"), valor: crmNum(g("cnValor")), prob: g("cnProb") === "" ? "" : Math.min(100, Math.max(0, +g("cnProb") || 0)), previsto: g("cnPrev"), resp: g("cnResp"), origem: g("cnOrigem") || (ct && ct.origem) || "", obs: g("cnObs") };
+  let n = CN.id ? crmNegocio(CN.id) : null;
+  if (n) { prop.enviadaEm = (n.prop && n.prop.enviadaEm) || ""; if (prop.status === "enviada" && !prop.enviadaEm) prop.enviadaEm = hojeIso(); Object.assign(n, d, { prop }); if (n.status === "aberto" && $("cnEtapa").value !== n.etapa) crmMover(n, $("cnEtapa").value); }
+  else { if (prop.status === "enviada") prop.enviadaEm = hojeIso(); n = crmNovoNegocio(Object.assign(d, { etapa: $("cnEtapa").value, prop })); CN.id = n.id; }
+  salvarNegocios(); if (!silencioso) crmRefazer(); return n;
+}
+function crmNegocioFinal(tipo) {
+  const n = crmSalvarNegocioForm(); if (!n) return;
+  if (tipo === "ganho") {
+    crmGanhar(n); $("dlgCrmNegocio").close(); crmRefazer();
+    const c = crmContato(n.contatoId);
+    if (confirm("Caso contratado! Criar uma tarefa para a secretaria abrir a pasta e cadastrar o processo de " + (c ? c.nome : "este cliente") + "?")) {
+      TAREFAS.push({ id: uid(), criada: hojeIso(), titulo: "Abrir pasta e cadastrar o processo — " + (c ? c.nome : n.titulo), proc: "", cli: c ? c.nome : "", resp: "Secretaria", prazo: somaDias(hojeIso(), 3), prio: "normal", status: "fazer", nota: "Caso contratado no CRM: " + n.titulo + (n.area ? " (" + n.area + ")" : "") + ". Reunir documentos, procuração e contrato de honorários." }); salvarTarefas(); atualizarTudo();
+    }
+    return;
+  }
+  CP.id = n.id; optsSel($("cpMotivo"), crmCfg().motivos); $("dlgCrmPerda").showModal();
+}
+const CP = { id: null };
+$("cpCancel").onclick = () => $("dlgCrmPerda").close();
+$("fCrmP").addEventListener("submit", e => { e.preventDefault(); const n = crmNegocio(CP.id); if (n) crmPerder(n, $("cpMotivo").value); $("dlgCrmPerda").close(); $("dlgCrmNegocio").close(); crmRefazer(); });
+$("cnContato").addEventListener("change", () => { const c = crmAchaContatoPorNome($("cnContato").value); if (c && !$("cnOrigem").value && c.origem) { const o = $("cnOrigem"); if (![...o.options].some(x => x.value === c.origem)) { const op = el("option", "", c.origem); op.value = c.origem; o.appendChild(op); } o.value = c.origem; } });
+$("cnCancel").onclick = () => $("dlgCrmNegocio").close();
+$("cnDel").onclick = () => { const n = crmNegocio(CN.id); if (!n || !confirm("Excluir o caso “" + n.titulo + "” e as atividades ligadas a ele?")) return; crmExcluirNegocio(n.id); $("dlgCrmNegocio").close(); crmRefazer(); };
+$("fCrmN").addEventListener("submit", e => { e.preventDefault(); if (crmSalvarNegocioForm()) { $("dlgCrmNegocio").close(); crmRefazer(); } });
+
+// ---------- diálogo: atividade
+const CA = { id: null };
+function crmAbrirAtiv(id, preset) {
+  const a = id ? CRM_ATIV.find(x => x.id === id) : null, v = a || Object.assign({ tipo: "ligacao", titulo: "", contatoId: "", negocioId: "", data: hojeIso(), hora: "", resp: respPadrao(), nota: "", feita: false }, preset || {});
+  CA.id = a ? a.id : null; CA.negocioId = v.negocioId || ""; CA.feitaEm = v.feitaEm || "";
+  optsSel($("caTipo"), CRM_ATIV_TIPOS); optsSel($("caResp"), respOpcoes()); const set = (k, x) => { $(k).value = x == null ? "" : x; };
+  set("caTipo", v.tipo); set("caTitulo", v.titulo); set("caData", v.data); set("caHora", v.hora); set("caResp", v.resp); set("caContato", crmNomeContato(v.contatoId)); set("caNota", v.nota); $("caFeita").checked = !!v.feita;
+  const n = crmNegocio(v.negocioId); $("caCaso").textContent = n ? "Ligada ao caso: " + n.titulo : ""; $("caDel").hidden = !a; crmDatalists();
+  $("dlgCrmAtiv").querySelector("h2").textContent = a ? "Editar atividade" : "Nova atividade"; const dlg = $("dlgCrmAtiv"); if (!dlg.open) dlg.showModal(); $("caTitulo").focus();
+}
+$("caCancel").onclick = () => $("dlgCrmAtiv").close();
+$("caDel").onclick = () => { if (!CA.id || !confirm("Excluir esta atividade?")) return; CRM_ATIV = CRM_ATIV.filter(x => x.id !== CA.id); salvarAtiv(); $("dlgCrmAtiv").close(); crmAtualizarAbertos(); };
+function crmAtualizarAbertos() { crmRefazer(); const dn = $("dlgCrmNegocio"); if (dn.open) crmNegocioAtivs(crmNegocio(CN.id)); const dc = $("dlgCrmContato"); if (dc.open && CC.id) crmFicha(crmContato(CC.id)); }
+$("fCrmA").addEventListener("submit", e => {
+  e.preventDefault(); const g = k => $(k).value.trim(), nome = g("caContato"); let ct = nome ? crmAchaContatoPorNome(nome) : null;
+  if (nome && !ct) { ct = crmNovoContato({ nome }); salvarContatos(); }
+  const d = { tipo: g("caTipo"), titulo: g("caTitulo"), data: g("caData"), hora: g("caHora"), resp: g("caResp"), contatoId: ct ? ct.id : "", negocioId: CA.negocioId, nota: g("caNota"), feita: $("caFeita").checked };
+  if (!d.titulo && !d.contatoId && !d.nota) { alert("Descreva a atividade ou escolha um contato."); return; }
+  d.feitaEm = d.feita ? (CA.feitaEm || hojeIso()) : "";
+  const a = CA.id ? CRM_ATIV.find(x => x.id === CA.id) : null; if (a) Object.assign(a, d); else crmNovaAtiv(d);
+  salvarAtiv(); $("dlgCrmAtiv").close(); crmAtualizarAbertos();
+});
+
+// ---------- inicialização
+function crmIniciar() {
+  $("crmTabs").addEventListener("click", e => { const b = e.target.closest("button[data-t]"); if (!b) return; CRMUI.aba = b.dataset.t; crmDesenhar(); });
+  crmBadge();
+}
+
+
 /* ===== 40-organizacao: quadro de tarefas (kanban), rotina e sugestões de organização do escritório ===== */
 const COLS = [["fazer", "A fazer"], ["andamento", "Em andamento"], ["aguardando", "Aguardando"], ["concluida", "Concluída"]];
 let TAREFAS = LS.get("tarefas", []);
@@ -2120,10 +2913,10 @@ function orgIniciar() { $("orgResp").addEventListener("change", orgDesenhar); or
    pastas/tarefas/clientes/valores compartilhados entre todos, e telas por perfil (advogado, secretaria, administrador). */
 const NV = { ativo: !!NUVEM_CFG, user: null, perfil: null, papel: "local", advId: null, db: null, auth: null, unsubs: [], mapas: {}, sessao: false, cadastrando: false, users: [] };
 const ACESSO = {
-  local: ["inicio", "consulta", "processos", "audiencias", "relatorios", "advogados", "organizacao"],
-  admin: ["meu", "inicio", "secretaria", "consulta", "processos", "audiencias", "relatorios", "advogados", "organizacao", "usuarios"],
-  advogado: ["meu", "inicio", "consulta", "processos", "audiencias", "relatorios", "advogados", "organizacao"],
-  secretaria: ["secretaria", "audiencias", "processos"]
+  local: ["inicio", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "organizacao"],
+  admin: ["meu", "inicio", "secretaria", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "organizacao", "usuarios"],
+  advogado: ["meu", "inicio", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "organizacao"],
+  secretaria: ["secretaria", "audiencias", "processos", "crm"]
 };
 const PAPEL_ROT = { admin: "Administrador", advogado: "Advogado(a)", secretaria: "Secretaria", local: "" };
 const souAdvogado = () => NV.papel !== "secretaria";
@@ -2132,8 +2925,10 @@ const meuAdv = () => ADVS.find(a => a.id === NV.advId) || null;
 const respPadrao = () => { const a = meuAdv(); return a ? a.curto : NV.papel === "local" ? "Davi" : "Equipe"; };
 const podeVer = v => (ACESSO[NV.papel] || []).includes(v) && (v !== "meu" || !!meuAdv());
 const homeDoPapel = () => NV.papel === "secretaria" ? "secretaria" : meuAdv() ? "meu" : "inicio";
-const ARR = { procs: () => PROCS, tarefas: () => TAREFAS };
-const CHAVES_NUVEM = ["procs", "tarefas", "nomes", "valores"];
+const ARR = { procs: () => PROCS, tarefas: () => TAREFAS, crm_contatos: () => CRM_CONTATOS, crm_negocios: () => CRM_NEGOCIOS, crm_atividades: () => CRM_ATIV, crm_config: () => CRM_CFGS };
+const CHAVES_NUVEM = ["procs", "tarefas", "nomes", "valores", ...CRM_COLS];
+// coleções do CRM ficam em orgs/{escritório}/… (um escritório = um espaço de dados); as demais, na raiz
+const colRef = col => CRM_COLS.includes(col) ? NV.db.collection("orgs").doc(CRM_ORG).collection(col) : NV.db.collection(col);
 if (NV.ativo) document.body.classList.add("sem-sessao");
 
 // ---------- utilidades
@@ -2275,7 +3070,8 @@ async function avisarAdmin(d) {
 // ---------- sincronização dos dados com o Firestore
 function sincronizar() {
   const erro = col => e => nuvemAviso("Não foi possível ler “" + col + "” da nuvem (" + ((e && (e.code || e.message)) || "erro") + ").", true);
-  for (const col of ["procs", "tarefas"]) NV.unsubs.push(NV.db.collection(col).onSnapshot(s => receberColecao(col, s), erro(col)));
+  // negócios (honorários) só para advogados; contatos, atividades e ajustes do CRM para toda a equipe
+  for (const col of ["procs", "tarefas", "crm_contatos", "crm_atividades", "crm_config"].concat(souSecretaria() ? [] : ["crm_negocios"])) NV.unsubs.push(colRef(col).onSnapshot(s => receberColecao(col, s), erro(col)));
   for (const k of souSecretaria() ? ["nomes"] : ["nomes", "valores"]) { const campo = k === "nomes" ? "lista" : "mapa"; NV.unsubs.push(NV.db.collection("config").doc(k).onSnapshot(d => receberDoc(k, campo, d), erro(k))); }
   if (NV.papel === "admin") NV.unsubs.push(NV.db.collection("users").onSnapshot(s => { NV.users = []; s.forEach(d => NV.users.push(Object.assign({ uid: d.id }, d.data()))); usuariosAtualizar(); }, erro("users")));
 }
@@ -2299,13 +3095,13 @@ function receberDoc(k, campo, d) {
 function erroEscrita(e) { nuvemAviso(e && e.code === "permission-denied" ? "Sem permissão para salvar esta alteração." : "Não foi possível salvar na nuvem: " + ((e && (e.code || e.message)) || "erro") + ". Verifique a conexão.", true); }
 function nuvemPush(k, v) {
   if (!NV.db || !NV.sessao) return;
-  if (k === "procs" || k === "tarefas") return pushColecao(k, v);
+  if (ARR[k]) return pushColecao(k, v);
   const json = JSON.stringify(v); if (NV.mapas[k] === json) return; NV.mapas[k] = json;
   NV.db.collection("config").doc(k).set({ [k === "nomes" ? "lista" : "mapa"]: JSON.parse(json), _por: NV.perfil.nome || "", _em: Date.now() }).catch(erroEscrita);
 }
 function pushColecao(col, arr) {
   const atual = {}; for (const o of arr) if (o && o.id) atual[o.id] = JSON.parse(JSON.stringify(o));
-  const antigo = NV.mapas[col] || {}, ops = [], ref = id => NV.db.collection(col).doc(id), meta = () => ({ _por: NV.perfil.nome || NV.perfil.email || "", _em: Date.now() });
+  const antigo = NV.mapas[col] || {}, ops = [], ref = id => colRef(col).doc(id), meta = () => ({ _por: NV.perfil.nome || NV.perfil.email || "", _em: Date.now() });
   for (const id in atual) {
     const n = atual[id], v = antigo[id];
     if (!v) { ops.push(b => b.set(ref(id), Object.assign({}, n, meta()))); continue; }
@@ -2465,6 +3261,7 @@ const VIEWS = {
   consulta: ["Consulta DJEN", "Busca por nome da parte no Diário de Justiça Eletrônico Nacional"],
   processos: ["Processos", "Pastas dos processos: cadastro pelo número, audiências, prazos e tarefas"],
   audiencias: ["Audiências", "Cadastro completo: local, participantes, preparação, resultado e providências"],
+  crm: ["CRM", "Funil de captação, contatos, atividades e indicadores do escritório"],
   relatorios: ["Relatórios", "Indicadores e gráficos do cliente pesquisado, prontos para imprimir ou apresentar"],
   advogados: ["Advogados", "Publicações do DJEN em nome de Fábio (OAB/SC 15.044) e Davi (OAB/SC 39.336)"],
   organizacao: ["Organização", "Tarefas, prazos e rotina do escritório"],
@@ -2475,6 +3272,7 @@ function desenharVista(v) {
   if (v === "relatorios") relatorioAtualizar();
   if (v === "processos") procDesenhar();
   if (v === "audiencias") audDesenhar();
+  if (v === "crm") crmDesenhar();
   if (v === "inicio") inicioDesenhar();
   if (v === "advogados") advDesenhar();
   if (v === "organizacao") orgDesenhar();
@@ -2541,7 +3339,7 @@ $("bkFile").onchange = async () => {
 let appIniciado = false;
 function iniciarApp() {
   if (appIniciado) return; appIniciado = true;
-  iniciarConsulta(); desenharInicioClientes(); orgIniciar(); procIniciar(); audIniciar(); telasIniciar(); advIniciar(); irPara();
+  iniciarConsulta(); desenharInicioClientes(); orgIniciar(); procIniciar(); audIniciar(); crmIniciar(); telasIniciar(); advIniciar(); irPara();
 }
 if (!NV.ativo) { aplicarPapel(); iniciarApp(); }
 
