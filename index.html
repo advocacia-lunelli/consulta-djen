@@ -2,7 +2,15 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000065">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Organização">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <title>Advocacia Lunelli · App Organização</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap">
@@ -362,6 +370,11 @@ dialog .dlgbody textarea{width:100%}
   body.pr-calc .cu-res{border:0;box-shadow:none;padding:0}
   body.pr-calc .cu-tab tr{break-inside:avoid}
 }
+
+/* ---- celular / app instalado */
+body{padding-bottom:env(safe-area-inset-bottom)}
+@media (max-width:860px){input,select,textarea{font-size:16px}.btn,button{min-height:36px}}
+@media (display-mode:standalone){html{-webkit-tap-highlight-color:transparent}}
 
 </style>
 </head>
@@ -3529,6 +3542,11 @@ function intDesenhar() {
     "A chave é pessoal: não a compartilhe nem a cole em mensagens. Se vazar, revogue no console do provedor."
   ]) ul.appendChild(el("li", "", t)); dv.appendChild(ul); pi.appendChild(dv);
   box.appendChild(pi);
+  // ---------------- instalar no celular
+  const pc = el("div", "panel"), hc = el("div", "hd"), inst = (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone; hc.append(el("h2", "", "Instalar no celular"), el("span", "tag" + (inst ? " ok" : ""), inst ? "instalado" : "opcional")); pc.appendChild(hc);
+  pc.appendChild(el("div", "hint", "O App Organização pode ser instalado na tela inicial, sem loja e sem custo. Abre em tela cheia, com o ícone da Lunelli."));
+  const ul2 = el("ul", "intpasso"); for (const t of ["iPhone: abra o endereço do app no Safari (não no Chrome), toque em Compartilhar e em “Adicionar à Tela de Início”.", "Android: abra no Chrome, toque nos três pontinhos e em “Instalar app” (ou “Adicionar à tela inicial”).", "Entre com o seu e-mail e senha de sempre. O que está na nuvem (processos, tarefas, CRM) aparece igual; chave da IA e índices dos cálculos ficam só em cada aparelho."]) ul2.appendChild(el("li", "", t));
+  pc.appendChild(ul2); box.appendChild(pc);
 }
 
 
@@ -4668,6 +4686,9 @@ function iniciarApp() {
   iniciarConsulta(); desenharInicioClientes(); orgIniciar(); procIniciar(); audIniciar(); crmIniciar(); telasIniciar(); advIniciar(); driveIniciar(); irPara();
 }
 if (!NV.ativo) { aplicarPapel(); iniciarApp(); }
+
+// app instalável (PWA): cache de reserva para abrir mesmo com internet ruim
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
 
 </script>
 </body>
