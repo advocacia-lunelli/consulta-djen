@@ -3,41 +3,76 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Advocacia Lunelli · Consulta DJEN</title>
+<title>Advocacia Lunelli · Radar DJEN</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap">
 <style>
+/* Advocacia Lunelli · Radar DJEN — estilos. Identidade: azul-marinho #000065, fonte Barlow. Layout inspirado em sistemas de gestão jurídica (menu lateral + painéis). */
 :root{
   --bg:#f3f5f8; --surface:#fff; --ink:#18212f; --muted:#5b6678; --line:#d5dbe4;
   --accent:#000065; --accent-ink:#fff; --soft:#e6e8f3;
   --crit:#a8281f; --crit-soft:#f7e1de; --warn:#7a5200; --warn-soft:#f8ebc9; --ok:#1f6b3a; --ok-soft:#dcefe1;
+  --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08);
   --sans:"Barlow","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif; --mono:Consolas,"Cascadia Mono",ui-monospace,monospace;
 }
 @media (prefers-color-scheme: dark){ :root{
   --bg:#10151d; --surface:#19212c; --ink:#e7ecf3; --muted:#9aa6b8; --line:#2e3948;
   --accent:#a3b1ff; --accent-ink:#0a0d2a; --soft:#232d3b;
-  --crit:#ff9a8f; --crit-soft:#47201d; --warn:#f0c66a; --warn-soft:#40330f; --ok:#84d19c; --ok-soft:#173622; color-scheme:dark } }
+  --crit:#ff9a8f; --crit-soft:#47201d; --warn:#f0c66a; --warn-soft:#40330f; --ok:#84d19c; --ok-soft:#173622; --shadow:none; color-scheme:dark } }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.45}
-.brand{background:#000065;color:#fff}
-.brand .in{max-width:1080px;margin:0 auto;padding:14px 16px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px}
-.logo{display:block;width:150px;height:40px;background:#fff;-webkit-mask:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAABQBAMAAABRxFVIAAAAGFBMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABWNxwqAAAACHRSTlMA/zPMmWYAAAfIcfQAAAj4SURBVHjazZrbUxtHFsZ/0zPCUAEkUq7EqRjRSCi7VeuAIHElXt+UsKlyqlKJAvZfmVqvtpJ9ypoim919WAc8xs7FNzSWsU1sYAZiYxJJPfswI2lG6OZCttJPw0zT/fXpc/nOOdIJDzE/sDcwMPCnY8qhh0MLg5q7Y1WeJx5bvxNYqcEgEnH24u8C1sRm3cfphV7BEi1QceXDXsHSq0+R8v6v6+9bPZaWONbo87Vsj3XrA7OxNDd6Kq1kY1SUZ3oJSww3m5DP9lDls2bTGfd3ewYr8qD5DHXup15d4icV1xW1D8v6Kf/plSWKaMDsIsfqfdXZXG9gJbe8P6IWgF6v/tpWby7Rx2F4YirLuqik9Ua3fDi86b9z6mCpTE9gjdbgRD6SUCDwEuD7F4kg0YA1oAPjHhEVDxGTP5R3MfqAqZH1mriOvCiqmpgdeLQLIM6/YXu7JEZs0MAY8lXrMfowRC0RBX2j8hpganH/8dTBycX5/Kpn/qn4luVb3PwC+qAlQtcVB9IoSfIUpQDZWglee9S2bdvejh1cVrbyHyadyhmNBSg/RUDFf7qBrYdz8Ld0Q1tUV2OAPmQeHNala/7DX5cqr0YBSgiEWdu7glldmUFEaxuroOtXBahN7fLwNpKiZgAuGCByCAvyjAVnh25MvQwHUeXKZShmGPUtNRNCUnhZDsuLM5agxqey8BX3fSVbsZpkIi923JVAHBFQEguKmVKWM/uBuC8Llro+k5heRquwB59ARAYNZ7DB9GhAeFqsWxzfGKqsNBLeQ+gB3p6BYqZ0qrmFvLyYGDSr68BXNHRITs+y6oq4mltIRxEXUTEikQAQqbmgqEXqwlwb0YssutwLvNjYhTt9Dac+C+hWP4jduoj70Au0YmLatvYAUjPDPz8DY/KBVXy9KuyJ+Lp7pXgi7696qLLSANDvACI5bbMu0kEFai4uvcXpJmbtS6tYgJid2lhGAuff2ViygMiQBepprc5ROL20HW9a3IjMTm0uAyKgNOKqr10NRisP4VbXqK4m8r7OnhJpoORfm7HJaA61wpVs66WCsFwVK2egKJ8T1p0rlafSkr+cWvIMx1gZ+kbWgtfbnu248O/GS5WW5D6VP8Ndeb2J1XUaB9PhP0+/bSmzGrx0C93yIn+5dbIuAiaWwxPXve7Z+bVFTy2Ff27/eBIWO3UQOkRMrneTIWhHfbLmAgjTI5pggtEpLA0UlLNdhPWp4zETj7BpVSUrQLlTWOXKWboWafRvQ144HnLL2Y69fLdH6WiLuOp0rlsFwAyZwcFGeGuzKi3tOWC54Ep0q6VHfz5D3EclRS1laUl4AwZRlpbaodRFzrdfQ9ScOeNgt80xhQzdfV7q4Ty/7Xi3xbfy/rB6dyRv24hEIhHvUFqsgNpRaTPmdB6qn0MPXUAsdSjnQILjSsjLexPPo/H6i2H5QVjsgNpRm+07ac1DuNm6wqc6dIkiuI4nrg7UpDmsLnliEbLTHVA7niaPhGu7zQKSqju/2cYA0h3CCt1OVVzTX6/euio7kELd+0irFFB2XroIwXqnIi5jAVDXO4BVd/pSq0uMBZ2oaB0TA0qj/zPtSsjDSSDM6s2mNYMQkA+dNvWFqofVrNZ5Yu28R/mWHdAx/EL8l23dk/deSV+ekSut9ipUy9jAmTYxMRYIrKW0KznFSSAhg3ou2oeXNFCaTLfxp5XtxLXW0iIXPLnDjmEaOUjaT4JeptjcuhxfUhYw05IKqwxVRn72WJtoagTcnWHhnuYkiC3KmYCiNxNCpqZ5a5BsTTn5ElAzAPMr7bh8MQBrFDCNHIx5IdJsmOvXbi7iT7gHlI/PO0594l91eRZAKQPkj0sxv/B26/ghqieuOvKT4ezRz6RqI/UpQCKRSKRO+YpcksDthVFv2t1tSGQBMQeICYCPJMDfJXB7O7pgLAIkPgPUnEScB0hJSDnA/YTmlav8uvy4A8Zjv4GgbeE3EkLNKDFdp8jLfqGKicvw+aIYjy9bzHr/OZpDT9emVdpv/i9S/ElDi0kPQtmMTHr7aRAZrFbdjCE4m0NERdxizOTzxU5bd6m4M3YRmJi+3NrE5ld5dehiJ427aW8hsYk4a05chnFn6t6W2Ax+4eU3hQe8WpJ7xHELn3wNAv0He9RwEJUi0zN60CFbq8Us9QUwxjG4ZdVM7gy9gFX0vdL9ahHHV4/TvkS71RQW8rk6+/cOBXv4co/fngEYtp8Nr3cH1fyh/jYrzR5+EICl/dGz1LXXHDBc4M95EGe8RYTbpXpu8WGsNSxhb/mdSx3AfcXTabf48a+z9wHWT3N40nfh8scu3eEvfW1guScePwi6fjHV3NmIoW7l/pHBsU67fV6g9gl8wzG2fFBFn7PdBZi/u73BBchl+UJ8yGAO5reHL1Y+p6IjtwpJ+TWpMWfD8tNS+8R6U554UM3K9N1aPfeT/iCp7Njd791Ha9F8xrzx8+tO8sbuIWnNDN3Mn/vJKE8O3Cgevbmraz+89uhZJVteO9Rk0cmDdlkN+/7agLWX2bi23h+73WfvvmE/3Ypu9R955MZv2pu/7RbW+629z9bMh+LJicJu5sHrv+7tVTxm6dUmiy4eXKdcpBBmGR2KRBBWCZAFDUdRdtEVQiy+qVcoctpCVrnTnYZMT3/lwKDU7CmB0ImjAWnFDFlhERMKtL8Mu++cFBIdiofPAvzybi4RpHTfNHDBYvDgVqguPpmpcT1LSS/ux1xAfWGphSczXuS7dRHgdn5WBmGp6/twidNd8A1iavu7WDXFKJBQIVYqotvfBQuH4/bQYih1KV6V9ai6EQw167IwKWN5lSRWYl61UoM0CFdcFpbHqoUE4Yzm4uFMS10N/T4xOdSVEB0XCIkiQhYoSjdHQUko6/wL0lJjXFKUBowDOjHxal0CqC4drgJLfvBdd7y7pS5MxpAZNbGDgJgGroxFrOGS1ObmhylfiMaQTvmjVNTCLfP959uhnjDAVn70hDYyMpL8w6VuRcJIn6W29977R+TXG/3JVdbeeog7+PPxgR/ZeMvU//u0z1Ljhff+9/7ynnp6ZOD4+Co3+47+HykkIpOVn2azAAAAAElFTkSuQmCC) left center/contain no-repeat;mask:url(data:image/png;base64,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) left center/contain no-repeat}
-.brand .tagline{font-weight:500;font-size:13px;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
-.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px;display:flex;flex-direction:column;gap:16px}
 h1{font-size:22px;font-weight:600;margin:0}
-.sub{color:var(--muted);font-size:13px;margin:2px 0 0}
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:12px}
+h2{font-size:17px;font-weight:600;margin:0}
+h3{font-size:15px;font-weight:600;margin:0}
+a{color:var(--accent)}
+input,select,button,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+
+/* ---- estrutura */
+.app{display:grid;grid-template-columns:236px minmax(0,1fr);min-height:100vh}
+.side{background:#000065;color:#fff;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;padding:18px 12px;gap:18px;overflow:auto}
+.logo{display:block;width:158px;height:42px;background:#fff;-webkit-mask:url(data:image/png;base64,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) left center/contain no-repeat;mask:url(data:image/png;base64,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) left center/contain no-repeat}
+.side .tagline{font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.8;margin-top:-10px;padding-left:2px}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav a{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:8px;color:#dfe3ff;text-decoration:none;font-weight:500}
+.nav a:hover{background:rgba(255,255,255,.08)}
+.nav a[aria-current=page]{background:rgba(255,255,255,.16);color:#fff}
+.nav svg{width:19px;height:19px;flex:none;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.nav .bd{margin-left:auto;background:#e8b923;color:#1a1a00;border-radius:10px;font-size:12px;font-weight:700;padding:0 7px;min-width:20px;text-align:center}
+.nav .bd.red{background:#ff6b5e;color:#2a0300}
+.side .foot{margin-top:auto;font-size:12px;color:#b7bde6;display:flex;flex-direction:column;gap:8px}
+.side .foot button{background:transparent;border:1px solid rgba(255,255,255,.3);color:#dfe3ff;border-radius:6px;padding:5px 8px;cursor:pointer;text-align:left}
+.side .foot button:hover{background:rgba(255,255,255,.08)}
+.main{min-width:0;display:flex;flex-direction:column}
+.topbar{background:var(--surface);border-bottom:1px solid var(--line);padding:14px 26px;display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;justify-content:space-between}
+.topbar .sub{color:var(--muted);font-size:13px;margin:2px 0 0}
+.content{padding:20px 26px 56px;max-width:1240px;width:100%;display:flex;flex-direction:column;gap:16px}
+.view{display:flex;flex-direction:column;gap:16px}
+@media (max-width:860px){
+  .app{grid-template-columns:1fr}
+  .side{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;padding:10px 12px;gap:8px 14px}
+  .side .tagline,.side .foot{display:none}
+  .logo{width:120px;height:32px}
+  .nav{flex-direction:row;flex-wrap:wrap;width:100%}
+  .nav a{padding:7px 10px;font-size:14px}
+  .topbar,.content{padding-left:14px;padding-right:14px}
+}
+
+/* ---- componentes básicos */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow)}
+.panel>h2,.panel>.hd{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:space-between}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
 .grid .wide{grid-column:span 2}
 @media (max-width:420px){.grid .wide{grid-column:span 1}}
 label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted);min-width:0}
-input,select,button{font:inherit;color:inherit}
-input[type=text],input[type=date],select{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 9px;min-width:0;width:100%;color:var(--ink)}
-:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+input[type=text],input[type=date],input[type=number],select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 9px;min-width:0;width:100%;color:var(--ink)}
+textarea{resize:vertical;min-height:60px}
 .acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:6px;padding:8px 16px;font-weight:600;cursor:pointer}
 .btn.sec{background:transparent;color:var(--ink);border:1px solid var(--line);font-weight:400}
+.btn.sm{padding:4px 10px;font-size:13px}
+.btn.danger{background:transparent;color:var(--crit);border:1px solid var(--crit)}
 .btn:disabled{opacity:.55;cursor:default}
 .chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .chip{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:14px;background:var(--bg);overflow:hidden}
@@ -50,8 +85,9 @@ input[type=text],input[type=date],select{background:var(--bg);border:1px solid v
 .checks{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px}
 .checks label{flex-direction:row;align-items:center;gap:6px;color:var(--ink);font-size:13px}
 .list{display:flex;flex-direction:column;gap:8px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;min-width:0;box-shadow:var(--shadow)}
 .card.passivo{border-left:4px solid var(--crit)}
+.card.nova{border-left:4px solid var(--accent)}
 .top{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
 .num{font-family:var(--mono);font-weight:600;overflow-wrap:anywhere}
 .copy{border:1px solid var(--line);background:transparent;border-radius:5px;padding:1px 7px;font-size:12px;color:var(--muted);cursor:pointer}
@@ -59,6 +95,7 @@ input[type=text],input[type=date],select{background:var(--bg);border:1px solid v
 .tag.dist{background:var(--accent);color:var(--accent-ink)}
 .tag.crit{background:var(--crit-soft);color:var(--crit)}
 .tag.ok{background:var(--ok-soft);color:var(--ok)}
+.tag.warn{background:var(--warn-soft);color:var(--warn)}
 .row{display:flex;flex-wrap:wrap;gap:2px 14px;color:var(--muted);font-size:13px}
 .row b,.partes b{color:var(--ink);font-weight:600}
 .partes{font-size:13px;overflow-wrap:anywhere}
@@ -67,21 +104,150 @@ summary{cursor:pointer;color:var(--accent);width:fit-content}
 .pub{border-top:1px solid var(--line);padding:6px 0;display:flex;flex-direction:column;gap:2px}
 .pub .h{display:flex;flex-wrap:wrap;gap:2px 10px}
 .pub .t{color:var(--muted);overflow-wrap:anywhere}
-a{color:var(--accent)}
 .empty{background:var(--surface);border:1px dashed var(--line);border-radius:8px;padding:28px 16px;text-align:center;color:var(--muted)}
-footer{color:var(--muted);font-size:12px}
 .lim{font-size:13px;gap:6px}
 .lim ul{margin:0;padding-left:18px;color:var(--muted);display:flex;flex-direction:column;gap:3px}
+footer.rod{color:var(--muted);font-size:12px;padding-top:8px}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid var(--line)}
+.tabs button{background:transparent;border:0;border-bottom:3px solid transparent;padding:8px 14px;cursor:pointer;color:var(--muted);font-weight:500}
+.tabs button[aria-selected=true]{color:var(--accent);border-bottom-color:var(--accent)}
+.tabs .n{background:var(--soft);border-radius:10px;padding:0 7px;font-size:12px;margin-left:4px}
+
+/* ---- painel inicial */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:2px}
+.kpi .v{font-size:30px;font-weight:700;color:var(--accent);line-height:1.1}
+.kpi .l{color:var(--muted);font-size:13px}
+.kpi .s{font-size:12px;color:var(--muted)}
+.cols2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+.mini{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+.mini li{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;border-top:1px solid var(--line);padding:6px 0;font-size:13px}
+.mini li:first-child{border-top:0}
+
+/* ---- publicações dos advogados */
+.who{display:inline-flex;gap:4px}
+.who span{font-size:12px;font-weight:700;border-radius:10px;padding:1px 8px;background:#000065;color:#fff}
+@media (prefers-color-scheme: dark){.who span{background:#a3b1ff;color:#0a0d2a}}
+.who span.d{background:#1f6b8f}
+.exc{color:var(--muted);font-size:13px;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.exc.open{display:block;-webkit-line-clamp:unset}
+.pubact{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+
+/* ---- kanban */
+.board{display:grid;grid-template-columns:repeat(4,minmax(220px,1fr));gap:12px;align-items:start;overflow-x:auto;padding-bottom:6px}
+.col{background:var(--soft);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;min-height:140px}
+.col.over{outline:2px dashed var(--accent)}
+.col h3{display:flex;justify-content:space-between;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.tk{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:9px 10px;display:flex;flex-direction:column;gap:5px;cursor:grab;box-shadow:var(--shadow)}
+.tk.atrasada{border-left:4px solid var(--crit)}
+.tk .t{font-weight:600;overflow-wrap:anywhere;cursor:pointer}
+.tk .m{display:flex;flex-wrap:wrap;gap:4px 8px;font-size:12px;color:var(--muted);align-items:center}
+.tk .mv{display:flex;gap:4px;justify-content:flex-end}
+.prio-alta{color:var(--crit);font-weight:700}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);padding:18px;width:min(520px,94vw)}
+dialog::backdrop{background:rgba(0,0,40,.45)}
+dialog form{display:flex;flex-direction:column;gap:10px}
+.ck{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+.ck label{flex-direction:row;align-items:flex-start;gap:8px;color:var(--ink);font-size:14px}
+.ideas{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.ideas .card h3{color:var(--accent)}
+.ideas ul{margin:0;padding-left:18px;color:var(--muted);font-size:13px;display:flex;flex-direction:column;gap:3px}
+
+/* ---- relatórios (sempre em fundo claro: é a peça que pode ser mostrada ao cliente) */
+.rel{--r-ink:#18212f;--r-muted:#5b6678;--r-line:#d5dbe4;--r-navy:#000065;--c1:#2a78d6;--c2:#eb6834;--c3:#1baf7a;--c4:#8a93a6;
+  background:#fff;color:var(--r-ink);border:1px solid var(--r-line);border-radius:10px;overflow:hidden;box-shadow:var(--shadow)}
+.rel .capa{background:#000065;color:#fff;padding:22px 26px;display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-between;align-items:flex-end;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.rel .capa .logo{width:170px;height:46px}
+.rel .capa h2{font-size:24px;font-weight:600;margin:10px 0 2px}
+.rel .capa .meta{font-size:13px;opacity:.88;text-align:right}
+.rel .corpo{padding:22px 26px;display:flex;flex-direction:column;gap:22px}
+.rel .resumo{font-size:15px;line-height:1.55;border-left:4px solid #000065;padding:2px 0 2px 14px}
+.rel .kp{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.rel .k{border:1px solid var(--r-line);border-radius:8px;padding:12px 14px}
+.rel .k .v{font-size:30px;font-weight:700;color:#000065;line-height:1.1}
+.rel .k .l{font-size:13px;color:var(--r-muted)}
+.rel .k .s{font-size:12px;color:var(--r-muted)}
+.rel .gr{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:18px}
+.rel figure{margin:0;border:1px solid var(--r-line);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;break-inside:avoid}
+.rel figcaption{font-weight:600;font-size:14px}
+.rel figcaption small{display:block;font-weight:400;color:var(--r-muted);font-size:12px}
+.rel svg{width:100%;height:auto;display:block;overflow:visible}
+.rel svg text{font-family:var(--sans);fill:var(--r-ink)}
+.rel svg .mut{fill:var(--r-muted)}
+.rel .lg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px}
+.rel .lg span{display:inline-flex;align-items:center;gap:6px}
+.rel .lg i{width:11px;height:11px;border-radius:3px;display:inline-block}
+.rel details{font-size:12px}
+.rel table{border-collapse:collapse;width:100%;font-size:12px}
+.rel th,.rel td{border-bottom:1px solid var(--r-line);padding:4px 6px;text-align:left;vertical-align:top}
+.rel th{color:var(--r-muted);font-weight:600}
+.rel td.n,.rel th.n{text-align:right;white-space:nowrap}
+.rel .tabproc td{font-size:12px}
+.rel input.val{width:130px;text-align:right;border:1px solid var(--r-line);background:#fff;color:#18212f;padding:3px 6px;border-radius:4px}
+.rel .nota{font-size:12px;color:var(--r-muted);border-top:1px solid var(--r-line);padding-top:10px}
+.rel h3.sec{font-size:16px;color:#000065;border-bottom:2px solid #000065;padding-bottom:4px}
+.relbar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.relbar label{flex-direction:row;align-items:center;gap:6px;color:var(--ink);font-size:13px}
+.relbar select{width:auto}
+
+@media print{
+  @page{size:A4;margin:12mm}
+  body{background:#fff}
+  .side,.topbar,.noprint,footer.rod,.relbar{display:none!important}
+  .app{display:block}
+  .content{padding:0;max-width:none}
+  .view:not(#v-relatorios){display:none!important}
+  .rel{border:0;box-shadow:none;border-radius:0}
+  .rel .gr{grid-template-columns:1fr 1fr}
+  .rel details{display:none}
+  .rel input.val{border:0;padding:0;text-align:right}
+  .rel .quebra{break-before:page}
+  .rel tr{break-inside:avoid}
+}
+
+a.btn{text-decoration:none;display:inline-block}
+
 </style>
 </head>
 <body>
-<header class="brand"><div class="in"><span class="logo" role="img" aria-label="Lunelli Advocacia"></span><span class="tagline">Advocacia Empresarial</span></div></header>
-<div class="wrap">
-  <div>
-    <h1>Consulta DJEN</h1>
-    <p class="sub">Busca ao vivo no Diário de Justiça Eletrônico Nacional (CNJ) por nome da parte. A consulta sai direto deste navegador para a base pública do CNJ.</p>
+<div class="app">
+<aside class="side">
+  <div><span class="logo" role="img" aria-label="Lunelli Advocacia"></span></div>
+  <div class="tagline">Advocacia Empresarial</div>
+  <nav class="nav" id="nav" aria-label="Seções">
+    <a href="#inicio" data-v="inicio"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>Início</a>
+    <a href="#consulta" data-v="consulta"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>Consulta</a>
+    <a href="#relatorios" data-v="relatorios"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Relatórios</a>
+    <a href="#advogados" data-v="advogados"><svg viewBox="0 0 24 24"><path d="M12 3v18M5 7h14M5 7l-3 7a3 3 0 006 0zM19 7l-3 7a3 3 0 006 0z"/></svg>Advogados<span class="bd" id="bdAdv" hidden></span></a>
+    <a href="#organizacao" data-v="organizacao"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="10" rx="1"/><rect x="17" y="4" width="4" height="6" rx="1"/></svg>Organização<span class="bd red" id="bdOrg" hidden></span></a>
+  </nav>
+  <div class="foot">
+    <button type="button" id="bkExp">Baixar backup dos dados</button>
+    <button type="button" id="bkImp">Restaurar backup…</button>
+    <input type="file" id="bkFile" accept="application/json,.json" hidden>
+    <span>Os dados (nomes salvos, tarefas, marcações) ficam só neste navegador.</span>
   </div>
+</aside>
 
+<div class="main">
+<header class="topbar"><div><h1 id="titulo">Início</h1><p class="sub" id="subtitulo"></p></div><div class="acts noprint" id="topActs"></div></header>
+<main class="content">
+
+<!-- ===================== INÍCIO ===================== -->
+<section class="view" id="v-inicio" hidden>
+  <div class="kpis" id="kpisInicio"></div>
+  <div class="cols2">
+    <div class="panel"><h2>Publicações novas por advogado <a class="btn sec sm" href="#advogados">Abrir</a></h2><div id="inAdv"></div></div>
+    <div class="panel"><h2>Próximos prazos e tarefas <a class="btn sec sm" href="#organizacao">Abrir</a></h2><div id="inPrazos"></div></div>
+  </div>
+  <div class="panel"><h2>Clientes monitorados</h2>
+    <div class="chips" id="inClientes"></div>
+    <div class="hint">Clique em um nome para consultar o DJEN e abrir o relatório. A lista é editada na tela Consulta.</div></div>
+</section>
+
+<!-- ===================== CONSULTA ===================== -->
+<section class="view" id="v-consulta" hidden>
+  <p class="status">Busca ao vivo no Diário de Justiça Eletrônico Nacional (CNJ) por nome da parte. A consulta sai direto deste navegador para a base pública do CNJ.</p>
   <form class="panel" id="form">
     <div class="grid">
       <label class="wide">Nome da parte (pessoa ou empresa)
@@ -110,13 +276,12 @@ footer{color:var(--muted);font-size:12px}
       <div class="hint" id="chipsHint">A lista de nomes fica salva só neste navegador. Clique em um nome para consultar.</div>
     </div>
   </form>
-
   <div class="msg" id="msg" hidden></div>
-
   <div class="panel" id="resBox" hidden>
     <div class="acts">
       <b id="resumo"></b>
-      <button class="btn sec" id="csv" type="button">Baixar planilha (Excel)</button>
+      <a class="btn sm" href="#relatorios" id="verRel">Ver relatório com gráficos</a>
+      <button class="btn sec sm" id="csv" type="button">Baixar planilha (Excel)</button>
     </div>
     <div class="checks">
       <label><input type="checkbox" id="fExato" checked> Só quando o nome consta como parte</label>
@@ -125,9 +290,7 @@ footer{color:var(--muted);font-size:12px}
       <label><input type="checkbox" id="fDoc"> Só com o CPF/CNPJ no texto</label>
     </div>
   </div>
-
   <div class="list" id="list"><div class="empty">Informe um nome e clique em Consultar. O período padrão são os últimos 30 dias.</div></div>
-
   <div class="panel lim" id="limites" hidden>
     <b>O que esta consulta pode não mostrar</b>
     <ul>
@@ -140,11 +303,101 @@ footer{color:var(--muted);font-size:12px}
     </ul>
     <span>A ausência de resultados não substitui certidão negativa nem a consulta direta ao tribunal.</span>
   </div>
+</section>
 
-  <footer>Advocacia Lunelli · ferramenta de uso interno. Fonte: API pública do DJEN (comunicaapi.pje.jus.br). Aparece apenas o que os tribunais publicam no DJEN; processos em segredo de justiça não constam. O CNJ limita a cerca de 20 consultas por minuto, por isso buscas longas avançam em etapas.</footer>
+<!-- ===================== RELATÓRIOS ===================== -->
+<section class="view" id="v-relatorios" hidden>
+  <div class="relbar noprint" id="relBar">
+    <label>Cliente <select id="relCli"></select></label>
+    <label><input type="checkbox" id="relTodos"> Incluir processos em que o nome não consta expressamente como parte</label>
+    <label><input type="checkbox" id="relTab" checked> Incluir tabela de processos</label>
+    <button class="btn" id="relPrint" type="button">Imprimir / salvar em PDF</button>
+  </div>
+  <div id="relVazio" class="empty" hidden>Nenhuma consulta feita ainda. Consulte um cliente na tela Consulta e o relatório é montado automaticamente.<br><br><a class="btn" href="#consulta">Ir para a Consulta</a></div>
+  <article class="rel" id="rel" hidden></article>
+</section>
+
+<!-- ===================== ADVOGADOS ===================== -->
+<section class="view" id="v-advogados" hidden>
+  <div class="panel">
+    <div class="hd"><div><h2>Publicações em nome dos advogados</h2><div class="hint" id="advInfo"></div></div>
+      <div class="acts">
+        <button class="btn sm" id="advAtualizar" type="button">Atualizar agora</button>
+        <label style="flex-direction:row;align-items:center;gap:6px;color:var(--ink)"><input type="checkbox" id="advAuto" checked> Atualizar sozinho a cada 10 min enquanto a página estiver aberta</label>
+        <button class="btn sec sm" id="advNotif" type="button" hidden>Ativar avisos do navegador</button>
+      </div></div>
+    <div class="acts">
+      <label>Advogado
+        <select id="advFiltro"><option value="">Os dois</option><option value="fabio">Fábio Ricardo Lunelli · OAB/SC 15.044</option><option value="davi">Davi Luciano Bertoli da Silva · OAB/SC 39.336</option></select></label>
+      <label>Tipo de comunicação <select id="advTipo"><option value="">Todos</option></select></label>
+      <label>Tribunal <select id="advTrib"><option value="">Todos</option></select></label>
+      <label style="min-width:220px">Buscar no texto ou no nº do processo <input type="text" id="advBusca" autocomplete="off"></label>
+      <label>Carregar histórico de
+        <select id="advDias"><option value="15">15 dias</option><option value="30" selected>30 dias</option><option value="60">60 dias</option><option value="90">90 dias</option></select></label>
+      <button class="btn sec sm" id="advHist" type="button" style="align-self:flex-end">Carregar</button>
+    </div>
+    <span class="status" id="advStatus"></span>
+  </div>
+  <div class="msg" id="advMsg" hidden></div>
+  <div class="tabs" role="tablist" id="advTabs">
+    <button role="tab" data-t="novas" aria-selected="true">Novas <span class="n" id="nNovas">0</span></button>
+    <button role="tab" data-t="tratadas" aria-selected="false">Tratadas <span class="n" id="nTrat">0</span></button>
+    <button role="tab" data-t="todas" aria-selected="false">Todas <span class="n" id="nTodas">0</span></button>
+  </div>
+  <div class="acts noprint"><button class="btn sec sm" id="advTodasLidas" type="button">Marcar todas as exibidas como tratadas</button><span class="hint">“Tratada” só organiza a sua fila aqui; não tem efeito no processo.</span></div>
+  <div class="list" id="advLista"></div>
+  <div class="acts"><button class="btn sec" id="advMais" type="button" hidden>Mostrar mais</button></div>
+</section>
+
+<!-- ===================== ORGANIZAÇÃO ===================== -->
+<section class="view" id="v-organizacao" hidden>
+  <div class="kpis" id="kpisOrg"></div>
+  <div class="panel">
+    <div class="hd"><h2>Quadro de tarefas</h2>
+      <div class="acts"><label style="flex-direction:row;align-items:center;gap:6px;color:var(--ink)">Responsável
+        <select id="orgResp" style="width:auto"><option value="">Todos</option><option value="Fábio">Fábio</option><option value="Davi">Davi</option><option value="Equipe">Equipe</option></select></label>
+        <button class="btn sm" id="orgNova" type="button">Nova tarefa</button></div></div>
+    <div class="board" id="board"></div>
+    <div class="hint">Arraste os cartões entre as colunas (ou use as setas). Clique no título para editar. Tarefas também podem ser criadas a partir de uma publicação, na tela Advogados.</div>
+  </div>
+  <div class="cols2">
+    <div class="panel"><h2>Rotina do escritório</h2><div id="rotina"></div><div class="hint">Os itens reiniciam sozinhos a cada dia, semana ou mês.</div></div>
+    <div class="panel"><h2>Prazos nos próximos 14 dias</h2><div id="orgPrazos"></div></div>
+  </div>
+  <div class="panel"><h2>Sugestões para começar a organizar o escritório</h2>
+    <div class="ideas" id="ideias"></div></div>
+</section>
+
+<footer class="rod">Advocacia Lunelli · ferramenta de uso interno. Fonte: API pública do DJEN (comunicaapi.pje.jus.br). Aparece apenas o que os tribunais publicam no DJEN; processos em segredo de justiça não constam. O CNJ limita a cerca de 20 consultas por minuto, por isso buscas longas avançam em etapas.</footer>
+</main>
+</div>
 </div>
 
+<dialog id="dlgTarefa">
+  <form method="dialog" id="fTarefa">
+    <h2 id="dlgTitulo">Nova tarefa</h2>
+    <label>Título <input type="text" id="tkTitulo" required autocomplete="off" placeholder="Ex.: Contestação · HCD · 0000000-00.2026.5.12.0000"></label>
+    <div class="grid">
+      <label>Responsável <select id="tkResp"><option>Fábio</option><option>Davi</option><option>Equipe</option></select></label>
+      <label>Prazo fatal <input type="date" id="tkPrazo"></label>
+      <label>Prioridade <select id="tkPrio"><option value="normal">Normal</option><option value="alta">Alta</option><option value="baixa">Baixa</option></select></label>
+      <label>Coluna <select id="tkStatus"></select></label>
+    </div>
+    <div class="grid">
+      <label>Cliente <input type="text" id="tkCli" autocomplete="off"></label>
+      <label>Nº do processo <input type="text" id="tkProc" autocomplete="off"></label>
+    </div>
+    <label>Observações <textarea id="tkNota"></textarea></label>
+    <div class="hint" id="tkInterno"></div>
+    <div class="acts" style="justify-content:space-between">
+      <span><button class="btn danger" type="button" id="tkDel" hidden>Excluir</button></span>
+      <span class="acts"><button class="btn sec" type="button" id="tkCancel">Cancelar</button><button class="btn" type="submit" id="tkSave">Salvar</button></span>
+    </div>
+  </form>
+</dialog>
+
 <script>
+/* ===== 00-core: utilitários, armazenamento local, cliente da API do DJEN ===== */
 const API = "https://comunicaapi.pje.jus.br/api/v1/comunicacao";
 const PAUSA = 3200, MAX_PAG = 30;
 const $ = id => document.getElementById(id);
@@ -154,70 +407,195 @@ const norm = s => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase
 const limpa = h => { const d = new DOMParser().parseFromString("<body>" + (h || "").replace(/<br\s*\/?>/gi, " ") + "</body>", "text/html"); return (d.body.textContent || "").replace(/\s+/g, " ").trim(); };
 const br = d => /^\d{4}-\d{2}-\d{2}/.test(d || "") ? d.slice(8, 10) + "/" + d.slice(5, 7) + "/" + d.slice(0, 4) : (d || "");
 const iso = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
-const E = { itens: [], termos: [], doc: "", rodando: false, parar: false };
+const hojeIso = () => iso(new Date());
+const somaDias = (isoStr, n) => { const d = new Date(isoStr + "T12:00:00"); d.setDate(d.getDate() + n); return iso(d); };
+const brl = n => (n == null || isNaN(n)) ? "—" : n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const brlCurto = n => n >= 1e6 ? "R$ " + (n / 1e6).toLocaleString("pt-BR", { maximumFractionDigits: 1 }) + " mi" : n >= 1e3 ? "R$ " + (n / 1e3).toLocaleString("pt-BR", { maximumFractionDigits: 0 }) + " mil" : "R$ " + Math.round(n);
+const nfmt = n => n.toLocaleString("pt-BR");
+const cap = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+function titulo(s) { // "AÇÃO TRABALHISTA - RITO SUMARÍSSIMO" -> "Ação Trabalhista - Rito Sumaríssimo"
+  return (s || "").toLowerCase().replace(/(^|[\s\-/(])([a-zà-ú])/g, (m, a, b) => a + b.toUpperCase()).replace(/\b(De|Da|Do|Das|Dos|E|Em|Para|Por|Ao|Na|No)\b/g, w => w.toLowerCase());
+}
+
+// ---- armazenamento local (tudo com prefixo djen.)
+const LS = {
+  get(k, pad) { try { const v = localStorage.getItem("djen." + k); return v == null ? pad : JSON.parse(v); } catch (e) { return pad; } },
+  set(k, v) { try { localStorage.setItem("djen." + k, JSON.stringify(v)); return true; } catch (e) { return false; } },
+  del(k) { try { localStorage.removeItem("djen." + k); } catch (e) {} }
+};
+function salvar(blob, nome) { const a = el("a"); a.href = URL.createObjectURL(blob); a.download = nome; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000); }
+
+// ---- advogados do escritório
+const ADVS = [
+  { id: "fabio", nome: "Fábio Ricardo Lunelli", curto: "Fábio", sigla: "F", oab: "15044", uf: "SC", rot: "OAB/SC 15.044" },
+  { id: "davi", nome: "Davi Luciano Bertoli da Silva", curto: "Davi", sigla: "D", oab: "39336", uf: "SC", rot: "OAB/SC 39.336" }
+];
+
+// ---- chamada à API com espaçamento global e espera no limite de requisições
+const NET = { ultima: 0 };
+async function pausaGlobal() { const w = NET.ultima + PAUSA - Date.now(); if (w > 0) await sleep(w); NET.ultima = Date.now(); }
+async function buscarPagina(params, ctl, aoEsperar) {
+  for (let tent = 1; tent <= 4; tent++) {
+    if (ctl && ctl.parar) throw { parado: true };
+    await pausaGlobal();
+    let r;
+    try { r = await fetch(API + "?" + new URLSearchParams(params), { headers: { Accept: "application/json" } }); }
+    catch (e) { if (tent === 4) throw { rede: true }; await sleep(2000 * tent); continue; }
+    if (r.status === 429) { for (let s = 60; s > 0 && !(ctl && ctl.parar); s -= 5) { if (aoEsperar) aoEsperar(s); await sleep(5000); } NET.ultima = Date.now(); continue; }
+    if (!r.ok) { if (r.status >= 500 && tent < 4) { await sleep(3000 * tent); continue; } throw { http: r.status }; }
+    return await r.json();
+  }
+  throw { http: 429 };
+}
+async function buscarTudo(base, ctl, rotulo, aoStatus, max) {
+  const todos = []; let cortado = false; max = max || MAX_PAG;
+  for (let pag = 1; ; pag++) {
+    if (aoStatus) aoStatus("Consultando " + rotulo + (pag > 1 ? " (página " + pag + ")" : "") + "…");
+    const j = await buscarPagina(Object.assign({}, base, { itensPorPagina: 100, pagina: pag }), ctl, s => aoStatus && aoStatus("Limite de consultas do CNJ atingido. Retomando em " + s + " s…"));
+    const itens = (j && j.items) || []; todos.push(...itens);
+    if (itens.length < 100) break;
+    if (pag >= max) { cortado = true; break; }
+  }
+  return { todos, cortado };
+}
+function erroAmigavel(e) {
+  if (e && e.parado) return ["Consulta interrompida. Os resultados abaixo estão incompletos.", false];
+  if (e && e.rede) return ["Não foi possível falar com o DJEN. Verifique a internet; a base do CNJ também costuma recusar acessos de fora do Brasil (VPN).", true];
+  return ["O DJEN respondeu com erro" + (e && e.http ? " (HTTP " + e.http + ")" : "") + ". Tente de novo em alguns minutos.", true];
+}
+
+// ---- valor da causa: o DJEN quase nunca informa; extraímos quando aparece no texto
+const RE_VALOR = [
+  /valor\s+(?:atribu[ií]do\s+)?(?:d[aoe]s?\s+)?(?:causa|a[cç][aã]o)[^R\d]{0,40}R\$\s*([\d.]+,\d{2})/i,
+  /atribu[ií](?:u|ram|ndo)?\s+(?:[aà]\s+)?causa\s+o\s+valor\s+de\s+R\$\s*([\d.]+,\d{2})/i,
+  /(?:d[aà]r?|deu|dado)\s+[aà]\s+causa\s+o\s+valor\s+de\s+R\$\s*([\d.]+,\d{2})/i
+];
+function extrairValor(texto) {
+  for (const re of RE_VALOR) { const m = re.exec(texto || ""); if (m) { const n = parseFloat(m[1].replace(/\./g, "").replace(",", ".")); if (n > 0 && n < 1e12) return n; } }
+  return null;
+}
+function lerValorBR(s) { // "1.234,56" ou "1234,56" ou "1234.56" -> número
+  s = String(s || "").replace(/[^\d.,]/g, ""); if (!s) return null;
+  if (s.includes(",")) s = s.replace(/\./g, "").replace(",", "."); else if ((s.match(/\./g) || []).length > 1) s = s.replace(/\./g, "");
+  const n = parseFloat(s); return isNaN(n) ? null : n;
+}
+
+// ---- classificação da natureza / justiça
+function ramoJustica(sig) {
+  sig = (sig || "").toUpperCase();
+  if (/^(TRT|TST)/.test(sig)) return "Justiça do Trabalho";
+  if (/^TRF|^JF/.test(sig)) return "Justiça Federal";
+  if (/^(STJ|STF)/.test(sig)) return "Tribunais superiores";
+  if (/^(TRE|TSE)/.test(sig)) return "Justiça Eleitoral";
+  if (/^TJM/.test(sig)) return "Justiça Militar";
+  if (/^TJ/.test(sig)) return "Justiça Estadual";
+  return "Outros";
+}
+function grupoAcao(classe) {
+  const c = norm(classe);
+  if (/EXECUCAO FISCAL/.test(c)) return "Execução fiscal";
+  if (/TRABALHISTA|RECLAMACAO TRABALHISTA|CUMPRIMENTO DE SENTENCA.*TRABALH/.test(c)) return "Trabalhista";
+  if (/FALENCIA|RECUPERACAO JUDICIAL|RECUPERACAO EXTRAJUDICIAL/.test(c)) return "Falência / recuperação";
+  if (/MANDADO DE SEGURANCA|HABEAS|MEDIDA CAUTELAR|TUTELA|PRODUCAO ANTECIPADA|ARRESTO|SEQUESTRO/.test(c)) return "Medidas urgentes e mandados";
+  if (/EXECUCAO|CUMPRIMENTO|PENHORA|LIQUIDACAO/.test(c)) return "Execução / cumprimento";
+  if (/AGRAVO|APELACAO|EMBARGOS DE DECLARACAO|RECURSO|REMESSA|RECLAMACAO|CONFLITO DE COMPETENCIA|AGRAVO INTERNO/.test(c)) return "Recursos e incidentes";
+  if (/JUIZADO/.test(c)) return "Juizado especial";
+  if (/CARTA PRECATORIA|CARTA ROGATORIA|CARTA DE ORDEM/.test(c)) return "Cartas";
+  if (/PROCEDIMENTO COMUM|PROCEDIMENTO ORDINARIO|MONITORIA|ACAO CIVIL|ACAO DE|PROCEDIMENTO SUMARIO|PROCEDIMENTO ESPECIAL|DESPEJO|USUCAPIAO|INVENTARIO|ALVARA|CONSIGNACAO|INDENIZA|COBRANCA|REVISIONAL|BUSCA E APREENSAO/.test(c)) return "Conhecimento (cível)";
+  if (/CRIMINAL|PENAL|INQUERITO|PROCEDIMENTO POLICIAL/.test(c)) return "Penal";
+  return "Outras classes";
+}
+function tomarValoresManuais() { return LS.get("valores", {}); }
+
+// ---- converte o item bruto do DJEN no formato usado pelo site
+function montarItem(i, termo, docLimpo, buscado) {
+  const texto = limpa(i.texto);
+  const dest = (i.destinatarios || []).map(d => ({ nome: d.nome || "", polo: d.polo || "" }));
+  const achados = termo ? dest.filter(d => (" " + norm(d.nome) + " ").includes(" " + termo + " ")) : [];
+  const polos = new Set(achados.map(d => d.polo));
+  const oabs = (i.destinatarioadvogados || []).filter(x => x.advogado).map(x => ({ nome: x.advogado.nome || "", num: String(x.advogado.numero_oab || "").replace(/\D/g, "").replace(/^0+/, ""), uf: (x.advogado.uf_oab || "").toUpperCase() }));
+  return {
+    id: i.id, data: i.data_disponibilizacao || "", tribunal: i.siglaTribunal || "", tipo: i.tipoComunicacao || "", docTipo: i.tipoDocumento || "",
+    processo: i.numeroprocessocommascara || i.numero_processo || "", chave: String(i.numero_processo || i.numeroprocessocommascara || i.id),
+    classe: (i.nomeClasse || "").toUpperCase(), orgao: i.nomeOrgao || "", link: i.link || "", texto, dest, buscado: buscado || "",
+    exato: achados.length > 0, polo: polos.has("P") && polos.has("A") ? "Ativo e passivo" : polos.has("P") ? "Passivo" : polos.has("A") ? "Ativo" : "",
+    dist: /istribui/.test(i.tipoComunicacao || ""), temDoc: !!docLimpo && texto.replace(/[^0-9A-Za-z]/g, "").toUpperCase().includes(docLimpo),
+    advs: oabs.map(x => x.nome + " (OAB " + x.num + "/" + x.uf + ")"), oabs,
+    valor: extrairValor(texto)
+  };
+}
+
+// ---- agrupa publicações por processo (usado na consulta, no relatório e no Excel)
+function agruparPorProcesso(itens, opts) {
+  opts = opts || {};
+  const m = new Map();
+  for (const i of itens) {
+    let g = m.get(i.chave); if (!g) { g = { chave: i.chave, pubs: [] }; m.set(i.chave, g); }
+    g.pubs.push(i);
+  }
+  const out = [...m.values()];
+  for (const g of out) {
+    g.pubs.sort((a, b) => b.data.localeCompare(a.data));
+    const p = g.pubs[0]; g.processo = p.processo; g.tribunal = p.tribunal; g.classe = p.classe; g.orgao = p.orgao;
+    g.dist = g.pubs.some(x => x.dist); g.temDoc = g.pubs.some(x => x.temDoc);
+    const pol = new Set(g.pubs.flatMap(x => x.polo ? x.polo.split(" e ").map(s => s.toLowerCase()) : []));
+    g.passivo = pol.has("passivo"); g.ativo = pol.has("ativo");
+    g.polo = pol.has("passivo") && pol.has("ativo") ? "ativo e passivo" : pol.has("passivo") ? "passivo" : pol.has("ativo") ? "ativo" : "";
+    g.primeira = g.pubs[g.pubs.length - 1].data; g.ultima = p.data;
+    const mais = g.pubs.reduce((a, b) => b.dest.length > a.dest.length ? b : a, p); g.dest = mais.dest;
+    g.advs = g.pubs.reduce((a, b) => b.advs.length > a.length ? b.advs : a, []);
+    g.buscados = [...new Set(g.pubs.map(x => x.buscado).filter(Boolean))];
+    g.valorExtraido = (g.pubs.find(x => x.valor) || {}).valor || null;
+  }
+  out.sort((a, b) => b.primeira.localeCompare(a.primeira));
+  return out;
+}
+
+// ---- diálogo de aviso simples
+function aviso(idMsg, t, erro) { const m = $(idMsg); m.textContent = t || ""; m.hidden = !t; m.className = "msg" + (erro ? " err" : ""); }
+async function copiar(txt, btn) {
+  try { await navigator.clipboard.writeText(txt); if (btn) { const o = btn.textContent; btn.textContent = "copiado"; setTimeout(() => btn.textContent = o, 1500); } } catch (e) {}
+}
+
+
+/* ===== 10-consulta: busca por nome da parte ===== */
+const E = { itens: [], termos: [], doc: "", rodando: false, ctl: { parar: false }, busca: null };
+const avisoC = (t, erro) => aviso("msg", t, erro);
 
 // ---- nomes salvos (apenas neste navegador)
-function lerLista() { try { return JSON.parse(localStorage.getItem("djen.nomes") || "[]"); } catch (e) { return []; } }
-function gravarLista(l) { try { localStorage.setItem("djen.nomes", JSON.stringify(l)); } catch (e) {} }
+const lerLista = () => LS.get("nomes", []);
+const gravarLista = l => LS.set("nomes", l);
 function desenharChips() {
   const box = $("chips"), l = lerLista(); box.textContent = "";
   for (const n of l) {
     const c = el("span", "chip"), b = el("button", "", n.nome), x = el("button", "x", "×");
     b.type = x.type = "button"; b.title = "Consultar " + n.nome; x.title = "Remover da lista"; x.setAttribute("aria-label", "Remover " + n.nome);
     b.onclick = () => { $("nome").value = n.nome; $("doc").value = n.doc || ""; consultar([n]); };
-    x.onclick = () => { gravarLista(lerLista().filter(i => i.nome !== n.nome)); desenharChips(); };
+    x.onclick = () => { gravarLista(lerLista().filter(i => i.nome !== n.nome)); desenharChips(); desenharInicioClientes(); };
     c.append(b, x); box.appendChild(c);
   }
   if (l.length > 1) { const t = el("button", "btn sec", "Consultar todos (" + l.length + ")"); t.type = "button"; t.onclick = () => consultar(lerLista()); box.appendChild(t); }
 }
 $("save").onclick = () => {
-  const nome = $("nome").value.trim(); if (!nome) { aviso("Digite o nome antes de salvar."); return; }
+  const nome = $("nome").value.trim(); if (!nome) { avisoC("Digite o nome antes de salvar."); return; }
   const l = lerLista().filter(i => norm(i.nome) !== norm(nome)); l.push({ nome, doc: $("doc").value.trim() });
-  l.sort((a, b) => a.nome.localeCompare(b.nome, "pt")); gravarLista(l); desenharChips(); aviso("");
+  l.sort((a, b) => a.nome.localeCompare(b.nome, "pt")); gravarLista(l); desenharChips(); desenharInicioClientes(); avisoC("");
 };
 
-function aviso(t, erro) { const m = $("msg"); m.textContent = t || ""; m.hidden = !t; m.className = "msg" + (erro ? " err" : ""); }
-
-// ---- chamada a API com espera no limite de requisicoes
-async function buscarPagina(params) {
-  for (let tent = 1; tent <= 4; tent++) {
-    if (E.parar) throw { parado: true };
-    let r;
-    try { r = await fetch(API + "?" + new URLSearchParams(params), { headers: { Accept: "application/json" } }); }
-    catch (e) { if (tent === 4) throw { rede: true }; await sleep(2000 * tent); continue; }
-    if (r.status === 429) { for (let s = 60; s > 0 && !E.parar; s -= 5) { $("status").textContent = "Limite de consultas do CNJ atingido. Retomando em " + s + " s…"; await sleep(5000); } continue; }
-    if (!r.ok) { if (r.status >= 500 && tent < 4) { await sleep(3000 * tent); continue; } throw { http: r.status }; }
-    return await r.json();
-  }
-  throw { http: 429 };
-}
-
-async function buscarTudo(base, rotulo) {
-  const todos = []; let cortado = false;
-  for (let pag = 1; ; pag++) {
-    $("status").textContent = "Consultando " + rotulo + (pag > 1 ? " (página " + pag + ")" : "") + "…";
-    const j = await buscarPagina(Object.assign({}, base, { itensPorPagina: 100, pagina: pag }));
-    const itens = (j && j.items) || []; todos.push(...itens);
-    if (itens.length < 100) break;
-    if (pag >= MAX_PAG) { cortado = true; break; }
-    await sleep(PAUSA);
-  }
-  return { todos, cortado };
-}
-
-async function consultar(alvos) {
+async function consultar(alvos, opcoes) {
   if (E.rodando) return;
+  opcoes = opcoes || {};
   const ini = $("ini").value, fim = $("fim").value, trib = $("trib").value;
   const proc = $("proc").value.replace(/\D/g, ""), oab = $("oab").value.trim().match(/^(\d+)[^A-Za-z]*([A-Za-z]{2})?$/);
   alvos = (alvos || []).filter(a => a.nome && a.nome.trim());
-  if (!alvos.length && !proc && !oab) { aviso("Informe ao menos o nome da parte, o número do processo ou a OAB."); return; }
-  if (!ini || !fim || ini > fim) { aviso("Confira o período: a data inicial deve ser anterior à final."); return; }
+  if (!alvos.length && !proc && !oab) { avisoC("Informe ao menos o nome da parte, o número do processo ou a OAB."); return; }
+  if (!ini || !fim || ini > fim) { avisoC("Confira o período: a data inicial deve ser anterior à final."); return; }
   if (!alvos.length) alvos = [{ nome: "", doc: $("doc").value.trim() }];
-  E.busca = { nomes: alvos.map(a => a.nome).filter(Boolean).join("; "), ini, fim, trib };
-  E.rodando = true; E.parar = false; E.itens = []; E.termos = alvos.map(a => norm(a.nome)).filter(Boolean);
-  $("go").disabled = true; $("stop").hidden = false; aviso(""); $("resBox").hidden = true;
+  E.busca = { nomes: alvos.map(a => a.nome).filter(Boolean).join("; "), lista: alvos.map(a => a.nome).filter(Boolean), ini, fim, trib, quando: new Date().toISOString() };
+  E.rodando = true; E.ctl = { parar: false }; E.itens = []; E.termos = alvos.map(a => norm(a.nome)).filter(Boolean);
+  $("go").disabled = true; $("stop").hidden = false; avisoC(""); $("resBox").hidden = true;
   $("list").textContent = ""; $("list").appendChild(el("div", "empty", "Consultando o DJEN…"));
-  const vistos = new Set(), avisos = [];
+  const vistos = new Set(), avisos = [], st = t => { $("status").textContent = t; };
   try {
     for (let k = 0; k < alvos.length; k++) {
       const a = alvos[k], base = { dataDisponibilizacaoInicio: ini, dataDisponibilizacaoFim: fim };
@@ -225,61 +603,41 @@ async function consultar(alvos) {
       if (trib) base.siglaTribunal = trib;
       if (proc) base.numeroProcesso = proc;
       if (oab) { base.numeroOab = oab[1]; if (oab[2]) base.ufOab = oab[2].toUpperCase(); }
-      const { todos, cortado } = await buscarTudo(base, a.nome ? '"' + a.nome + '"' : "o DJEN");
+      const { todos, cortado } = await buscarTudo(base, E.ctl, a.nome ? '"' + a.nome + '"' : "o DJEN", st);
       if (cortado) avisos.push('A busca por "' + a.nome + '" passou de ' + (MAX_PAG * 100) + " resultados e foi interrompida. Reduza o período ou escolha um tribunal.");
       const docLimpo = (a.doc || "").replace(/[^0-9A-Za-z]/g, "").toUpperCase(), termo = norm(a.nome);
       for (const i of todos) {
         if (vistos.has(i.id)) continue; vistos.add(i.id);
-        const texto = limpa(i.texto);
-        const dest = (i.destinatarios || []).map(d => ({ nome: d.nome || "", polo: d.polo || "" }));
-        const achados = termo ? dest.filter(d => (" " + norm(d.nome) + " ").includes(" " + termo + " ")) : [];
-        const polos = new Set(achados.map(d => d.polo));
-        E.itens.push({
-          id: i.id, data: i.data_disponibilizacao || "", tribunal: i.siglaTribunal || "", tipo: i.tipoComunicacao || "", docTipo: i.tipoDocumento || "",
-          processo: i.numeroprocessocommascara || i.numero_processo || "", chave: String(i.numero_processo || i.numeroprocessocommascara || i.id),
-          classe: (i.nomeClasse || "").toUpperCase(), orgao: i.nomeOrgao || "", link: i.link || "", texto, dest, buscado: a.nome,
-          exato: achados.length > 0, polo: polos.has("P") && polos.has("A") ? "Ativo e passivo" : polos.has("P") ? "Passivo" : polos.has("A") ? "Ativo" : "",
-          dist: /istribui/.test(i.tipoComunicacao || ""), temDoc: !!docLimpo && texto.replace(/[^0-9A-Za-z]/g, "").toUpperCase().includes(docLimpo),
-          advs: (i.destinatarioadvogados || []).filter(x => x.advogado).map(x => x.advogado.nome + " (OAB " + x.advogado.numero_oab + "/" + x.advogado.uf_oab + ")")
-        });
+        E.itens.push(montarItem(i, termo, docLimpo, a.nome));
       }
       desenhar();
-      if (k < alvos.length - 1) await sleep(PAUSA);
     }
-    $("status").textContent = "Consulta concluída às " + new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) + ".";
-    if (avisos.length) aviso(avisos.join(" "));
+    st("Consulta concluída às " + new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) + ".");
+    if (avisos.length) avisoC(avisos.join(" "));
   } catch (e) {
-    $("status").textContent = "";
-    if (e && e.parado) aviso("Consulta interrompida. Os resultados abaixo estão incompletos.");
-    else if (e && e.rede) aviso("Não foi possível falar com o DJEN. Verifique a internet; a base do CNJ também costuma recusar acessos de fora do Brasil (VPN).", true);
-    else aviso("O DJEN respondeu com erro" + (e && e.http ? " (HTTP " + e.http + ")" : "") + ". Tente de novo em alguns minutos.", true);
-    desenhar();
+    st(""); const [t, err] = erroAmigavel(e); avisoC(t, err); desenhar();
   }
   E.rodando = false; $("go").disabled = false; $("stop").hidden = true;
   desenhar(); $("limites").hidden = false;
+  guardarUltima();
+  if (typeof relatorioAtualizar === "function") relatorioAtualizar();
+  if (opcoes.abrirRelatorio && E.itens.length) location.hash = "#relatorios";
+}
+
+// guarda a última consulta (texto cortado) para o relatório sobreviver a uma recarga da página
+function guardarUltima() {
+  const itens = E.itens.slice(0, 4000).map(i => Object.assign({}, i, { texto: i.texto.slice(0, 500), dest: i.dest.slice(0, 40), oabs: [] }));
+  if (!LS.set("ultima", { busca: E.busca, termos: E.termos, itens })) { LS.set("ultima", { busca: E.busca, termos: E.termos, itens: itens.map(i => Object.assign({}, i, { texto: "", dest: i.dest.slice(0, 10) })) }); }
+}
+function restaurarUltima() {
+  const u = LS.get("ultima", null);
+  if (u && u.itens && u.itens.length) { E.itens = u.itens; E.busca = u.busca; E.termos = u.termos || []; }
 }
 
 function grupos() {
   const fx = $("fExato").checked && E.termos.length, fp = $("fPass").checked, fd = $("fDist").checked, fdoc = $("fDoc").checked;
-  const m = new Map();
-  for (const i of E.itens) {
-    if (fx && !i.exato) continue;
-    let g = m.get(i.chave); if (!g) { g = { chave: i.chave, pubs: [] }; m.set(i.chave, g); }
-    g.pubs.push(i);
-  }
-  let out = [...m.values()];
-  for (const g of out) {
-    g.pubs.sort((a, b) => b.data.localeCompare(a.data));
-    const p = g.pubs[0]; g.processo = p.processo; g.tribunal = p.tribunal; g.classe = p.classe; g.orgao = p.orgao;
-    g.dist = g.pubs.some(x => x.dist); g.temDoc = g.pubs.some(x => x.temDoc);
-    const pol = new Set(g.pubs.flatMap(x => x.polo ? x.polo.split(" e ").map(s => s.toLowerCase()) : []));
-    g.passivo = pol.has("passivo"); g.polo = pol.has("passivo") && pol.has("ativo") ? "ativo e passivo" : pol.has("passivo") ? "passivo" : pol.has("ativo") ? "ativo" : "";
-    g.primeira = g.pubs[g.pubs.length - 1].data; g.ultima = p.data;
-    const mais = g.pubs.reduce((a, b) => b.dest.length > a.dest.length ? b : a, p); g.dest = mais.dest;
-    g.advs = g.pubs.reduce((a, b) => b.advs.length > a.length ? b.advs : a, []);
-  }
+  let out = agruparPorProcesso(E.itens.filter(i => !(fx && !i.exato)));
   if (fp) out = out.filter(g => g.passivo); if (fd) out = out.filter(g => g.dist); if (fdoc) out = out.filter(g => g.temDoc);
-  out.sort((a, b) => b.primeira.localeCompare(a.primeira));
   return out;
 }
 
@@ -293,8 +651,7 @@ function desenhar() {
   for (const g of gs.slice(0, 300)) {
     const c = el("article", "card" + (g.passivo ? " passivo" : "")), top = el("div", "top");
     const num = el("span", "num", g.processo); top.appendChild(num);
-    const cp = el("button", "copy", "copiar"); cp.type = "button";
-    cp.onclick = async () => { try { await navigator.clipboard.writeText(g.processo); cp.textContent = "copiado"; setTimeout(() => cp.textContent = "copiar", 1500); } catch (e) { const r = document.createRange(); r.selectNodeContents(num); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } };
+    const cp = el("button", "copy", "copiar"); cp.type = "button"; cp.onclick = () => copiar(g.processo, cp);
     top.append(cp, el("span", "tag", g.tribunal));
     if (g.dist) top.appendChild(el("span", "tag dist", "Distribuição"));
     if (g.polo) top.appendChild(el("span", "tag" + (g.passivo ? " crit" : ""), "Polo " + g.polo));
@@ -320,6 +677,24 @@ function desenhar() {
   if (gs.length > 300) list.appendChild(el("div", "empty", "Mostrando os 300 processos mais recentes de " + gs.length + ". Baixe a planilha para ver todos."));
 }
 
+$("form").addEventListener("submit", e => { e.preventDefault(); consultar([{ nome: $("nome").value, doc: $("doc").value }]); });
+$("stop").onclick = () => { E.ctl.parar = true; };
+for (const id of ["fExato", "fPass", "fDist", "fDoc"]) $(id).addEventListener("change", desenhar);
+
+function iniciarConsulta() {
+  const hoje = new Date(), antes = new Date(); antes.setDate(hoje.getDate() - 30);
+  $("fim").value = iso(hoje); $("ini").value = iso(antes);
+  desenharChips();
+  restaurarUltima();
+  if (E.itens.length) { desenhar(); $("limites").hidden = false; $("status").textContent = "Última consulta restaurada (" + new Date(E.busca.quando).toLocaleString("pt-BR") + ")."; }
+  fetch(API + "/tribunal").then(r => r.ok ? r.json() : []).then(ufs => {
+    const siglas = [...new Set((ufs || []).flatMap(u => (u.instituicoes || []).map(i => i.sigla)).filter(Boolean))].sort();
+    for (const s of siglas) { const o = el("option", "", s); o.value = s; $("trib").appendChild(o); }
+  }).catch(() => {});
+}
+
+
+/* ===== 15-excel: exportação da consulta em Excel (.xlsx) com fallback CSV ===== */
 function baixarCsv() {
   const cab = ["Data", "Tribunal", "Processo", "Classe", "Órgão", "Tipo", "Documento", "Nome buscado", "Consta como parte", "Polo", "CPF/CNPJ no texto", "Partes", "Advogados", "Link", "Texto"];
   const q = v => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"';
@@ -327,7 +702,6 @@ function baixarCsv() {
   const linhas = E.itens.filter(i => vis.has(i.id)).sort((a, b) => b.data.localeCompare(a.data)).map(i => [br(i.data), i.tribunal, i.processo, i.classe, i.orgao, i.tipo, i.docTipo, i.buscado, i.exato ? "Sim" : "Não", i.polo, i.temDoc ? "Sim" : "Não", i.dest.map(d => d.nome + (d.polo ? " (" + d.polo + ")" : "")).join("; "), i.advs.join("; "), i.link, i.texto.slice(0, 2000)].map(q).join(";"));
   salvar(new Blob(["﻿" + cab.map(q).join(";") + "\r\n" + linhas.join("\r\n")], { type: "text/csv;charset=utf-8" }), "consulta-djen-" + iso(new Date()) + ".csv");
 }
-function salvar(blob, nome) { const a = el("a"); a.href = URL.createObjectURL(blob); a.download = nome; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000); }
 
 // ---- planilha Excel formatada (a biblioteca so e carregada quando o botao e usado)
 const LIBS = ["https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js", "https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"];
@@ -335,6 +709,7 @@ function carregarExcel() {
   if (window.ExcelJS) return Promise.resolve(true);
   return LIBS.reduce((p, url) => p.then(ok => ok || new Promise(res => { const s = document.createElement("script"); s.src = url; s.onload = () => res(!!window.ExcelJS); s.onerror = () => res(false); document.head.appendChild(s); })), Promise.resolve(false));
 }
+const valorDe = g => { const m = tomarValoresManuais()[g.chave]; return typeof m === "number" ? m : (g.valorExtraido || ""); };
 const poloTxt = d => d.polo === "P" ? " (passivo)" : d.polo === "A" ? " (ativo)" : d.polo ? " (" + d.polo + ")" : "";
 const dataXls = d => /^\d{4}-\d{2}-\d{2}/.test(d || "") ? new Date(Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10))) : (d || "");
 
@@ -359,7 +734,7 @@ async function baixarXlsx() {
         const x = r.getCell(k + 1), c = cols[k];
         if (c.link) { if (/^https:\/\//.test(v || "")) { x.value = { text: "abrir documento", hyperlink: v }; x.font = { name: "Arial", size: 10, underline: true, color: { argb: "FF1F4F8F" } }; } else x.value = ""; }
         else { x.value = v; x.font = { name: "Arial", size: 10, bold: !!c.b }; }
-        if (v instanceof Date) x.numFmt = "dd/mm/yyyy";
+        if (v instanceof Date) x.numFmt = "dd/mm/yyyy"; if (c.moeda && typeof v === "number") x.numFmt = '"R$" #,##0.00';
         x.alignment = { vertical: "top", horizontal: c.c ? "center" : "left", wrapText: true };
         x.border = { top: BORDA, bottom: BORDA, left: BORDA, right: BORDA };
         if (n % 2) x.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF3F4FA" } };
@@ -374,10 +749,10 @@ async function baixarXlsx() {
   folha("Processos", [
     { t: "Processo", w: 27, b: 1 }, { t: "Tribunal", w: 10, c: 1 }, { t: "Polo do nome buscado", w: 14, c: 1, polo: 1 }, { t: "Veio por lista de distribuição", w: 14, c: 1, sim: 1 },
     { t: "Classe", w: 30 }, { t: "Órgão", w: 34 }, { t: "Partes", w: 60 }, { t: "Primeira publicação", w: 13, c: 1 }, { t: "Última publicação", w: 13, c: 1 },
-    { t: "Nº de publicações", w: 12, c: 1 }, { t: "CPF/CNPJ no texto", w: 11, c: 1, sim: 1 }, { t: "Advogados na publicação", w: 50 }, { t: "Documento mais recente", w: 18, c: 1, link: 1 }
+    { t: "Nº de publicações", w: 12, c: 1 }, { t: "Valor da causa (R$)", w: 16, c: 1, moeda: 1 }, { t: "CPF/CNPJ no texto", w: 11, c: 1, sim: 1 }, { t: "Advogados na publicação", w: 50 }, { t: "Documento mais recente", w: 18, c: 1, link: 1 }
   ], gs.map(g => [g.processo, g.tribunal, g.polo ? g.polo.charAt(0).toUpperCase() + g.polo.slice(1) : "", g.dist ? "Sim" : "Não", g.classe, g.orgao,
     g.dest.slice(0, 30).map(d => d.nome + poloTxt(d)).join("; ") + (g.dest.length > 30 ? "; e mais " + (g.dest.length - 30) : ""),
-    dataXls(g.primeira), dataXls(g.ultima), g.pubs.length, g.temDoc ? "Sim" : "Não", g.advs.slice(0, 20).join("; "), (g.pubs.find(p => /^https:\/\//.test(p.link)) || {}).link || ""]));
+    dataXls(g.primeira), dataXls(g.ultima), g.pubs.length, valorDe(g), g.temDoc ? "Sim" : "Não", g.advs.slice(0, 20).join("; "), (g.pubs.find(p => /^https:\/\//.test(p.link)) || {}).link || ""]));
 
   folha("Publicações", [
     { t: "Processo", w: 27, b: 1 }, { t: "Data", w: 12, c: 1 }, { t: "Tribunal", w: 10, c: 1 }, { t: "Tipo de ato", w: 18 }, { t: "Documento", w: 18 },
@@ -390,24 +765,548 @@ async function baixarXlsx() {
 
 $("csv").onclick = async () => {
   const bt = $("csv"), rot = bt.textContent; bt.disabled = true; bt.textContent = "Montando a planilha…";
-  try { if (await carregarExcel()) await baixarXlsx(); else { baixarCsv(); aviso("Não foi possível carregar o gerador de Excel (sem acesso à internet ou bloqueio na rede). Baixei a versão simples, em CSV."); } }
-  catch (e) { baixarCsv(); aviso("Houve um erro ao montar o Excel. Baixei a versão simples, em CSV."); }
+  try { if (await carregarExcel()) await baixarXlsx(); else { baixarCsv(); avisoC("Não foi possível carregar o gerador de Excel (sem acesso à internet ou bloqueio na rede). Baixei a versão simples, em CSV."); } }
+  catch (e) { baixarCsv(); avisoC("Houve um erro ao montar o Excel. Baixei a versão simples, em CSV."); }
   bt.disabled = false; bt.textContent = rot;
 };
 
-$("form").addEventListener("submit", e => { e.preventDefault(); consultar([{ nome: $("nome").value, doc: $("doc").value }]); });
-$("stop").onclick = () => { E.parar = true; };
-for (const id of ["fExato", "fPass", "fDist", "fDoc"]) $(id).addEventListener("change", desenhar);
 
-(function iniciar() {
-  const hoje = new Date(), antes = new Date(); antes.setDate(hoje.getDate() - 30);
-  $("fim").value = iso(hoje); $("ini").value = iso(antes);
-  desenharChips();
-  fetch(API + "/tribunal").then(r => r.ok ? r.json() : []).then(ufs => {
-    const siglas = [...new Set((ufs || []).flatMap(u => (u.instituicoes || []).map(i => i.sigla)).filter(Boolean))].sort();
-    for (const s of siglas) { const o = el("option", "", s); o.value = s; $("trib").appendChild(o); }
-  }).catch(() => {});
-})();
+/* ===== 20-relatorios: indicadores e gráficos (SVG próprio, sem bibliotecas) do cliente pesquisado ===== */
+const REL = { cli: "", todos: false, tab: true };
+const NS = "http://www.w3.org/2000/svg";
+const COR = { navy: "#000065", c1: "#2a78d6", c2: "#eb6834", c3: "#1baf7a", c4: "#8a93a6", grade: "#e6e9ef" };
+function S(tag, attrs, txt) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (txt != null) e.textContent = txt; return e; }
+const corta = (s, n) => s.length > n ? s.slice(0, n - 1) + "…" : s;
+
+// ---------- gráficos
+function barH(dados, fmt) {
+  fmt = fmt || nfmt;
+  const W = 560, LBL = 210, AREA = 250, LH = 28, H = dados.length * LH + 6, max = Math.max(1, ...dados.map(d => d.v));
+  const svg = S("svg", { viewBox: "0 0 " + W + " " + H, role: "img" });
+  dados.forEach((d, k) => {
+    const y = k * LH + 3, w = Math.max(3, d.v / max * AREA), g = S("g", {});
+    g.appendChild(S("title", {}, d.rot + ": " + fmt(d.v)));
+    const t = S("text", { x: LBL - 8, y: y + 17, "text-anchor": "end", "font-size": 12.5 }, corta(d.rot, 32)); g.appendChild(t);
+    g.appendChild(S("rect", { x: LBL, y: y + 3, width: w, height: 18, rx: 3, fill: COR.navy }));
+    g.appendChild(S("text", { x: LBL + w + 6, y: y + 17, "font-size": 12.5, "font-weight": 600 }, fmt(d.v)));
+    svg.appendChild(g);
+  });
+  return svg;
+}
+function donut(dados) {
+  const total = dados.reduce((s, d) => s + d.v, 0) || 1, R = 70, C = 2 * Math.PI * R;
+  const svg = S("svg", { viewBox: "0 0 220 220", role: "img", style: "max-width:220px;margin:0 auto" });
+  svg.appendChild(S("circle", { cx: 110, cy: 110, r: R, fill: "none", stroke: COR.grade, "stroke-width": 30 }));
+  let acc = 0;
+  for (const d of dados) {
+    if (!d.v) continue;
+    const len = d.v / total * C, vis = dados.filter(x => x.v).length > 1 ? Math.max(len - 2, 0.5) : len;
+    const c = S("circle", { cx: 110, cy: 110, r: R, fill: "none", stroke: d.cor, "stroke-width": 30, "stroke-dasharray": vis + " " + (C - vis), "stroke-dashoffset": -acc, transform: "rotate(-90 110 110)" });
+    c.appendChild(S("title", {}, d.rot + ": " + d.v + " (" + Math.round(d.v / total * 100) + "%)"));
+    svg.appendChild(c); acc += len;
+  }
+  svg.appendChild(S("text", { x: 110, y: 112, "text-anchor": "middle", "font-size": 34, "font-weight": 700, fill: COR.navy }, String(total)));
+  svg.appendChild(S("text", { x: 110, y: 132, "text-anchor": "middle", "font-size": 12, class: "mut" }, "processos"));
+  const lg = el("div", "lg");
+  for (const d of dados) { const sp = el("span"); const i = el("i"); i.style.background = d.cor; sp.append(i, document.createTextNode(d.rot + " · " + d.v + " (" + Math.round(d.v / total * 100) + "%)")); lg.appendChild(sp); }
+  return { svg, lg };
+}
+function colunas(dados) {
+  const W = 560, H = 210, PL = 34, PB = 34, PT = 14, n = dados.length, max = Math.max(1, ...dados.map(d => d.v));
+  const passo = [1, 2, 5, 10, 20, 50, 100, 200, 500].find(p => max / p <= 4) || 1000, topo = Math.ceil(max / passo) * passo;
+  const svg = S("svg", { viewBox: "0 0 " + W + " " + H, role: "img" });
+  for (let v = 0; v <= topo; v += passo) {
+    const y = H - PB - v / topo * (H - PB - PT);
+    svg.appendChild(S("line", { x1: PL, x2: W, y1: y, y2: y, stroke: COR.grade, "stroke-width": 1 }));
+    svg.appendChild(S("text", { x: PL - 6, y: y + 4, "text-anchor": "end", "font-size": 11, class: "mut" }, String(v)));
+  }
+  const area = W - PL, bw = area / n, larg = Math.min(34, bw - 4), cada = Math.ceil(n / 12);
+  dados.forEach((d, k) => {
+    const h = d.v / topo * (H - PB - PT), x = PL + k * bw + (bw - larg) / 2, y = H - PB - h, g = S("g", {});
+    g.appendChild(S("title", {}, d.rot + ": " + d.v + " publicação(ões)"));
+    if (d.v) g.appendChild(S("rect", { x, y, width: larg, height: h, rx: 3, fill: COR.navy }));
+    if (d.v && n <= 16) g.appendChild(S("text", { x: x + larg / 2, y: y - 4, "text-anchor": "middle", "font-size": 11, "font-weight": 600 }, String(d.v)));
+    if (k % cada === 0) g.appendChild(S("text", { x: x + larg / 2, y: H - PB + 16, "text-anchor": "middle", "font-size": 11, class: "mut" }, d.rot));
+    svg.appendChild(g);
+  });
+  svg.appendChild(S("line", { x1: PL, x2: W, y1: H - PB, y2: H - PB, stroke: "#b8bfcc" }));
+  return svg;
+}
+function figura(titulo, sub, conteudo, tabela, extra) {
+  const f = el("figure"), c = el("figcaption", "", titulo);
+  if (sub) c.appendChild(el("small", "", sub));
+  f.append(c, conteudo); if (extra) f.appendChild(extra);
+  if (tabela) {
+    const d = el("details"); d.appendChild(el("summary", "", "Ver os dados em tabela"));
+    const t = el("table"), tr = el("tr"); tr.append(el("th", "", tabela.cab[0]), Object.assign(el("th", "n", tabela.cab[1]), {}));
+    t.appendChild(tr);
+    for (const [a, b] of tabela.linhas) { const r = el("tr"); r.append(el("td", "", a), el("td", "n", b)); t.appendChild(r); }
+    d.appendChild(t); f.appendChild(d);
+  }
+  return f;
+}
+const contar = (arr, f) => { const m = new Map(); for (const x of arr) { const k = f(x); m.set(k, (m.get(k) || 0) + 1); } return [...m.entries()].map(([rot, v]) => ({ rot, v })).sort((a, b) => b.v - a.v || a.rot.localeCompare(b.rot, "pt")); };
+function topN(dados, n) { if (dados.length <= n) return dados; const r = dados.slice(0, n - 1), resto = dados.slice(n - 1).reduce((s, d) => s + d.v, 0); r.push({ rot: "Outros (" + (dados.length - n + 1) + ")", v: resto }); return r; }
+
+// ---------- dados do relatório
+function relItens() {
+  let it = E.itens;
+  if (REL.cli) it = it.filter(i => i.buscado === REL.cli);
+  if (!REL.todos && E.termos.length) it = it.filter(i => i.exato);
+  return it;
+}
+function relProcessos(itens) {
+  const man = tomarValoresManuais(), gs = agruparPorProcesso(itens);
+  for (const g of gs) {
+    const m = man[g.chave];
+    if (typeof m === "number") { g.valor = m; g.valorFonte = "manual"; }
+    else if (g.valorExtraido) { g.valor = g.valorExtraido; g.valorFonte = "texto"; }
+    else { g.valor = null; g.valorFonte = ""; }
+    g.grupo = grupoAcao(g.classe); g.ramo = ramoJustica(g.tribunal);
+    g.poloRot = g.passivo && g.ativo ? "Ativo e passivo" : g.passivo ? "Passivo" : g.ativo ? "Ativo" : "Não identificado";
+  }
+  return gs;
+}
+function bucketsTempo(itens, ini, fim) {
+  const a = new Date((ini || hojeIso()) + "T12:00:00"), b = new Date((fim || hojeIso()) + "T12:00:00");
+  const dias = Math.round((b - a) / 864e5), mensal = dias > 75, m = new Map(), ordem = [];
+  const chave = d => { // d: Date
+    if (mensal) return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
+    const x = new Date(d); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return iso(x);
+  };
+  const rot = k => mensal ? k.slice(5) + "/" + k.slice(2, 4) : k.slice(8) + "/" + k.slice(5, 7);
+  for (let d = new Date(a); d <= b; d.setDate(d.getDate() + 1)) { const k = chave(d); if (!m.has(k)) { m.set(k, 0); ordem.push(k); } }
+  for (const i of itens) { if (!i.data) continue; const k = chave(new Date(i.data.slice(0, 10) + "T12:00:00")); if (m.has(k)) m.set(k, m.get(k) + 1); else { m.set(k, 1); ordem.push(k); } }
+  ordem.sort();
+  return { dados: ordem.map(k => ({ rot: rot(k), v: m.get(k) })), unidade: mensal ? "mês" : "semana (início na segunda)" };
+}
+
+// ---------- montagem
+function relatorioAtualizar() {
+  const vazio = !E.itens.length; $("relVazio").hidden = !vazio; $("rel").hidden = vazio; $("relBar").hidden = vazio;
+  if (vazio) return;
+  // seletor de cliente
+  const sel = $("relCli"), lista = (E.busca && E.busca.lista) || [], atual = REL.cli;
+  sel.textContent = "";
+  const o0 = el("option", "", lista.length > 1 ? "Todos os pesquisados (" + lista.length + ")" : (lista[0] || "Consulta atual")); o0.value = ""; sel.appendChild(o0);
+  if (lista.length > 1) for (const n of lista) { const o = el("option", "", n); o.value = n; sel.appendChild(o); }
+  sel.value = lista.includes(atual) ? atual : ""; REL.cli = sel.value;
+  desenharRelatorio();
+}
+function desenharRelatorio() {
+  const R = $("rel"); R.textContent = "";
+  const itens = relItens(), gs = relProcessos(itens), b = E.busca || {}, n = gs.length;
+  const cliente = REL.cli || (b.lista && b.lista.length ? b.lista.join(" · ") : "Consulta ao DJEN");
+  const quando = new Date(b.quando || Date.now());
+
+  // capa
+  const capa = el("div", "capa"), esq = el("div");
+  esq.appendChild(el("span", "logo")); esq.lastChild.setAttribute("role", "img"); esq.lastChild.setAttribute("aria-label", "Lunelli Advocacia");
+  esq.appendChild(el("h2", "", "Relatório de acompanhamento processual"));
+  esq.appendChild(el("div", "", cliente));
+  const meta = el("div", "meta"); meta.innerHTML = ""; meta.append(el("div", "", "Período das publicações: " + br(b.ini) + " a " + br(b.fim)), el("div", "", b.trib ? "Tribunal: " + b.trib : "Todos os tribunais"), el("div", "", "Emitido em " + quando.toLocaleDateString("pt-BR") + " · Fonte: DJEN/CNJ"));
+  capa.append(esq, meta); R.appendChild(capa);
+  const corpo = el("div", "corpo"); R.appendChild(corpo);
+  if (!n) { corpo.appendChild(el("p", "resumo", "Nenhum processo localizado para este cliente no período e com os critérios escolhidos.")); return; }
+
+  // números
+  const nPass = gs.filter(g => g.passivo).length, soPass = gs.filter(g => g.passivo && !g.ativo).length, nAtivo = gs.filter(g => g.ativo && !g.passivo).length, nAmbos = gs.filter(g => g.passivo && g.ativo).length;
+  const nIndef = gs.filter(g => !g.passivo && !g.ativo).length;
+  const comValor = gs.filter(g => g.valor != null), totalValor = comValor.reduce((s, g) => s + g.valor, 0);
+  const grupoDados = contar(gs, g => g.grupo), classeDados = contar(gs, g => titulo(g.classe) || "Sem classe informada"), tribDados = contar(gs, g => g.tribunal || "—"), ramoDados = contar(gs, g => g.ramo);
+  const tipoPub = contar(itens, i => i.tipo || "Outros");
+  const pct = x => n ? Math.round(x / n * 100) : 0;
+
+  // resumo em texto
+  const plural = (k, s, p) => k === 1 ? s : p;
+  let txt = "No período de " + br(b.ini) + " a " + br(b.fim) + ", o DJEN registrou " + nfmt(itens.length) + " publicação(ões) em " + n + " " + plural(n, "processo", "processos") + " em que " + (REL.cli || (b.lista && b.lista.length === 1 ? b.lista[0] : "os nomes pesquisados")) + " consta como parte, em " + tribDados.length + " " + plural(tribDados.length, "tribunal", "tribunais") + ". ";
+  txt += nPass ? "Em " + nPass + " (" + pct(nPass) + "%) o cliente figura no polo passivo" + (nAtivo ? " e, em " + nAtivo + ", no polo ativo" : "") + ". " : (nAtivo ? "Em " + nAtivo + " o cliente figura no polo ativo. " : "");
+  const pred = grupoDados.find(d => !/^(Recursos|Outras)/.test(d.rot)) || grupoDados[0];
+  txt += "A natureza predominante é " + pred.rot.toLowerCase() + " (" + pred.v + " " + plural(pred.v, "processo", "processos") + "). ";
+  txt += comValor.length ? "Há valor da causa identificado em " + comValor.length + " de " + n + " processos, somando " + brl(totalValor) + "." : "O valor da causa não consta das publicações do DJEN e não foi informado.";
+  corpo.appendChild(el("p", "resumo", txt));
+
+  // KPIs
+  const kp = el("div", "kp");
+  const K = (v, l, s, longo) => { const k = el("div", "k"); const vv = el("div", "v", v); if (longo) vv.style.fontSize = "20px"; k.append(vv, el("div", "l", l)); if (s) k.appendChild(el("div", "s", s)); return k; };
+  kp.append(
+    K(nfmt(n), "Processos localizados", nfmt(itens.length) + " publicações"),
+    K(nfmt(nPass), "Processos em que é parte passiva", pct(nPass) + "% do total"),
+    K(nfmt(nAtivo), "Processos em que é parte ativa", nAmbos ? "além de " + nAmbos + " com os dois polos" : pct(nAtivo) + "% do total"),
+    K(comValor.length ? brlCurto(totalValor) : "—", "Valor das causas identificadas", comValor.length + " de " + n + " com valor" + (comValor.length ? " · média " + brlCurto(totalValor / comValor.length) : "")),
+    K(pred.rot, "Natureza predominante", pred.v + " " + plural(pred.v, "processo", "processos"), pred.rot.length > 14)
+  );
+  corpo.appendChild(kp);
+
+  // gráficos
+  const gr = el("div", "gr");
+  const polo = donut([{ rot: "Passivo", v: soPass, cor: COR.c2 }, { rot: "Ativo", v: nAtivo, cor: COR.c1 }, { rot: "Ativo e passivo", v: nAmbos, cor: COR.c3 }, { rot: "Não identificado", v: nIndef, cor: COR.c4 }].filter(d => d.v));
+  gr.appendChild(figura("Posição do cliente nos processos", "Polo em que o nome consta nas publicações", polo.svg, { cab: ["Polo", "Processos"], linhas: [["Passivo", soPass], ["Ativo", nAtivo], ["Ativo e passivo", nAmbos], ["Não identificado", nIndef]] }, polo.lg));
+  gr.appendChild(figura("Natureza das ações", "Agrupamento pela classe processual", barH(topN(grupoDados, 7)), { cab: ["Natureza", "Processos"], linhas: grupoDados.map(d => [d.rot, d.v]) }));
+  gr.appendChild(figura("Classes processuais mais frequentes", "Como o processo está classificado no tribunal", barH(topN(classeDados, 9)), { cab: ["Classe", "Processos"], linhas: classeDados.map(d => [d.rot, d.v]) }));
+  gr.appendChild(figura("Onde tramitam", "Por tribunal", barH(topN(tribDados, 9)), { cab: ["Tribunal", "Processos"], linhas: tribDados.map(d => [d.rot, d.v]) }));
+  gr.appendChild(figura("Justiça", "Processos por ramo do Judiciário", barH(ramoDados), { cab: ["Ramo", "Processos"], linhas: ramoDados.map(d => [d.rot, d.v]) }));
+  const tempo = bucketsTempo(itens, b.ini, b.fim);
+  gr.appendChild(figura("Movimento no DJEN", "Publicações por " + tempo.unidade, colunas(tempo.dados), { cab: ["Período", "Publicações"], linhas: tempo.dados.map(d => [d.rot, d.v]) }));
+  if (comValor.length) {
+    const tv = comValor.slice().sort((a, b) => b.valor - a.valor).slice(0, 10);
+    gr.appendChild(figura("Maiores valores de causa", "Até 10 processos com valor identificado ou informado", barH(tv.map(g => ({ rot: g.processo, v: g.valor })), brlCurto), { cab: ["Processo", "Valor"], linhas: comValor.slice().sort((a, b) => b.valor - a.valor).map(g => [g.processo, brl(g.valor)]) }));
+  }
+  gr.appendChild(figura("Tipo de publicação", "Natureza do ato publicado no DJEN", barH(topN(tipoPub, 6)), { cab: ["Tipo", "Publicações"], linhas: tipoPub.map(d => [d.rot, d.v]) }));
+  corpo.appendChild(gr);
+
+  // tabela de processos (com campo de valor da causa)
+  if (REL.tab) {
+    corpo.appendChild(el("h3", "sec quebra", "Processos e valor da causa"));
+    const info = el("div", "hint noprint", "O DJEN quase nunca informa o valor da causa. Quando ele aparece no texto da publicação, é preenchido automaticamente (marcado como “texto”). Nos demais, digite o valor no campo para que entre nos totais e nos gráficos; ele fica salvo neste navegador.");
+    corpo.appendChild(info);
+    const t = el("table", "tabproc"), th = el("tr");
+    ["Processo", "Tribunal", "Classe", "Natureza", "Polo", "Última publicação", "Valor da causa (R$)"].forEach((h, k) => th.appendChild(el("th", k === 6 ? "n" : "", h)));
+    t.appendChild(th);
+    for (const g of gs.slice(0, 400)) {
+      const r = el("tr"), tdv = el("td", "n");
+      const inp = el("input", "val"); inp.type = "text"; inp.inputMode = "decimal"; inp.placeholder = "informar";
+      inp.value = g.valor != null ? g.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 }) : "";
+      inp.setAttribute("aria-label", "Valor da causa do processo " + g.processo);
+      const grava = () => { const v = lerValorBR(inp.value), m = tomarValoresManuais(); if (v == null) delete m[g.chave]; else m[g.chave] = v; LS.set("valores", m); desenharRelatorio(); };
+      inp.addEventListener("change", grava); inp.addEventListener("keydown", e => { if (e.key === "Enter") inp.blur(); });
+      tdv.appendChild(inp); if (g.valorFonte === "texto") tdv.appendChild(el("div", "hint noprint", "texto"));
+      r.append(el("td", "", g.processo), el("td", "", g.tribunal), el("td", "", titulo(g.classe)), el("td", "", g.grupo), el("td", "", g.poloRot), el("td", "", br(g.ultima)), tdv);
+      t.appendChild(r);
+    }
+    corpo.appendChild(t);
+    if (gs.length > 400) corpo.appendChild(el("div", "hint", "Exibindo 400 de " + gs.length + " processos. Os gráficos consideram todos."));
+  }
+
+  corpo.appendChild(el("p", "nota", "Metodologia: os dados vêm das publicações do Diário de Justiça Eletrônico Nacional (DJEN/CNJ) no período indicado e da busca pelo nome informado. Não aparecem processos em segredo de justiça, processos sem publicação no DJEN no período, nomes grafados de forma diferente e atos comunicados fora do DJEN (carta, oficial de justiça, Domicílio Judicial Eletrônico). Homônimos podem existir. A natureza é inferida da classe processual; o valor da causa é o constante do texto publicado ou informado manualmente. Este relatório não substitui certidão nem a consulta direta aos tribunais."));
+}
+
+$("relCli").addEventListener("change", () => { REL.cli = $("relCli").value; desenharRelatorio(); });
+$("relTodos").addEventListener("change", () => { REL.todos = $("relTodos").checked; desenharRelatorio(); });
+$("relTab").addEventListener("change", () => { REL.tab = $("relTab").checked; desenharRelatorio(); });
+$("relPrint").addEventListener("click", () => {
+  const t0 = document.title; document.title = "Relatório - " + (REL.cli || (E.busca && E.busca.nomes) || "DJEN") + " - " + hojeIso();
+  window.print(); setTimeout(() => { document.title = t0; }, 1500);
+});
+
+
+/* ===== 30-advogados: publicações do DJEN em nome de Fábio (OAB/SC 15.044) e Davi (OAB/SC 39.336) ===== */
+const AD = { pubs: LS.get("adv.pubs", {}), estado: LS.get("adv.estado", {}), meta: LS.get("adv.meta", { ultima: 0 }), rodando: false, aba: "novas", limite: 60, ctl: { parar: false }, timer: null };
+const TITULO_BASE = document.title;
+const advPor = id => ADVS.find(a => a.id === id);
+const ehNova = p => !(AD.estado[p.id] && AD.estado[p.id].tratada);
+
+function advSalvar() {
+  const ids = Object.keys(AD.pubs);
+  if (ids.length > 2500) { ids.sort((a, b) => (AD.pubs[b].data || "").localeCompare(AD.pubs[a].data || "")); for (const id of ids.slice(2500)) delete AD.pubs[id]; }
+  if (!LS.set("adv.pubs", AD.pubs)) { for (const id in AD.pubs) AD.pubs[id].texto = AD.pubs[id].texto.slice(0, 400); LS.set("adv.pubs", AD.pubs); }
+  LS.set("adv.estado", AD.estado); LS.set("adv.meta", AD.meta);
+}
+function slim(it, quem) {
+  return { id: it.id, data: it.data, tribunal: it.tribunal, tipo: it.tipo, docTipo: it.docTipo, processo: it.processo, chave: it.chave, classe: it.classe, orgao: it.orgao, link: it.link, texto: it.texto.slice(0, 1200), dest: it.dest.slice(0, 10), quem, visto: Date.now() };
+}
+const prazoNoTexto = t => { const m = /prazo\s+(?:legal\s+)?(?:de\s+)?(\d{1,3})\s*(?:\([^)]*\)\s*)?(dias|horas|dia|hora)/i.exec(t || ""); return m ? m[1] + " " + m[2].toLowerCase() : ""; };
+
+async function advCarregar(dias, silencioso) {
+  if (AD.rodando) return; AD.rodando = true; AD.ctl = { parar: false };
+  const primeira = !AD.meta.ultima, fim = hojeIso(), ini = somaDias(fim, -dias), st = t => { $("advStatus").textContent = t; };
+  $("advAtualizar").disabled = true; $("advHist").disabled = true; aviso("advMsg", "");
+  let novos = 0;
+  try {
+    for (const a of ADVS) {
+      const { todos, cortado } = await buscarTudo({ numeroOab: a.oab, ufOab: a.uf, dataDisponibilizacaoInicio: ini, dataDisponibilizacaoFim: fim }, AD.ctl, a.curto + " (" + a.rot + ")", st, 6);
+      if (cortado) aviso("advMsg", "Para " + a.curto + " há mais de 600 publicações no período; foram carregadas as 600 mais recentes. Reduza o período para ver o restante.");
+      for (const i of todos) {
+        const it = montarItem(i, "", "", ""), quem = new Set([a.id]);
+        for (const x of ADVS) if (it.oabs.some(o => o.num === x.oab && o.uf === x.uf)) quem.add(x.id);
+        const ex = AD.pubs[it.id];
+        if (ex) { for (const q of quem) if (!ex.quem.includes(q)) ex.quem.push(q); }
+        else { AD.pubs[it.id] = slim(it, [...quem]); novos++; }
+      }
+      advDesenhar();
+    }
+    AD.meta.ultima = Date.now(); advSalvar();
+    st("Atualizado às " + new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) + (novos ? " · " + novos + " publicação(ões) nova(s)" : " · nada novo"));
+    if (novos && !primeira) advAvisarNovas(novos);
+  } catch (e) { st(""); const [t, err] = erroAmigavel(e); aviso("advMsg", t, err); }
+  AD.rodando = false; $("advAtualizar").disabled = false; $("advHist").disabled = false;
+  advDesenhar(); atualizarBadges();
+}
+function advAvisarNovas(n) {
+  try { if ("Notification" in window && Notification.permission === "granted" && document.hidden) new Notification("Advocacia Lunelli · DJEN", { body: n + " nova(s) publicação(ões) para Fábio ou Davi." }); } catch (e) {}
+}
+
+function advFiltradas() {
+  const f = $("advFiltro").value, tp = $("advTipo").value, tr = $("advTrib").value, q = norm($("advBusca").value);
+  return Object.values(AD.pubs).filter(p => (!f || p.quem.includes(f)) && (!tp || p.tipo === tp) && (!tr || p.tribunal === tr) && (!q || norm(p.processo + " " + p.texto + " " + p.classe + " " + p.orgao).includes(q)))
+    .sort((a, b) => (b.data || "").localeCompare(a.data || "") || b.visto - a.visto);
+}
+function advOpcoes() {
+  const ps = Object.values(AD.pubs);
+  for (const [id, campo] of [["advTipo", "tipo"], ["advTrib", "tribunal"]]) {
+    const s = $(id), cur = s.value, vals = [...new Set(ps.map(p => p[campo]).filter(Boolean))].sort();
+    s.textContent = ""; const o = el("option", "", "Todos"); o.value = ""; s.appendChild(o);
+    for (const v of vals) { const x = el("option", "", v); x.value = v; s.appendChild(x); }
+    s.value = vals.includes(cur) ? cur : "";
+  }
+}
+function advDesenhar() {
+  advOpcoes();
+  const todas = advFiltradas(), novas = todas.filter(ehNova), trat = todas.filter(p => !ehNova(p));
+  $("nNovas").textContent = novas.length; $("nTrat").textContent = trat.length; $("nTodas").textContent = todas.length;
+  const lista = AD.aba === "novas" ? novas : AD.aba === "tratadas" ? trat : todas, box = $("advLista"); box.textContent = "";
+  $("advInfo").textContent = AD.meta.ultima ? "Última atualização: " + new Date(AD.meta.ultima).toLocaleString("pt-BR") + " · " + nfmt(Object.keys(AD.pubs).length) + " publicações guardadas neste navegador" : "Ainda não carregado.";
+  if (!lista.length) box.appendChild(el("div", "empty", AD.rodando ? "Carregando as publicações…" : AD.aba === "novas" ? "Nenhuma publicação nova. Tudo tratado por aqui." : "Nada para mostrar com estes filtros."));
+  for (const p of lista.slice(0, AD.limite)) box.appendChild(advCard(p));
+  $("advMais").hidden = lista.length <= AD.limite; $("advMais").textContent = "Mostrar mais (" + (lista.length - AD.limite) + ")";
+  $("advTodasLidas").hidden = AD.aba !== "novas" || !novas.length;
+  atualizarBadges();
+}
+function advCard(p) {
+  const nova = ehNova(p), c = el("article", "card" + (nova ? " nova" : "")), top = el("div", "top");
+  const who = el("span", "who"); for (const q of p.quem) { const a = advPor(q); if (a) { const s = el("span", q === "davi" ? "d" : "", a.curto); who.appendChild(s); } }
+  top.append(el("b", "", br(p.data)), who, el("span", "tag" + (/intima/i.test(p.tipo) ? " crit" : /istribui/i.test(p.tipo) ? " dist" : ""), p.tipo));
+  if (p.docTipo && p.docTipo !== p.tipo) top.appendChild(el("span", "tag", p.docTipo));
+  top.appendChild(el("span", "tag", p.tribunal));
+  const pz = prazoNoTexto(p.texto); if (pz) top.appendChild(Object.assign(el("span", "tag warn", "texto cita prazo de " + pz), { title: "Detectado no texto da publicação. Confira o prazo e a contagem no processo." }));
+  c.appendChild(top);
+  const l2 = el("div", "top"), num = el("span", "num", p.processo), cp = el("button", "copy", "copiar"); cp.type = "button"; cp.onclick = () => copiar(p.processo, cp);
+  l2.append(num, cp); c.appendChild(l2);
+  c.appendChild(Object.assign(el("div", "row"), {})); c.lastChild.append(el("span", "", titulo(p.classe)), el("span", "", p.orgao));
+  if (p.dest.length) { const pt = el("div", "partes"); pt.appendChild(el("b", "", "Partes: ")); pt.appendChild(document.createTextNode(p.dest.slice(0, 6).map(d => d.nome + (d.polo === "P" ? " (passivo)" : d.polo === "A" ? " (ativo)" : "")).join("; ") + (p.dest.length > 6 ? " e outros" : ""))); c.appendChild(pt); }
+  const ex = el("div", "exc", p.texto || "(sem texto)"); ex.title = "Clique para ver o texto completo"; ex.style.cursor = "pointer"; ex.onclick = () => ex.classList.toggle("open"); c.appendChild(ex);
+  const ac = el("div", "pubact");
+  const bt = el("button", "btn sm" + (nova ? "" : " sec"), nova ? "Marcar como tratada" : "Reabrir"); bt.type = "button";
+  bt.onclick = () => { AD.estado[p.id] = Object.assign(AD.estado[p.id] || {}, { tratada: nova, quando: Date.now() }); advSalvar(); advDesenhar(); };
+  const bk = el("button", "btn sec sm", "Criar tarefa"); bk.type = "button";
+  bk.onclick = () => abrirTarefa({ titulo: (p.docTipo || p.tipo) + " · " + p.processo, proc: p.processo, resp: p.quem.length === 1 ? advPor(p.quem[0]).curto : "Equipe", nota: "Origem: publicação de " + br(p.data) + " (" + p.tribunal + ").\n" + (p.link || ""), pubId: p.id });
+  ac.append(bt, bk);
+  if (/^https:\/\//.test(p.link)) { const a = el("a", "btn sec sm", "Abrir documento"); a.href = p.link; a.target = "_blank"; a.rel = "noopener noreferrer"; a.style.textDecoration = "none"; ac.appendChild(a); }
+  c.appendChild(ac); return c;
+}
+function atualizarBadges() {
+  const n = Object.values(AD.pubs).filter(ehNova).length, b = $("bdAdv");
+  b.hidden = !n; b.textContent = n > 99 ? "99+" : n;
+  document.title = (n ? "(" + (n > 99 ? "99+" : n) + ") " : "") + TITULO_BASE;
+  if (typeof atualizarBadgeOrg === "function") atualizarBadgeOrg();
+}
+function advIniciar() {
+  $("advTabs").addEventListener("click", e => { const b = e.target.closest("button[data-t]"); if (!b) return; AD.aba = b.dataset.t; AD.limite = 60; for (const x of $("advTabs").children) x.setAttribute("aria-selected", x === b); advDesenhar(); });
+  for (const id of ["advFiltro", "advTipo", "advTrib"]) $(id).addEventListener("change", () => { AD.limite = 60; advDesenhar(); });
+  $("advBusca").addEventListener("input", () => { AD.limite = 60; advDesenhar(); });
+  $("advMais").onclick = () => { AD.limite += 60; advDesenhar(); };
+  $("advAtualizar").onclick = () => advCarregar(AD.meta.ultima ? 5 : 30, false);
+  $("advHist").onclick = () => advCarregar(+$("advDias").value, false);
+  $("advTodasLidas").onclick = () => { const lista = advFiltradas().filter(ehNova); if (!lista.length) return; if (!confirm("Marcar " + lista.length + " publicação(ões) como tratadas?")) return; for (const p of lista) AD.estado[p.id] = Object.assign(AD.estado[p.id] || {}, { tratada: true, quando: Date.now() }); advSalvar(); advDesenhar(); };
+  const auto = LS.get("adv.auto", true); $("advAuto").checked = auto;
+  $("advAuto").onchange = () => { LS.set("adv.auto", $("advAuto").checked); agendar(); };
+  if ("Notification" in window && Notification.permission === "default") { $("advNotif").hidden = false; $("advNotif").onclick = async () => { try { await Notification.requestPermission(); } catch (e) {} $("advNotif").hidden = Notification.permission !== "default"; }; }
+  function agendar() { clearInterval(AD.timer); if ($("advAuto").checked) AD.timer = setInterval(() => { if (!document.hidden) advCarregar(4, true); }, 10 * 60 * 1000); }
+  agendar();
+  advDesenhar();
+  // carga inicial / atualização ao abrir o site
+  if (!AD.meta.ultima) setTimeout(() => advCarregar(30, true), 800);
+  else if (Date.now() - AD.meta.ultima > 10 * 60 * 1000) setTimeout(() => advCarregar(Math.min(30, Math.max(5, Math.ceil((Date.now() - AD.meta.ultima) / 864e5) + 3)), true), 800);
+}
+
+
+/* ===== 40-organizacao: quadro de tarefas (kanban), rotina e sugestões de organização do escritório ===== */
+const COLS = [["fazer", "A fazer"], ["andamento", "Em andamento"], ["aguardando", "Aguardando"], ["concluida", "Concluída"]];
+let TAREFAS = LS.get("tarefas", []);
+let tkEditando = null, tkPubId = null;
+const salvarTarefas = () => LS.set("tarefas", TAREFAS);
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const atrasada = t => t.status !== "concluida" && t.prazo && t.prazo < hojeIso();
+
+// prazo interno sugerido: 2 dias antes do prazo fatal, pulando sábados e domingos (não considera feriados)
+function prazoInterno(fatal) {
+  if (!fatal) return ""; let d = new Date(fatal + "T12:00:00"), n = 2;
+  while (n > 0) { d.setDate(d.getDate() - 1); if (d.getDay() !== 0 && d.getDay() !== 6) n--; }
+  return iso(d);
+}
+
+function abrirTarefa(preset, id) {
+  const dlg = $("dlgTarefa"), t = id ? TAREFAS.find(x => x.id === id) : null; tkEditando = t ? t.id : null; tkPubId = (preset && preset.pubId) || null;
+  const v = t || Object.assign({ titulo: "", proc: "", cli: "", resp: "Davi", prazo: "", prio: "normal", status: "fazer", nota: "" }, preset || {});
+  $("dlgTitulo").textContent = t ? "Editar tarefa" : "Nova tarefa";
+  $("tkTitulo").value = v.titulo; $("tkProc").value = v.proc || ""; $("tkCli").value = v.cli || ""; $("tkResp").value = v.resp; $("tkPrazo").value = v.prazo || ""; $("tkPrio").value = v.prio || "normal"; $("tkNota").value = v.nota || "";
+  const s = $("tkStatus"); s.textContent = ""; for (const [k, n] of COLS) { const o = el("option", "", n); o.value = k; s.appendChild(o); } s.value = v.status;
+  $("tkDel").hidden = !t; tkInterno(); if (!dlg.open) dlg.showModal(); $("tkTitulo").focus();
+}
+function tkInterno() { const f = $("tkPrazo").value; $("tkInterno").textContent = f ? "Sugestão de prazo interno (2 dias úteis antes, sem considerar feriados): " + br(prazoInterno(f)) : "Informe o prazo fatal para ver a sugestão de prazo interno."; }
+$("tkPrazo").addEventListener("change", tkInterno);
+$("tkCancel").onclick = () => $("dlgTarefa").close();
+$("tkDel").onclick = () => { if (!tkEditando || !confirm("Excluir esta tarefa?")) return; TAREFAS = TAREFAS.filter(t => t.id !== tkEditando); salvarTarefas(); $("dlgTarefa").close(); orgDesenhar(); };
+$("fTarefa").addEventListener("submit", e => {
+  e.preventDefault();
+  const dados = { titulo: $("tkTitulo").value.trim(), proc: $("tkProc").value.trim(), cli: $("tkCli").value.trim(), resp: $("tkResp").value, prazo: $("tkPrazo").value, prio: $("tkPrio").value, status: $("tkStatus").value, nota: $("tkNota").value.trim() };
+  if (!dados.titulo) return;
+  if (tkEditando) { const t = TAREFAS.find(x => x.id === tkEditando); if (t) { Object.assign(t, dados); if (dados.status === "concluida" && !t.concluidaEm) t.concluidaEm = Date.now(); } }
+  else { const t = Object.assign({ id: uid(), criada: Date.now() }, dados); if (tkPubId) { t.pubId = tkPubId; if (AD.pubs[tkPubId]) { AD.estado[tkPubId] = Object.assign(AD.estado[tkPubId] || {}, { tratada: true, quando: Date.now() }); advSalvar(); advDesenhar(); } } TAREFAS.push(t); }
+  salvarTarefas(); $("dlgTarefa").close(); orgDesenhar();
+});
+$("orgNova").onclick = () => abrirTarefa({});
+
+function tkCard(t) {
+  const c = el("div", "tk" + (atrasada(t) ? " atrasada" : "")); c.draggable = true; c.dataset.id = t.id;
+  const ti = el("div", "t", t.titulo); ti.onclick = () => abrirTarefa(null, t.id); c.appendChild(ti);
+  const m = el("div", "m"); m.appendChild(el("span", "tag", t.resp));
+  if (t.prio === "alta") m.appendChild(el("span", "prio-alta", "Prioridade alta"));
+  if (t.prazo) m.appendChild(el("span", atrasada(t) ? "tag crit" : "tag", (atrasada(t) ? "Atrasada · " : "Prazo ") + br(t.prazo)));
+  if (t.cli) m.appendChild(el("span", "", t.cli));
+  c.appendChild(m);
+  if (t.proc) c.appendChild(el("div", "m", t.proc));
+  const mv = el("div", "mv"), i = COLS.findIndex(x => x[0] === t.status);
+  const bt = (txt, d, tit) => { const b = el("button", "btn sec sm", txt); b.type = "button"; b.title = tit; b.onclick = () => { t.status = COLS[i + d][0]; if (t.status === "concluida") t.concluidaEm = Date.now(); salvarTarefas(); orgDesenhar(); }; return b; };
+  if (i > 0) mv.appendChild(bt("←", -1, "Mover para " + COLS[i - 1][1])); if (i < COLS.length - 1) mv.appendChild(bt("→", 1, "Mover para " + COLS[i + 1][1]));
+  c.appendChild(mv);
+  c.addEventListener("dragstart", e => { e.dataTransfer.setData("text/plain", t.id); e.dataTransfer.effectAllowed = "move"; });
+  return c;
+}
+function orgDesenhar() {
+  const resp = $("orgResp").value, board = $("board"); board.textContent = "";
+  const vis = TAREFAS.filter(t => !resp || t.resp === resp);
+  for (const [k, nome] of COLS) {
+    const col = el("div", "col"), its = vis.filter(t => t.status === k).sort((a, b) => (a.prazo || "9999").localeCompare(b.prazo || "9999"));
+    const h = el("h3"); h.append(el("span", "", nome), el("span", "", its.length)); col.appendChild(h);
+    for (const t of its) col.appendChild(tkCard(t));
+    if (!its.length) col.appendChild(el("div", "hint", k === "fazer" ? "Sem tarefas. Crie uma nova ou parta de uma publicação." : "—"));
+    col.addEventListener("dragover", e => { e.preventDefault(); col.classList.add("over"); });
+    col.addEventListener("dragleave", () => col.classList.remove("over"));
+    col.addEventListener("drop", e => { e.preventDefault(); col.classList.remove("over"); const id = e.dataTransfer.getData("text/plain"), t = TAREFAS.find(x => x.id === id); if (t && t.status !== k) { t.status = k; if (k === "concluida") t.concluidaEm = Date.now(); salvarTarefas(); orgDesenhar(); } });
+    board.appendChild(col);
+  }
+  // indicadores
+  const abertas = TAREFAS.filter(t => t.status !== "concluida"), atr = abertas.filter(atrasada).length, sem7 = abertas.filter(t => t.prazo && t.prazo >= hojeIso() && t.prazo <= somaDias(hojeIso(), 7)).length;
+  const concl = TAREFAS.filter(t => t.status === "concluida" && t.concluidaEm && Date.now() - t.concluidaEm < 30 * 864e5).length;
+  const k = $("kpisOrg"); k.textContent = "";
+  const K = (v, l, s) => { const d = el("div", "kpi"); d.append(el("div", "v", v), el("div", "l", l)); if (s) d.appendChild(el("div", "s", s)); return d; };
+  k.append(K(abertas.length, "Tarefas em aberto", "Fábio " + abertas.filter(t => t.resp === "Fábio").length + " · Davi " + abertas.filter(t => t.resp === "Davi").length + " · Equipe " + abertas.filter(t => t.resp === "Equipe").length), K(atr, "Atrasadas", atr ? "Atenção: prazo vencido" : "Nenhuma"), K(sem7, "Prazos nos próximos 7 dias"), K(concl, "Concluídas em 30 dias"));
+  // prazos 14 dias
+  const pz = $("orgPrazos"); pz.textContent = "";
+  const lista = abertas.filter(t => t.prazo && t.prazo <= somaDias(hojeIso(), 14)).sort((a, b) => a.prazo.localeCompare(b.prazo));
+  if (!lista.length) pz.appendChild(el("div", "hint", "Nenhum prazo cadastrado para os próximos 14 dias."));
+  else { const ul = el("ul", "mini"); for (const t of lista) { const li = el("li"); li.append(el("b", "", br(t.prazo)), el("span", "tag" + (atrasada(t) ? " crit" : ""), atrasada(t) ? "Atrasada" : t.resp), document.createTextNode(t.titulo)); li.style.cursor = "pointer"; li.onclick = () => abrirTarefa(null, t.id); ul.appendChild(li); } pz.appendChild(ul); }
+  atualizarBadgeOrg(); if (typeof inicioDesenhar === "function") inicioDesenhar();
+}
+function atualizarBadgeOrg() { const n = TAREFAS.filter(atrasada).length, b = $("bdOrg"); b.hidden = !n; b.textContent = n; }
+
+// ---- rotina do escritório (itens reiniciam por dia, semana ou mês)
+const ROTINA = [
+  ["dia", "r1", "Conferir as publicações novas de Fábio e Davi e tratar cada uma (tela Advogados)"],
+  ["dia", "r2", "Cadastrar prazo fatal e prazo interno das intimações com prazo"],
+  ["dia", "r3", "Conferir distribuições novas contra clientes (lista de nomes monitorados)"],
+  ["semana", "r4", "Revisar o quadro: tarefas atrasadas e prazos da semana seguinte"],
+  ["semana", "r5", "Reunião curta de alinhamento (15–30 min): prioridades, dúvidas, delegações"],
+  ["semana", "r6", "Rodar a consulta de todos os clientes e conferir processos novos"],
+  ["mes", "r7", "Gerar o relatório de cada cliente ativo e arquivar em PDF"],
+  ["mes", "r8", "Atualizar a lista de nomes monitorados (clientes novos, grafias, CNPJs)"],
+  ["mes", "r9", "Baixar o backup dos dados do site (menu lateral)"]
+];
+function chavePeriodo(f) {
+  const d = new Date(); if (f === "dia") return hojeIso(); if (f === "mes") return hojeIso().slice(0, 7);
+  const x = new Date(d); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return iso(x);
+}
+function rotinaDesenhar() {
+  const st = LS.get("rotina", {}), box = $("rotina"); box.textContent = "";
+  for (const [f, nome] of [["dia", "Todo dia"], ["semana", "Toda semana"], ["mes", "Todo mês"]]) {
+    box.appendChild(el("h3", "", nome)); const ul = el("ul", "ck");
+    for (const [ff, id, txt] of ROTINA.filter(r => r[0] === f)) {
+      const lb = el("label"), cb = el("input"); cb.type = "checkbox"; cb.checked = st[id] === chavePeriodo(f);
+      cb.onchange = () => { const s = LS.get("rotina", {}); if (cb.checked) s[id] = chavePeriodo(f); else delete s[id]; LS.set("rotina", s); };
+      lb.append(cb, document.createTextNode(txt)); const li = el("li"); li.appendChild(lb); ul.appendChild(li);
+    }
+    box.appendChild(ul);
+  }
+}
+
+// ---- sugestões iniciais
+const IDEIAS = [
+  ["Fluxo de cada publicação", ["Recebida → Triada → Tarefa criada → Prazo cadastrado → Cumprida → Conferida.", "Toda publicação com prazo vira tarefa com responsável e data fatal.", "Quem cumpre não é quem confere: o outro advogado dá a última olhada antes do protocolo."]],
+  ["Dois prazos por tarefa", ["Prazo fatal (o da lei) e prazo interno (2 dias úteis antes).", "O quadro destaca em vermelho o que já passou do prazo.", "Confira sempre a contagem no processo: o site não considera feriados nem suspensões."]],
+  ["Padrão de nomes", ["Tarefa: “Peça · Cliente · nº do processo”. Ex.: Contestação · HCD · 0000000-00.2026.5.12.0000.", "Arquivos: AAAA-MM-DD_Cliente_Processo_Peça.pdf, em uma pasta por cliente.", "Nome do cliente igual ao da lista monitorada, para os relatórios baterem."]],
+  ["Divisão de carteira", ["Defina um advogado responsável por cliente e o outro como suplente.", "Distribuições novas contra cliente: quem é responsável faz a triagem em até 1 dia útil.", "Revisão mensal da carteira: processos parados, prazos em aberto, cobranças."]],
+  ["Reunião semanal de 30 minutos", ["Pauta fixa: atrasadas, prazos da semana, distribuições novas, dúvidas.", "Sai com tarefas criadas e responsáveis definidos.", "Use a rotina ao lado como checklist."]],
+  ["Para crescer depois", ["Cadastro de clientes com contatos, CPF/CNPJ e contrato.", "Agenda de audiências e diligências.", "Financeiro: honorários e cobranças por cliente; portal do cliente com o relatório desta página."]]
+];
+function ideiasDesenhar() {
+  const box = $("ideias"); box.textContent = "";
+  for (const [t, itens] of IDEIAS) { const c = el("div", "card"); c.appendChild(el("h3", "", t)); const ul = el("ul"); for (const i of itens) ul.appendChild(el("li", "", i)); c.appendChild(ul); box.appendChild(c); }
+}
+function orgIniciar() { $("orgResp").addEventListener("change", orgDesenhar); orgDesenhar(); rotinaDesenhar(); ideiasDesenhar(); }
+
+
+/* ===== 50-app: navegação, painel inicial, backup e inicialização ===== */
+const VIEWS = {
+  inicio: ["Início", "Visão geral do escritório"],
+  consulta: ["Consulta DJEN", "Busca por nome da parte no Diário de Justiça Eletrônico Nacional"],
+  relatorios: ["Relatórios", "Indicadores e gráficos do cliente pesquisado, prontos para imprimir ou apresentar"],
+  advogados: ["Advogados", "Publicações do DJEN em nome de Fábio (OAB/SC 15.044) e Davi (OAB/SC 39.336)"],
+  organizacao: ["Organização", "Tarefas, prazos e rotina do escritório"]
+};
+function irPara() {
+  let v = (location.hash || "").replace("#", ""); if (!VIEWS[v]) v = "inicio";
+  for (const k in VIEWS) $("v-" + k).hidden = k !== v;
+  for (const a of document.querySelectorAll("#nav a")) { if (a.dataset.v === v) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); }
+  $("titulo").textContent = VIEWS[v][0]; $("subtitulo").textContent = VIEWS[v][1];
+  if (v === "relatorios") relatorioAtualizar();
+  if (v === "inicio") inicioDesenhar();
+  if (v === "advogados") advDesenhar();
+  window.scrollTo(0, 0);
+}
+window.addEventListener("hashchange", irPara);
+
+function desenharInicioClientes() {
+  const box = $("inClientes"); box.textContent = ""; const l = lerLista();
+  if (!l.length) { box.appendChild(el("span", "hint", "Nenhum nome salvo ainda. Na tela Consulta, digite um nome e use “Salvar este nome na lista”.")); return; }
+  for (const n of l) {
+    const b = el("button", "btn sec sm", n.nome); b.type = "button"; b.title = "Consultar e abrir o relatório";
+    b.onclick = () => { $("nome").value = n.nome; $("doc").value = n.doc || ""; location.hash = "#consulta"; consultar([n], { abrirRelatorio: true }); };
+    box.appendChild(b);
+  }
+}
+function inicioDesenhar() {
+  const novas = Object.values(AD.pubs).filter(ehNova), abertas = TAREFAS.filter(t => t.status !== "concluida"), atr = abertas.filter(atrasada);
+  const k = $("kpisInicio"); k.textContent = "";
+  const K = (v, l, s) => { const d = el("div", "kpi"); d.append(el("div", "v", v), el("div", "l", l)); if (s) d.appendChild(el("div", "s", s)); return d; };
+  const proc = E.itens.length ? new Set(E.itens.filter(i => i.exato || !E.termos.length).map(i => i.chave)).size : 0;
+  k.append(K(novas.length, "Publicações novas", "dos dois advogados, ainda não tratadas"), K(abertas.length, "Tarefas em aberto"), K(atr.length, "Tarefas atrasadas", atr.length ? "exigem atenção" : "nenhuma"), K(proc, "Processos na última consulta", E.busca ? E.busca.nomes || "consulta avulsa" : "faça uma consulta"));
+  const a = $("inAdv"); a.textContent = ""; const ul = el("ul", "mini");
+  for (const ad of ADVS) {
+    const mine = Object.values(AD.pubs).filter(p => p.quem.includes(ad.id)), n = mine.filter(ehNova).length, ult = mine.reduce((m, p) => p.data > m ? p.data : m, "");
+    const li = el("li"); li.append(el("b", "", ad.nome), el("span", "tag" + (n ? " dist" : ""), n + " nova(s)"), el("span", "hint", ult ? "última publicação em " + br(ult) : "sem dados")); ul.appendChild(li);
+  }
+  a.appendChild(ul); if (!AD.meta.ultima) a.appendChild(el("div", "hint", "As publicações são carregadas ao abrir o site."));
+  const p = $("inPrazos"); p.textContent = "";
+  const prox = abertas.filter(t => t.prazo).sort((x, y) => x.prazo.localeCompare(y.prazo)).slice(0, 6);
+  if (!prox.length) p.appendChild(el("div", "hint", "Nenhuma tarefa com prazo. Crie tarefas na tela Organização ou a partir das publicações."));
+  else { const u = el("ul", "mini"); for (const t of prox) { const li = el("li"); li.append(el("b", "", br(t.prazo)), el("span", "tag" + (atrasada(t) ? " crit" : ""), atrasada(t) ? "Atrasada" : t.resp), document.createTextNode(t.titulo)); u.appendChild(li); } p.appendChild(u); }
+}
+
+// ---- backup dos dados deste navegador
+$("bkExp").onclick = () => {
+  const dados = {}; try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k.startsWith("djen.") && k !== "djen.ultima") dados[k] = localStorage.getItem(k); } } catch (e) {}
+  salvar(new Blob([JSON.stringify({ app: "radar-djen-lunelli", versao: 1, geradoEm: new Date().toISOString(), dados })], { type: "application/json" }), "backup-radar-djen-" + hojeIso() + ".json");
+};
+$("bkImp").onclick = () => $("bkFile").click();
+$("bkFile").onchange = async () => {
+  const f = $("bkFile").files[0]; if (!f) return;
+  try {
+    const j = JSON.parse(await f.text()); if (j.app !== "radar-djen-lunelli" || !j.dados) throw new Error("formato");
+    if (!confirm("Restaurar o backup de " + new Date(j.geradoEm).toLocaleString("pt-BR") + "? Isso substitui os nomes salvos, tarefas e marcações deste navegador.")) return;
+    for (const k in j.dados) if (k.startsWith("djen.")) localStorage.setItem(k, j.dados[k]);
+    location.reload();
+  } catch (e) { alert("Arquivo de backup inválido."); }
+  $("bkFile").value = "";
+};
+
+// ---- inicialização
+iniciarConsulta();
+desenharInicioClientes();
+orgIniciar();
+advIniciar();
+irPara();
+
 </script>
 </body>
 </html>
