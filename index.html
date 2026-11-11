@@ -329,6 +329,40 @@ dialog .dlgbody textarea{width:100%}
 #intCorpo label.chk input{width:auto;flex:none}
 #intCorpo .panel{margin-bottom:12px}
 
+/* ---- Cálculos judiciais */
+#v-calculos .cu-form{display:flex;flex-direction:column;gap:10px;border-top-left-radius:0}
+#v-calculos .cu-form h3,#v-calculos .cu-res h3{margin:10px 0 2px;font-size:14px;color:var(--accent)}
+#v-calculos .intgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px 14px}
+#v-calculos label{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--muted)}
+#v-calculos label.chk{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+#v-calculos textarea{font-family:var(--mono);min-height:90px}
+#v-calculos .cu-go{align-self:flex-start;padding:9px 22px;font-size:14px}
+#cuRes{margin-top:12px}
+.cu-res{display:flex;flex-direction:column;gap:6px}
+.cu-cab{color:var(--muted);font-size:12px}
+.cu-dados{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:6px 18px;font-size:13px}
+.cu-dados div{display:flex;flex-direction:column}.cu-dados span{color:var(--muted);font-size:12px}
+.cu-ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:3px;font-size:13px}
+.cu-tw{overflow-x:auto}
+.cu-tab{border-collapse:collapse;width:100%;font-size:13px}
+.cu-tab th,.cu-tab td{border-bottom:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+.cu-tab th{color:var(--muted);font-weight:600;font-size:12px;white-space:nowrap}
+.cu-tab .n{text-align:right;white-space:nowrap}
+.cu-tab tr.tot td{font-weight:700;border-top:2px solid var(--line)}
+.cu-res-tab{max-width:560px}
+.cu-total{display:flex;justify-content:space-between;gap:12px;align-items:baseline;background:var(--soft);border-radius:8px;padding:10px 14px;margin-top:6px;font-size:15px}
+.cu-total b{font-size:22px;color:var(--accent)}
+.cu-aviso{background:#fff8e1;border:1px solid #f0d78c;color:#5b4500;border-radius:8px;padding:8px 12px;font-size:13px;margin-top:6px}
+.cu-aviso ul{margin:4px 0 0;padding-left:18px}
+.cu-nota{color:var(--muted);font-size:12px;border-top:1px solid var(--line);padding-top:8px;margin-top:6px}
+@media print{
+  body.pr-calc .view{display:none!important}
+  body.pr-calc #v-calculos{display:block!important}
+  body.pr-calc #v-calculos .panel:not(.cu-res){display:none!important}
+  body.pr-calc .cu-res{border:0;box-shadow:none;padding:0}
+  body.pr-calc .cu-tab tr{break-inside:avoid}
+}
+
 </style>
 </head>
 <body>
@@ -347,6 +381,7 @@ dialog .dlgbody textarea{width:100%}
     <a href="#relatorios" data-v="relatorios"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Relatórios</a>
     <a href="#advogados" data-v="advogados"><svg viewBox="0 0 24 24"><path d="M12 3v18M5 7h14M5 7l-3 7a3 3 0 006 0zM19 7l-3 7a3 3 0 006 0z"/></svg>Advogados<span class="bd" id="bdAdv" hidden></span></a>
     <a href="#organizacao" data-v="organizacao"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="10" rx="1"/><rect x="17" y="4" width="4" height="6" rx="1"/></svg>Organização<span class="bd red" id="bdOrg" hidden></span></a>
+    <a href="#calculos" data-v="calculos" hidden><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h2M12 12h2M16 12h0M8 16h2M12 16h2M16 16h0"/></svg>Cálculos</a>
     <a href="#integracoes" data-v="integracoes" hidden><svg viewBox="0 0 24 24"><path d="M7 18a4 4 0 010-8 5.5 5.5 0 0110.6 1.5A3.3 3.3 0 0117 18z"/></svg>Integrações</a>
     <a href="#usuarios" data-v="usuarios" hidden><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.6 3-6 7-6s7 2.4 7 6M17 5a3.5 3.5 0 010 7M22 20c0-2.8-1.8-4.8-4.5-5.6"/></svg>Usuários<span class="bd red" id="bdUsr" hidden></span></a>
   </nav>
@@ -394,6 +429,11 @@ dialog .dlgbody textarea{width:100%}
   <div class="panel"><h2>Pedidos de acesso pendentes</h2><div id="usPend"></div></div>
   <div class="panel"><h2>Usuários com acesso</h2><div id="usAtivos"></div></div>
   <div class="panel"><h2>Dados antigos deste navegador</h2><div id="usLocais"></div></div>
+</section>
+
+<!-- ===================== CÁLCULOS JUDICIAIS ===================== -->
+<section class="view" id="v-calculos" hidden>
+  <div id="cuCorpo"></div>
 </section>
 
 <!-- ===================== INTEGRAÇÕES (Google Drive e IA) ===================== -->
@@ -859,11 +899,20 @@ dialog .dlgbody textarea{width:100%}
   <div class="dlgbody">
     <h2 id="iaTitulo">Assistente de IA</h2>
     <div class="hint" id="iaProv"></div>
-    <div class="hint">A IA escreve rascunhos: confira fatos, prazos e citações antes de usar. O texto do processo/contato é enviado ao provedor escolhido (Claude ou Gemini); por padrão CPF, CNPJ, telefones e e-mails são mascarados antes do envio. Evite enviar segredo de justiça ou dados sensíveis sem necessidade.</div>
+    <div class="hint">A IA escreve rascunhos: confira fatos, prazos e citações antes de usar. O texto do processo/contato é enviado ao provedor escolhido (Claude ou Gemini; no JusIA, é você quem cola o pedido no site); por padrão CPF, CNPJ, telefones e e-mails são mascarados antes do envio. Evite enviar segredo de justiça ou dados sensíveis sem necessidade.</div>
     <div class="acts" id="iaAcoes"></div>
     <label>Instrução ou pergunta (opcional nos botões acima; use “Perguntar” para uma pergunta livre)<textarea id="iaPergunta" rows="2" placeholder="Ex.: Redija uma réplica focada na prescrição; ou: explique o que significa esta decisão ao cliente"></textarea></label>
     <div class="acts"><button class="btn" type="button" id="iaEnviar">Perguntar</button></div>
     <div class="msg" id="iaStatus" hidden></div>
+    <div id="iaManual" hidden class="intpasso">
+      <b id="iaManualTit">Modo assistido</b>
+      <div class="hint">Neste modo o app não se conecta sozinho ao serviço: o pedido é copiado, você cola no site (com a sua conta/assinatura) e traz a resposta para cá para continuar (copiar, salvar no Drive, criar tarefas).</div>
+      <label><span id="iaManualPedRot">Pedido a colar</span><textarea id="iaManualPrompt" rows="4" readonly></textarea></label>
+      <div class="acts"><a class="btn sec sm" id="iaManualAbrir" href="https://ia.jusbrasil.com.br" target="_blank" rel="noopener">Abrir o site</a><button class="btn sec sm" type="button" id="iaManualCopiar">Copiar o pedido</button></div>
+      <label><span id="iaManualRespRot">Cole aqui a resposta</span><textarea id="iaManualResp" rows="6" placeholder="Cole a resposta aqui"></textarea></label>
+      <div class="acts"><button class="btn sm" type="button" id="iaManualOk">Usar resposta</button><button class="btn sec sm" type="button" id="iaManualCancel">Cancelar</button></div>
+      <div class="hint" id="iaManualMsg"></div>
+    </div>
     <label>Resposta (rascunho)<textarea id="iaSaida" rows="12"></textarea></label>
     <div id="iaTarefas"></div>
     <div class="acts" style="justify-content:space-between">
@@ -3461,21 +3510,22 @@ function intDesenhar() {
   box.appendChild(pd);
 
   // ---------------- IA
-  const pi = el("div", "panel"), h2 = el("div", "hd"), ia = iaCfg(); h2.append(el("h2", "", "Assistentes de IA (Claude e Gemini)"), el("span", "tag" + (iaPronta() ? " ok" : " warn"), iaPronta() ? "chave neste navegador" : "sem chave")); pi.appendChild(h2);
+  const pi = el("div", "panel"), h2 = el("div", "hd"), ia = iaCfg(); h2.append(el("h2", "", "Assistentes de IA (Claude, Gemini e JusIA)"), el("span", "tag" + (iaPronta() ? " ok" : " warn"), iaPronta() ? "chave neste navegador" : "sem chave")); pi.appendChild(h2);
   pi.appendChild(el("div", "hint", "Resumir andamentos, sugerir tarefas e prazos a conferir a partir das publicações, redigir mensagens ao cliente e minutas. Cada pessoa cola a própria chave de API: ela fica guardada só neste navegador (não vai para a nuvem do app nem para os backups). Tudo é rascunho para revisão do advogado."));
-  const sP = el("select"); optsSel(sP, [["claude", "Claude (Anthropic)"], ["gemini", "Gemini (Google)"]]); sP.value = ia.prov;
+  const sP = el("select"); optsSel(sP, [["claude", "Claude (Anthropic)"], ["gemini", "Gemini (Google)"], ["claudeai", "Claude.ai — minha assinatura (modo assistido)"], ["jusia", "JusIA (Jusbrasil) — modo assistido"]]); sP.value = ia.prov;
   const kC = intTexto(ia.chaveClaude, "sk-ant-…", "password"), kG = intTexto(ia.chaveGemini, "AIza…", "password"), mC = intTexto(ia.modeloClaude), mG = intTexto(ia.modeloGemini);
   const [lMa, cMa] = intCheck("Mascarar CPF, CNPJ, telefones e e-mails antes de enviar à IA (recomendado)", ia.mascara);
-  const g2 = el("div", "intgrid"); g2.append(intCampo("Provedor usado", sP), intCampo("Chave do Claude (console.anthropic.com)", kC), intCampo("Modelo do Claude", mC), intCampo("Chave do Gemini (aistudio.google.com)", kG), intCampo("Modelo do Gemini", mG, "Se o Google renomear o modelo, edite aqui."));
+  const g2 = el("div", "intgrid"); g2.append(intCampo("Provedor usado", sP, "Modo assistido (Claude.ai com sua assinatura, ou JusIA): sem chave; o app copia o pedido e você cola a resposta de volta. Nem a assinatura do claude.ai nem o Jus IA liberam conexão automática."), intCampo("Chave do Claude (console.anthropic.com)", kC), intCampo("Modelo do Claude", mC), intCampo("Chave do Gemini (aistudio.google.com)", kG), intCampo("Modelo do Gemini", mG, "Se o Google renomear o modelo, edite aqui."));
   const m2 = el("div", "msg"), ac2 = el("div", "acts"); m2.hidden = true;
   const sv = () => iaSalvarCfg({ prov: sP.value, chaveClaude: kC.value.trim(), chaveGemini: kG.value.trim(), modeloClaude: mC.value.trim() || IA_PADRAO.modeloClaude, modeloGemini: mG.value.trim() || IA_PADRAO.modeloGemini, mascara: cMa.checked });
-  ac2.append(btn("Salvar neste navegador", () => { sv(); intMsg(m2, "Salvo. Esta chave fica só neste navegador."); setTimeout(intDesenhar, 1200); }, ""), btn("Testar a IA", async () => { sv(); intMsg(m2, "Testando…"); try { const r = await iaPerguntar("Responda em uma frase curta.", [{ role: "user", content: "Diga apenas: IA conectada ao App Organização." }], 60); intMsg(m2, "Resposta: " + r.trim().slice(0, 200)); } catch (e) { intMsg(m2, e.message, true); } }));
+  ac2.append(btn("Salvar neste navegador", () => { sv(); intMsg(m2, "Salvo. Esta chave fica só neste navegador."); setTimeout(intDesenhar, 1200); }, ""), btn("Testar a IA", async () => { sv(); if (IA_ASSIST[sP.value]) { intMsg(m2, "No modo assistido não há conexão automática para testar. Abra o assistente em um processo: o pedido é copiado, você cola em " + IA_ASSIST[sP.value].nome + " e traz a resposta de volta."); return; } intMsg(m2, "Testando…"); try { const r = await iaPerguntar("Responda em uma frase curta.", [{ role: "user", content: "Diga apenas: IA conectada ao App Organização." }], 60); intMsg(m2, "Resposta: " + r.trim().slice(0, 200)); } catch (e) { intMsg(m2, e.message, true); } }));
   pi.append(g2, lMa, ac2, m2);
   const dv = el("details"); dv.appendChild(el("summary", "", "Privacidade e custos (leia antes de usar com dados de clientes)"));
   const ul = el("ul", "intpasso"); for (const t of [
     "O texto enviado (andamentos, dados do cliente, proposta) sai do seu navegador direto para a Anthropic ou para o Google. Sigilo profissional: use com critério e evite segredo de justiça.",
     "Claude: a API da Anthropic é paga por uso (cartão no console) e, pelos termos comerciais, não usa os dados da API para treinar modelos. Gemini: o plano gratuito do Google AI Studio pode usar os dados para melhorar os produtos; prefira o plano pago ou o Claude para dados de clientes.",
     "A IA pode errar e inventar. Prazos, datas, fundamentos legais e jurisprudência devem ser sempre conferidos. As tarefas sugeridas entram marcadas como “Sugerida pela IA”.",
+    "Claude.ai (assinatura): a assinatura do claude.ai não vale como chave de API; no modo assistido o pedido (com dados mascarados) é colado por você na sua conta, sob as configurações de privacidade do seu plano. JusIA (Jusbrasil): não há API pública do Jus IA; no modo assistido o app apenas copia o pedido para a área de transferência e recebe de volta o texto que você colar. Nada é enviado automaticamente ao Jusbrasil e a assinatura do JusIA é a sua. Confira sempre cada precedente na fonte.",
     "A chave é pessoal: não a compartilhe nem a cole em mensagens. Se vazar, revogue no console do provedor."
   ]) ul.appendChild(el("li", "", t)); dv.appendChild(ul); pi.appendChild(dv);
   box.appendChild(pi);
@@ -3489,7 +3539,10 @@ function intDesenhar() {
 const IA_PADRAO = { prov: "claude", chaveClaude: "", chaveGemini: "", modeloClaude: "claude-sonnet-5-5", modeloGemini: "gemini-2.5-flash", mascara: true };
 const iaCfg = () => Object.assign({}, IA_PADRAO, LS.get("ia", {}));
 const iaSalvarCfg = p => LS.setLocal("ia", Object.assign(iaCfg(), p));
-const iaPronta = () => { const c = iaCfg(); return !!(c.prov === "gemini" ? c.chaveGemini : c.chaveClaude); };
+const IA_ASSIST = { jusia: { nome: "JusIA", url: "https://ia.jusbrasil.com.br", rot: "JusIA (Jusbrasil) · modo assistido" }, claudeai: { nome: "Claude.ai", url: "https://claude.ai/new", rot: "Claude.ai (minha assinatura) · modo assistido" } };
+const iaAssist = () => IA_ASSIST[iaCfg().prov] || null;
+const iaPronta = () => { const c = iaCfg(); return !!IA_ASSIST[c.prov] || !!(c.prov === "gemini" ? c.chaveGemini : c.chaveClaude); };
+const iaProvRot = () => { const c = iaCfg(); return IA_ASSIST[c.prov] ? IA_ASSIST[c.prov].rot : c.prov === "gemini" ? "Gemini · " + c.modeloGemini : "Claude · " + c.modeloClaude; };
 const iaDisponivel = () => !souSecretaria();
 const IA_SISTEMA = "Você é um assistente de um escritório de advocacia brasileiro (Advocacia Lunelli), usado por advogados. Responda em português do Brasil, de forma objetiva e prática. Tudo o que você produz é rascunho para revisão de um advogado: não invente fatos, números de processo, dispositivos legais nem jurisprudência; quando não tiver certeza, diga e indique o que conferir. Prazos processuais devem sempre ser conferidos no processo (contagem em dias úteis, CPC e CLT). Dados pessoais podem aparecer mascarados ([CPF], [TELEFONE]); mantenha os marcadores.";
 
@@ -3519,6 +3572,18 @@ async function iaPerguntar(sistema, mensagens, max) {
     const txt = (j.content || []).filter(b => b.type === "text").map(b => b.text).join(""); if (!txt) throw new Error("O Claude não devolveu texto."); return txt;
   } catch (e) { throw e.name === "AbortError" ? new Error("A IA demorou demais para responder. Tente de novo.") : e; } finally { clearTimeout(t); }
 }
+
+// Modo assistido (JusIA e Claude.ai com assinatura, que não têm API para sites): o pedido vai para a área de transferência, a pessoa cola no site e traz a resposta de volta.
+function iaManual(sistema, msgs) {
+  return new Promise((ok, no) => {
+    const ult = msgs[msgs.length - 1].content, prompt = msgs.length === 1 ? sistema + "\n\n" + ult : ult;
+    const as = iaAssist() || IA_ASSIST.jusia; $("iaManualTit").textContent = as.nome + " — modo assistido"; $("iaManualAbrir").href = as.url; $("iaManualAbrir").textContent = "Abrir o " + as.nome; $("iaManualRespRot").textContent = "Cole aqui a resposta do " + as.nome; $("iaManualPedRot").textContent = "Pedido a colar no " + as.nome;
+    $("iaManualPrompt").value = prompt; $("iaManualResp").value = ""; $("iaManualMsg").textContent = ""; $("iaManual").hidden = false; IA.manual = { ok, no };
+    crmCopiar(prompt).then(c => { $("iaManualMsg").textContent = c ? "Pedido copiado. Abra o " + as.nome + ", cole (Ctrl+V), espere a resposta e cole-a abaixo." : "Não consegui copiar sozinho: selecione o texto do pedido abaixo, copie e cole no JusIA."; });
+  });
+}
+function iaManualFim(resp, erro) { const m = IA.manual; IA.manual = null; $("iaManual").hidden = true; if (!m) return; if (erro) { const e = new Error(erro); e.cancelado = true; m.no(e); } else m.ok(resp); }
+async function iaChamar(sistema, msgs, max) { return iaAssist() ? iaManual(sistema, msgs) : iaPerguntar(sistema, msgs, max); }
 
 // ---------- contextos (o que a IA recebe sobre o processo, o contato ou o caso)
 const iaLim = (s, n) => { s = String(s || ""); return s.length > n ? s.slice(0, n) + "…" : s; };
@@ -3553,16 +3618,16 @@ function iaCtxNegocio(n) {
 }
 
 // ---------- diálogo do assistente
-const IA = { ctx: "", acoes: [], dest: null, alvoDrive: null, hist: [], ocupado: false, pub: null };
+const IA = { ctx: "", acoes: [], dest: null, alvoDrive: null, hist: [], ocupado: false, pub: null, manual: null };
 function iaStatus(t, erro) { const s = $("iaStatus"); s.textContent = t || ""; s.className = "msg" + (erro ? " err" : ""); s.hidden = !t; }
 function iaOcupar(b) { IA.ocupado = b; for (const x of $("dlgIA").querySelectorAll("button.ia-bt, #iaEnviar")) x.disabled = b; }
 function iaAbrir(o) {
   Object.assign(IA, { ctx: o.ctx, acoes: o.acoes || [], dest: o.dest || null, alvoDrive: o.alvoDrive || null, hist: [], pub: null });
   $("iaTitulo").textContent = "Assistente de IA — " + o.titulo; $("iaSaida").value = ""; $("iaTarefas").textContent = ""; $("iaPergunta").value = ""; iaStatus("");
-  const c = iaCfg(); $("iaProv").textContent = (c.prov === "gemini" ? "Gemini · " + c.modeloGemini : "Claude · " + c.modeloClaude) + (c.mascara ? " · dados pessoais mascarados" : " · sem máscara de dados pessoais");
+  const c = iaCfg(); $("iaProv").textContent = iaProvRot() + (c.mascara ? " · dados pessoais mascarados" : " · sem máscara de dados pessoais"); iaManualFim(null, "Substituído."); $("iaManual").hidden = true;
   const box = $("iaAcoes"); box.textContent = ""; for (const a of IA.acoes) { const b = btn(a.rot, () => iaRodar(a.prompt), ""); b.classList.add("ia-bt"); box.appendChild(b); }
   $("iaDrive").hidden = !(IA.alvoDrive && driveAtivo()); $("iaCopiar").textContent = "Copiar texto";
-  if (!iaPronta()) iaStatus("Falta a chave da IA. Abra Integrações, cole a chave do Claude ou do Gemini e volte aqui.", true);
+  if (!iaPronta()) iaStatus("Falta a chave da IA. Abra Integrações, cole a chave do Claude ou do Gemini (ou escolha o JusIA) e volte aqui.", true);
   const dlg = $("dlgIA"); if (!dlg.open) dlg.showModal();
 }
 async function iaRodar(prompt, livre) {
@@ -3570,12 +3635,16 @@ async function iaRodar(prompt, livre) {
   const texto = iaMascara(livre ? prompt : prompt + (extra ? "\n\nInstrução adicional do advogado: " + extra : ""));
   const msgs = IA.hist.concat([{ role: "user", content: IA.hist.length ? texto : "CONTEXTO:\n" + IA.ctx + "\n\nPEDIDO:\n" + texto }]);
   iaOcupar(true); iaStatus("Consultando a IA…"); $("iaTarefas").textContent = "";
-  try { const r = await iaPerguntar(IA_SISTEMA, msgs); IA.hist = msgs.concat([{ role: "assistant", content: r }]); $("iaSaida").value = r; iaStatus(""); if (livre) $("iaPergunta").value = ""; }
-  catch (e) { iaStatus(e.message || String(e), true); } finally { iaOcupar(false); }
+  try { const r = (await iaChamar(IA_SISTEMA, msgs)).trim(); IA.hist = msgs.concat([{ role: "assistant", content: r }]); $("iaSaida").value = r; iaStatus(""); if (livre) $("iaPergunta").value = ""; }
+  catch (e) { if (e.cancelado) iaStatus(""); else iaStatus(e.message || String(e), true); } finally { iaOcupar(false); }
 }
 $("iaEnviar").onclick = () => { const t = $("iaPergunta").value.trim(); if (!t) { iaStatus("Escreva a pergunta ou a instrução.", true); return; } iaRodar(t, true); };
 $("iaCopiar").onclick = async () => { const ok = await crmCopiar($("iaSaida").value); $("iaCopiar").textContent = ok ? "Copiado ✔" : "Não foi possível copiar"; setTimeout(() => { $("iaCopiar").textContent = "Copiar texto"; }, 2500); };
 $("iaFechar").onclick = () => $("dlgIA").close();
+$("dlgIA").addEventListener("close", () => iaManualFim(null, "Fechado."));
+$("iaManualOk").onclick = () => { const t = $("iaManualResp").value.trim(); if (!t) { $("iaManualMsg").textContent = "Cole a resposta do " + (iaAssist() || IA_ASSIST.jusia).nome + " no campo abaixo."; return; } iaManualFim(t); };
+$("iaManualCancel").onclick = () => iaManualFim(null, "Cancelado.");
+$("iaManualCopiar").onclick = async () => { const c = await crmCopiar($("iaManualPrompt").value); $("iaManualMsg").textContent = c ? "Pedido copiado de novo." : "Não consegui copiar: selecione o texto e copie."; };
 $("iaDrive").onclick = async () => {
   const txt = $("iaSaida").value.trim(); if (!txt || !IA.alvoDrive) { iaStatus("Não há texto para salvar.", true); return; }
   try {
@@ -3602,7 +3671,9 @@ const IA_ACOES_NEGOCIO = [
   { rot: "Mensagem de acompanhamento", prompt: "Redija uma mensagem curta de acompanhamento da proposta (WhatsApp ou e-mail), sem pressionar, retomando os pontos principais e oferecendo esclarecimentos." },
   { rot: "Argumentos para o fechamento", prompt: "Liste de 4 a 6 argumentos honestos para apresentar ao contato e prováveis objeções (principalmente honorários) com sugestões de resposta." }
 ];
-const iaProc = p => iaAbrir({ titulo: p.numero, ctx: iaCtxProc(p), acoes: IA_ACOES_PROC, alvoDrive: driveAlvo("proc", p), dest: { proc: p.numero, cli: p.cliente, resp: p.resp } });
+const IA_PESQ_JUSIA = { rot: "Pesquisar jurisprudência (JusIA)", prompt: "Pesquise jurisprudência (STF, STJ, TST, TNU e o tribunal deste processo) sobre a questão jurídica indicada na instrução adicional do advogado, ou, se não houver, sobre a principal questão discutida neste processo. Liste apenas precedentes REAIS que você conseguir localizar, cada um com tribunal, número do processo, relator, data de julgamento, ementa resumida e link. Marque todos como [CONFERIR NA FONTE] e não invente números. Se não localizar, diga." };
+const IA_PESQ_ROTEIRO = { rot: "Roteiro de pesquisa jurisprudencial", prompt: "Monte um roteiro de pesquisa jurisprudencial para a questão indicada na instrução adicional do advogado (ou a principal questão do processo): termos de busca, tribunais e filtros, súmulas, temas repetitivos/repercussão geral a procurar e um checklist para validar cada julgado. NÃO cite julgados de memória." };
+const iaProc = p => iaAbrir({ titulo: p.numero, ctx: iaCtxProc(p), acoes: IA_ACOES_PROC.concat([iaCfg().prov === "jusia" ? IA_PESQ_JUSIA : IA_PESQ_ROTEIRO]), alvoDrive: driveAlvo("proc", p), dest: { proc: p.numero, cli: p.cliente, resp: p.resp } });
 const iaContato = c => iaAbrir({ titulo: c.nome, ctx: iaCtxContato(c), acoes: IA_ACOES_CONTATO, alvoDrive: driveAlvo("contato", c) });
 const iaNegocio = n => iaAbrir({ titulo: n.titulo || "caso", ctx: iaCtxNegocio(n), acoes: IA_ACOES_NEGOCIO, alvoDrive: driveAlvo("negocio", n) });
 
@@ -3614,7 +3685,7 @@ async function iaResumirPub(p, x) {
   IA.pub = x; if (!iaPronta()) return;
   iaOcupar(true); iaStatus("Analisando a publicação…");
   try {
-    const msgs = [{ role: "user", content: "CONTEXTO:\n" + IA.ctx + "\n\nPEDIDO:\n" + IA_PROMPT_PUB }], r = await iaPerguntar(IA_SISTEMA, msgs, 1500); IA.hist = msgs.concat([{ role: "assistant", content: r }]);
+    const msgs = [{ role: "user", content: "CONTEXTO:\n" + IA.ctx + "\n\nPEDIDO:\n" + IA_PROMPT_PUB }], r = await iaChamar(IA_SISTEMA, msgs, 1500); IA.hist = msgs.concat([{ role: "assistant", content: r }]);
     const j = iaJson(r), pz = j.prazo || {};
     $("iaSaida").value = "Resumo: " + (j.resumo || "—") + "\nTipo: " + (j.tipo || "—") + "\nPrazo: " + (pz.indicado ? (pz.dias != null ? pz.dias + (pz.dias_uteis ? " dias úteis" : " dias") : "indicado") + (pz.observacao ? " — " + pz.observacao : "") + "  (CONFIRA a contagem no processo)" : "o texto não indica prazo") + "\n\nSugestões geradas por IA: revise antes de usar.";
     const box = $("iaTarefas"); box.textContent = ""; const ts = (j.tarefas || []).filter(t => t && t.titulo).slice(0, 5);
@@ -3636,9 +3707,9 @@ async function iaResumirPub(p, x) {
    pastas/tarefas/clientes/valores compartilhados entre todos, e telas por perfil (advogado, secretaria, administrador). */
 const NV = { ativo: !!NUVEM_CFG, user: null, perfil: null, papel: "local", advId: null, db: null, auth: null, unsubs: [], mapas: {}, sessao: false, cadastrando: false, users: [] };
 const ACESSO = {
-  local: ["inicio", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "organizacao", "integracoes"],
-  admin: ["meu", "inicio", "secretaria", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "organizacao", "integracoes", "usuarios"],
-  advogado: ["meu", "inicio", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "organizacao", "integracoes"],
+  local: ["inicio", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "organizacao", "calculos", "integracoes"],
+  admin: ["meu", "inicio", "secretaria", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "organizacao", "calculos", "integracoes", "usuarios"],
+  advogado: ["meu", "inicio", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "organizacao", "calculos", "integracoes"],
   secretaria: ["secretaria", "audiencias", "processos", "crm"]
 };
 const PAPEL_ROT = { admin: "Administrador", advogado: "Advogado(a)", secretaria: "Secretaria", local: "" };
@@ -3978,6 +4049,532 @@ function telasIniciar() {
 }
 
 
+/* ===== 47-calculos: índices (SGS/Banco Central) e motor de cálculos judiciais (sem tela; a tela está em 48) =====
+   Tudo roda no navegador. Índices mensais vêm da API pública do Banco Central (CORS liberado), ficam em cache local por dia
+   e podem ser complementados/corrigidos à mão (Integrações › Índices). Os cálculos são ESTIMATIVAS de apoio: o advogado confere
+   premissas, índices e decisões do caso (título executivo, tribunal, contadoria). */
+const CLC_SERIES = { ipca: [433, "IPCA"], inpc: [188, "INPC"], igpm: [189, "IGP-M"], ipcae: [10764, "IPCA-E"], selic: [4390, "Selic (taxa acumulada no mês)"], tr: [7811, "TR"], poup: [196, "Poupança (rendimento mensal)"], salmin: [1619, "Salário mínimo"] };
+const CLC_ROT_CORR = { "": "Sem correção", ipca: "IPCA", inpc: "INPC", igpm: "IGP-M", ipcae: "IPCA-E", selic: "Selic", tr: "TR" };
+const CX = { idx: {}, atual: {}, manual: {} };
+function clcLerIdx() { const c = LS.get("indices", {}); CX.idx = c.dados || {}; CX.atual = c.atual || {}; CX.manual = LS.get("indices_manual", {}); }
+clcLerIdx();
+
+// ---------- datas
+const clcD = s => new Date(s + "T12:00:00Z");
+const clcDias = (a, b) => Math.round((clcD(b) - clcD(a)) / 864e5);
+const clcMes = s => String(s).slice(0, 7);
+const clcMesAdd = (m, n) => { let y = +m.slice(0, 4), mo = +m.slice(5, 7) + n; y += Math.floor((mo - 1) / 12); mo = ((mo - 1) % 12 + 12) % 12 + 1; return y + "-" + String(mo).padStart(2, "0"); };
+function clcMeses(de, ate) { const l = []; if (de > ate) return l; for (let m = de; m <= ate; m = clcMesAdd(m, 1)) l.push(m); return l; }
+const clcAddDias = (iso, n) => new Date(clcD(iso).getTime() + n * 864e5).toISOString().slice(0, 10);
+function clcAddMeses(iso, n) { const y = +iso.slice(0, 4), m = +iso.slice(5, 7), d = +iso.slice(8, 10); const ult = new Date(Date.UTC(y, m - 1 + n + 1, 0, 12)).getUTCDate(); const t = new Date(Date.UTC(y, m - 1 + n, Math.min(d, ult), 12)); return t.toISOString().slice(0, 10); }
+function clcAnosCompletos(a, b) { let y = +b.slice(0, 4) - +a.slice(0, 4); if (b.slice(5) < a.slice(5)) y--; return Math.max(0, y); }
+const clcR2 = n => Math.round((n + Number.EPSILON) * 100) / 100;
+const clcBrl = n => clcR2(n).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const clcPct = (n, c) => (n == null || isNaN(n) ? "—" : n.toLocaleString("pt-BR", { minimumFractionDigits: c == null ? 2 : c, maximumFractionDigits: c == null ? 2 : c }) + "%");
+const clcFat = n => n.toLocaleString("pt-BR", { minimumFractionDigits: 6, maximumFractionDigits: 6 });
+
+// ---------- índices
+const clcTaxa = (s, mes) => { const m = CX.manual[s]; if (m && m[mes] != null) return m[mes]; const d = CX.idx[s]; return d && d[mes] != null ? d[mes] : null; };
+function clcUltimoMes(s) { const ks = Object.keys(Object.assign({}, CX.idx[s] || {}, CX.manual[s] || {})).sort(); return ks.length ? ks[ks.length - 1] : ""; }
+async function clcBaixarSerie(s) {
+  const cod = CLC_SERIES[s][0], hoje = new Date(), fmt = d => String(d.getUTCDate()).padStart(2, "0") + "/" + String(d.getUTCMonth() + 1).padStart(2, "0") + "/" + d.getUTCFullYear(), out = {}, pedidos = [];
+  for (let k = 0; ; k++) { const ini = new Date(Date.UTC(1994 + 9 * k, 6, 1)); if (ini > hoje) break; const fim = new Date(Math.min(Date.UTC(1994 + 9 * (k + 1), 6, 0), hoje.getTime())); pedidos.push([ini, fim]); }
+  const partes = await Promise.all(pedidos.map(async ([i, f]) => {
+    const r = await fetch("https://api.bcb.gov.br/dados/serie/bcdata.sgs." + cod + "/dados?formato=json&dataInicial=" + fmt(i) + "&dataFinal=" + fmt(f));
+    if (!r.ok) throw new Error("Banco Central respondeu " + r.status); return r.json();
+  }));
+  for (const arr of partes) for (const x of arr || []) { const v = parseFloat(x.valor); if (!isNaN(v) && /^\d{2}\/\d{2}\/\d{4}$/.test(x.data)) out[x.data.slice(6, 10) + "-" + x.data.slice(3, 5)] = v; }
+  if (!Object.keys(out).length) throw new Error("série vazia");
+  return out;
+}
+async function clcCarregar(series, forcar) {
+  const hoje = hojeIso(), erros = [];
+  await Promise.all(series.map(async s => {
+    if (!forcar && CX.atual[s] === hoje && CX.idx[s] && Object.keys(CX.idx[s]).length) return;
+    try { CX.idx[s] = await clcBaixarSerie(s); CX.atual[s] = hoje; } catch (e) { erros.push(CLC_SERIES[s][1] + ": " + (e.message || e)); }
+  }));
+  LS.setLocal("indices", { dados: CX.idx, atual: CX.atual }); return erros;
+}
+function clcImportarManual(serie, texto) {
+  let n = 0; const m = CX.manual[serie] || (CX.manual[serie] = {});
+  for (const l of String(texto || "").split(/\r?\n/)) {
+    const x = /^\s*(?:(\d{1,2})\/(\d{4})|(\d{4})-(\d{2}))\s*[;\t: ]\s*(-?[\d.,]+)\s*%?\s*$/.exec(l); if (!x) continue;
+    const mes = x[1] ? x[2] + "-" + x[1].padStart(2, "0") : x[3] + "-" + x[4], v = lerValorBR(x[5].startsWith("-") ? x[5].slice(1) : x[5]); if (v == null) continue;
+    m[mes] = x[5].startsWith("-") ? -v : v; n++;
+  }
+  LS.setLocal("indices_manual", CX.manual); return n;
+}
+
+// ---------- motor mensal
+const clcRegDe = (reg, mes) => { let r = reg[0]; for (const p of reg) if (!p.de || p.de <= mes) r = p; return r; };
+function clcMotor(p) {
+  const av = [], det = [], jdet = [], mIni = clcMes(p.ini), mFim = clcMes(p.fim), mFimCorr = p.incluirFim ? mFim : clcMesAdd(mFim, -1);
+  let prod = 1, somaSel = 0;
+  for (const m of clcMeses(clcMesAdd(mIni, 1), mFimCorr)) {
+    const r = clcRegDe(p.reg, m); if (!r.corr) continue; const t = clcTaxa(r.corr, m);
+    if (t == null) { av.push(CLC_ROT_CORR[r.corr] + " de " + m.slice(5) + "/" + m.slice(0, 4)); continue; }
+    if (r.corr === "selic" && p.selicModo !== "composta") somaSel += t; else prod *= 1 + t / 100;
+    det.push({ mes: m, serie: r.corr, taxa: t, acum: prod * (1 + somaSel / 100) });
+  }
+  if (p.fimEm === "corr" && p.fimPct && mFim > mIni) { somaSel += p.fimPct; det.push({ mes: mFim, serie: "fim", taxa: p.fimPct, acum: prod * (1 + somaSel / 100) }); }
+  const fator = prod * (1 + somaSel / 100);
+  const jIni = p.jurosIni && p.jurosIni > p.ini ? p.jurosIni : p.ini, mJ = clcMes(jIni); let jurosPct = 0;
+  for (const m of clcMeses(clcMesAdd(mJ, 1), mFimCorr)) {
+    const r = clcRegDe(p.reg, m); let t = null;
+    if (r.juros === "selic") t = clcTaxa("selic", m);
+    else if (r.juros === "taxalegal") { const s = clcTaxa("selic", m), i = clcTaxa("ipca", m); t = s == null || i == null ? null : Math.max(0, s - i); }
+    else if (r.juros === "poup") { const pp = clcTaxa("poup", m), tr = clcTaxa("tr", m); t = pp == null ? null : ((1 + pp / 100) / (1 + (tr || 0) / 100) - 1) * 100; }
+    else if (r.juros === "trd") t = clcTaxa("tr", m);
+    else continue;
+    if (t == null) { av.push("índice de juros de " + m.slice(5) + "/" + m.slice(0, 4)); continue; }
+    jurosPct += t; jdet.push({ mes: m, tipo: r.juros, taxa: t, acum: jurosPct });
+  }
+  for (let i = 0; i < p.reg.length; i++) {
+    const r = p.reg[i]; if (r.juros !== "simples" && r.juros !== "composto") continue;
+    const de = r.de ? r.de + "-01" : "0000-01-01", ate = p.reg[i + 1] && p.reg[i + 1].de ? p.reg[i + 1].de + "-01" : "9999-12-31", s = jIni > de ? jIni : de, e = p.fim < ate ? p.fim : ate;
+    if (e <= s) continue; const dias = clcDias(s, e), t = +r.taxa || 0;
+    const pct = r.juros === "simples" ? t * dias / 30 : (Math.pow(1 + t / 100, dias / 30) - 1) * 100; jurosPct += pct;
+    jdet.push({ mes: clcMes(s), tipo: r.juros, taxa: t, dias, acum: jurosPct });
+  }
+  if (p.fimEm === "juros" && p.fimPct && mFim > mJ) { jurosPct += p.fimPct; jdet.push({ mes: mFim, tipo: "fim", taxa: p.fimPct, acum: jurosPct }); }
+  let compPct = 0;
+  if (p.comp && p.comp.taxa) { const ci = p.comp.ini && p.comp.ini > p.ini ? p.comp.ini : p.ini, dias = Math.max(0, clcDias(ci, p.fim)); compPct = p.comp.tipo === "composto" ? (Math.pow(1 + p.comp.taxa / 100, dias / 30) - 1) * 100 : p.comp.taxa * dias / 30; }
+  const corrigido = p.valor * fator, juros = corrigido * jurosPct / 100, comp = (p.comp && p.comp.base === "original" ? p.valor : corrigido) * compPct / 100;
+  return { fator, corrigido, jurosPct, juros, compPct, comp, det, jdet, avisos: av };
+}
+
+// ---------- regimes (períodos com índice de correção e tipo de juros)
+const clcRegCivel = o => [{ de: null, corr: o.corrAnt || null, juros: o.jurosAnt === "nenhum" ? null : o.jurosAnt, taxa: o.taxa }, { de: "2024-09", corr: "ipca", juros: "taxalegal" }];
+const clcRegTrab = o => [{ de: null, corr: o.pre || "ipcae", juros: "trd" }, { de: clcMes(o.citacao), corr: "selic", juros: null }];
+const clcRegFazenda = o => [{ de: null, corr: o.corr, juros: "simples", taxa: o.jurosAnt == null ? 0.5 : o.jurosAnt }, { de: "2009-07", corr: o.corr, juros: "poup" }, { de: "2021-12", corr: "selic", juros: null }];
+const clcRegTrib = () => [{ de: null, corr: null, juros: "selic" }];
+const clcRegRest = () => [{ de: null, corr: "selic", juros: null }];
+const clcRegLivre = o => [{ de: null, corr: o.corr || null, juros: o.juros || null, taxa: o.taxa }];
+function clcDescReg(reg) {
+  const nomeJ = { simples: "juros simples", composto: "juros compostos", selic: "juros pela Selic (soma das taxas mensais)", taxalegal: "juros = Selic – IPCA (taxa legal, mínimo zero)", poup: "juros da poupança (sem a TR)", trd: "juros pela TR/TRD (soma)" };
+  return reg.map((r, i) => {
+    const per = (r.de ? "a partir de " + r.de.slice(5) + "/" + r.de.slice(0, 4) : (reg.length > 1 ? "até " + clcMesAdd(reg[i + 1].de, -1).slice(5) + "/" + clcMesAdd(reg[i + 1].de, -1).slice(0, 4) : "todo o período"));
+    const pr = r.de && reg[i + 1] && reg[i + 1].de ? " até " + clcMesAdd(reg[i + 1].de, -1).slice(5) + "/" + clcMesAdd(reg[i + 1].de, -1).slice(0, 4) : "";
+    return "Período " + per + pr + ": correção " + (r.corr ? CLC_ROT_CORR[r.corr] : "—") + "; " + (r.juros ? (nomeJ[r.juros] || r.juros) + (r.taxa && (r.juros === "simples" || r.juros === "composto") ? " de " + clcPct(r.taxa) + " a.m." : "") : "sem juros separados");
+  });
+}
+
+// ---------- atualização de parcelas + encargos
+function clcCalcular(c) { // c: { parcelas:[{ini,valor,rot,jurosIni}], motor:{...}, multaMora:{dia,max}, multaPct, multaFixa, honPct, honFixo, m523, h523, despesas, astreintes }
+  const linhas = [], avisos = new Set(); let sV = 0, sC = 0, sJ = 0, sK = 0, sM = 0, detUnico = null;
+  for (const pc of c.parcelas) {
+    const r = clcMotor(Object.assign({}, c.motor, { valor: pc.valor, ini: pc.ini, jurosIni: pc.jurosIni || c.motor.jurosIni }));
+    r.avisos.forEach(a => avisos.add(a));
+    let multa = 0, mpct = 0; if (c.multaMora) { const d = clcDias(pc.ini, c.motor.fim); if (d > 0) { mpct = Math.min(c.multaMora.dia * d, c.multaMora.max); multa = pc.valor * mpct / 100; } }
+    const L = { rot: pc.rot, ini: pc.ini, valor: clcR2(pc.valor), fator: r.fator, corrigido: clcR2(r.corrigido), jurosPct: r.jurosPct, juros: clcR2(r.juros), comp: clcR2(r.comp), multaMora: clcR2(multa), multaPct: mpct };
+    L.total = clcR2(L.corrigido + L.juros + L.comp + L.multaMora); linhas.push(L);
+    sV += L.valor; sC += L.corrigido; sJ += L.juros; sK += L.comp; sM += L.multaMora; if (!detUnico) detUnico = r;
+  }
+  const sub = clcR2(sC + sJ + sK + sM), extras = [];
+  const add = (rot, v) => { if (v) extras.push([rot, clcR2(v)]); };
+  const multaC = c.multaPct ? clcR2(sC * c.multaPct / 100) : 0; add("Multa contratual/convencional (" + clcPct(c.multaPct) + " sobre o principal atualizado)", multaC); add("Multa em valor fixo", c.multaFixa || 0);
+  const baseHon = clcR2(sC + sJ + sK + sM);
+  const honC = c.honPct ? clcR2(baseHon * c.honPct / 100) : 0; add("Honorários advocatícios (" + clcPct(c.honPct) + " sobre o débito atualizado)", honC); add("Honorários em valor fixo", c.honFixo || 0);
+  const base523 = clcR2(sC + sJ + sK + multaC + (c.multaFixa || 0)); if (c.m523) add("Multa de 10% do art. 523, § 1º, CPC (sobre " + clcBrl(base523) + ")", base523 * 0.1); if (c.h523) add("Honorários de 10% do art. 523, § 1º, CPC (sobre " + clcBrl(base523) + ")", base523 * 0.1);
+  add("Astreintes", c.astreintes || 0); add("Despesas/custas", c.despesas || 0);
+  const total = clcR2(sub + extras.reduce((a, x) => a + x[1], 0));
+  return { linhas, soma: { valor: clcR2(sV), corrigido: clcR2(sC), juros: clcR2(sJ), comp: clcR2(sK), multaMora: clcR2(sM) }, sub, extras, total, detUnico, avisos: [...avisos] };
+}
+
+// ---------- trabalhista: verbas rescisórias e horas extras
+function clcAvosAno(ini, fim) { // meses do ano de 'fim' com 15 dias ou mais de contrato
+  const ano = fim.slice(0, 4), ini2 = ini > ano + "-01-01" ? ini : ano + "-01-01"; let n = 0;
+  for (let m = 1; m <= +fim.slice(5, 7); m++) { const mi = ano + "-" + String(m).padStart(2, "0") + "-01", mf = clcAddDias(clcAddMeses(mi, 1), -1), s = ini2 > mi ? ini2 : mi, e = fim < mf ? fim : mf; if (e >= s && clcDias(s, e) + 1 >= 15) n++; }
+  return n;
+}
+function clcAvosPeriodo(ini, fim) { let m = (+fim.slice(0, 4) - +ini.slice(0, 4)) * 12 + (+fim.slice(5, 7) - +ini.slice(5, 7)); if (clcAddMeses(ini, m) > fim) m--; m = Math.max(0, m); if (clcDias(clcAddMeses(ini, m), fim) + 1 >= 15) m++; return Math.min(m, 12); }
+function clcRescisao(o) {
+  const L = [], av = [], rem = o.rem, sjc = o.tipo === "sjc", acordo = o.tipo === "acordo", jc = o.tipo === "jc", pd = o.tipo === "pd";
+  if (o.desl < o.adm) return { erro: "A data de desligamento é anterior à admissão." };
+  const anos = clcAnosCompletos(o.adm, o.desl), avisoDias = Math.min(30 + 3 * anos, 90); let proj = o.desl;
+  const diaIni = clcMes(o.adm) === clcMes(o.desl) ? +o.adm.slice(8) : 1, dias = Math.min(30, +o.desl.slice(8) - diaIni + 1);
+  L.push(["Saldo de salário", dias + " dia(s) ÷ 30", rem / 30 * dias, "v"]); let avisoV = 0;
+  if ((sjc || acordo) && o.aviso === "indenizado") { const d = acordo ? avisoDias / 2 : avisoDias; avisoV = rem / 30 * d; proj = clcAddDias(o.desl, Math.floor(d)); L.push(["Aviso prévio indenizado" + (acordo ? " (metade, art. 484-A)" : ""), d + " dia(s) = 30 + 3 por ano completo (" + anos + "), máx. 90", avisoV, "v"]); }
+  else if ((sjc || acordo) && o.aviso === "trabalhado") av.push("Aviso prévio trabalhado: os " + avisoDias + " dias já são remunerados como salário; confira o saldo do mês.");
+  if (pd && o.aviso === "naocumprido") L.push(["(–) Aviso prévio não cumprido pelo empregado", "30 dias (art. 487, § 2º, CLT)", -rem, "v"]);
+  let dec = 0;
+  if (!jc) { const avos = clcAvosAno(o.adm, proj); dec = rem / 12 * avos; L.push(["13º salário proporcional", avos + "/12 (meses com 15+ dias, projetado até " + br(proj) + ")", dec, "v"]); if (o.decimoPago) L.push(["(–) 13º já pago no ano", "", -o.decimoPago, "v"]); }
+  if (o.fvSimples) L.push(["Férias vencidas + 1/3", o.fvSimples + " período(s)", o.fvSimples * rem * 4 / 3, "v"]);
+  if (o.fvDobro) L.push(["Férias vencidas em dobro + 1/3", o.fvDobro + " período(s) (art. 137 CLT; Súmula 450 TST)", o.fvDobro * 2 * rem * 4 / 3, "v"]);
+  if (!jc) { const k = clcAnosCompletos(o.adm, proj), ini = clcAddMeses(o.adm, 12 * k), avos = clcAvosPeriodo(ini, proj); L.push(["Férias proporcionais + 1/3", avos + "/12 (período desde " + br(ini) + ")", rem / 12 * avos * 4 / 3, "v"]); }
+  else av.push("Justa causa: sem 13º e férias proporcionais, aviso prévio, multa de 40% e liberação do FGTS.");
+  if (o.multa477) L.push(["Multa do art. 477, § 8º, CLT", "1 remuneração (atraso no pagamento das verbas)", rem, "v"]);
+  const fgtsRes = 0.08 * (rem / 30 * dias + avisoV + dec), pctM = sjc ? 0.4 : acordo ? 0.2 : 0, baseM = (o.fgts || 0) + fgtsRes;
+  if (!jc) { L.push(["FGTS (8%) sobre saldo de salário, aviso e 13º", "base " + clcBrl(rem / 30 * dias + avisoV + dec), fgtsRes, "f"]); if (pctM) L.push(["Multa rescisória do FGTS (" + pctM * 100 + "%)", "sobre " + clcBrl(baseM) + " (saldo informado + FGTS da rescisão)", baseM * pctM, "f"]); }
+  const tv = L.filter(x => x[3] === "v").reduce((a, x) => a + x[2], 0), tf = L.filter(x => x[3] === "f").reduce((a, x) => a + x[2], 0);
+  av.push("Valores brutos: sem INSS e IRRF. Reflexos de médias (comissões, horas extras habituais) devem integrar a remuneração base.");
+  if (acordo) av.push("Acordo (art. 484-A): FGTS movimenta-se até 80%, sem seguro-desemprego; a projeção do aviso foi feita pela metade.");
+  return { linhas: L.map(x => [x[0], x[1], clcR2(x[2]), x[3]]), totalVerbas: clcR2(tv), totalFgts: clcR2(tf), total: clcR2(tv + tf), anos, avisoDias, avisos: av };
+}
+function clcHorasExtras(o) {
+  const vh = o.sal / o.div, he50 = o.h50 * vh * (1 + o.a50 / 100), he100 = o.h100 * vh * (1 + o.a100 / 100), he = he50 + he100, dsr = o.diasUteis > 0 ? he / o.diasUteis * o.domFer : 0, base = he + dsr, d13 = base / 12, fer = base / 12 * 4 / 3, fgts = 0.08 * (base + d13 + fer), mf = o.multaFgts ? fgts * 0.4 : 0;
+  const L = [["Valor da hora normal", clcBrl(o.sal) + " ÷ " + o.div, vh], ["Horas extras " + o.a50 + "% (" + o.h50 + " h/mês)", "", he50], ["Horas extras " + o.a100 + "% (" + o.h100 + " h/mês)", "", he100], ["DSR sobre horas extras (Súmula 172 TST)", o.domFer + " ÷ " + o.diasUteis + " dias úteis", dsr], ["13º salário (1/12)", "", d13], ["Férias + 1/3 (1/12 × 4/3)", "", fer], ["FGTS 8%", "sobre horas, DSR, 13º e férias", fgts]];
+  if (mf) L.push(["Multa de 40% do FGTS", "", mf]);
+  const mes = base + d13 + fer + fgts + mf;
+  return { linhas: L.map(x => [x[0], x[1], clcR2(x[2])]), totalMes: clcR2(mes), total: clcR2(mes * o.meses), meses: o.meses, avisos: ["Médias mensais constantes. Variações de horas por mês, aviso prévio e demais reflexos devem ser ajustados à sentença.", "Hora extra com base no divisor " + o.div + "; confira a norma coletiva e a jornada."] };
+}
+
+// ---------- previdenciário
+function clcParcelasAtrasados(o) { // {dib, ate:'YYYY-MM', marco, dif, treze}
+  const corte = o.marco ? clcMes(clcAddMeses(o.marco, -60)) : "", ini = clcMes(o.dib), prim = corte && corte > ini ? corte : ini, ps = [], anos = {};
+  for (const m of clcMeses(prim, o.ate)) { ps.push({ ini: m + "-01", valor: o.dif, rot: "Comp. " + m.slice(5) + "/" + m.slice(0, 4) }); anos[m.slice(0, 4)] = (anos[m.slice(0, 4)] || 0) + 1; }
+  if (o.treze) for (const y of Object.keys(anos)) if (y + "-12" <= o.ate) ps.push({ ini: y + "-12-01", valor: o.dif * anos[y] / 12, rot: "13º de " + y + " (" + anos[y] + "/12)" });
+  return { parcelas: ps.sort((a, b) => a.ini.localeCompare(b.ini) || a.rot.localeCompare(b.rot)), prescrito: !!(corte && corte > ini), corte };
+}
+function clcRMI(o) { // {esp, sexo, media, anos, meses, prop, deps, salmin, teto}
+  const L = [], av = []; let pct = 0, nome = "";
+  const lim = o.sexo === "F" ? 15 : 20, tempo = o.anos + o.meses / 12, exc = Math.max(0, o.prop ? tempo - lim : Math.floor(o.anos + 1e-9) - lim);
+  if (o.esp === "programada") { pct = Math.min(100, 60 + 2 * exc); nome = "Aposentadoria (regra geral da EC 103/2019, art. 26)"; L.push(["Tempo exigido de contribuição para a regra geral", lim + " anos (" + (o.sexo === "F" ? "mulher" : "homem") + ")", ""]); if (o.anos < lim) av.push("Tempo informado inferior a " + lim + " anos: confira a carência e a regra aplicável antes de usar o resultado."); }
+  else if (o.esp === "incap") { pct = Math.min(100, 60 + 2 * exc); nome = "Aposentadoria por incapacidade permanente (art. 26, § 2º, I)"; }
+  else if (o.esp === "incapacid") { pct = 100; nome = "Aposentadoria por incapacidade permanente — acidente/doença do trabalho (art. 26, § 3º, II)"; }
+  else if (o.esp === "temp") { pct = 91; nome = "Auxílio por incapacidade temporária (91%, Lei 8.213/91 art. 61)"; }
+  else if (o.esp === "acidente") { pct = 50; nome = "Auxílio-acidente (50%, Lei 8.213/91 art. 86)"; }
+  else if (o.esp === "pensao") { pct = Math.min(100, 50 + 10 * o.deps); nome = "Pensão por morte (cota familiar 50% + 10% por dependente, art. 23 da EC 103/2019)"; }
+  if (["programada", "incap"].includes(o.esp)) L.push(["Coeficiente: 60% + 2% por ano que excede " + lim + " anos", (o.prop ? "tempo " + clcPct(tempo, 2).replace("%", "") + " anos (proporcional por mês)" : "anos completos: " + o.anos) + " → excedente " + clcPct(exc, 2).replace("%", "") + " ano(s)", ""]);
+  L.push(["Percentual aplicado", nome, ""]);
+  const bruto = o.media * pct / 100; let rmi = bruto;
+  if (o.esp !== "acidente" && rmi < o.salmin) { rmi = o.salmin; av.push("Resultado elevado ao salário mínimo (R$ " + o.salmin.toLocaleString("pt-BR", { minimumFractionDigits: 2 }) + ")."); }
+  if (rmi > o.teto) { rmi = o.teto; av.push("Resultado limitado ao teto do RGPS (R$ " + o.teto.toLocaleString("pt-BR", { minimumFractionDigits: 2 }) + ")."); }
+  av.push("Estimativa para DIB após 13/11/2019 pela regra permanente: a média salarial (100% dos salários desde 07/1994, corrigidos) deve ser apurada à parte e informada. Regras de transição e direito adquirido não são calculadas.");
+  if (o.esp === "pensao") av.push("Pensão: informe como valor-base a aposentadoria que o segurado recebia ou a que teria direito (incapacidade permanente). As cotas se redistribuem conforme o caso.");
+  return { linhas: L, pct, bruto: clcR2(bruto), rmi: clcR2(rmi), nome, avisos: av };
+}
+function clcTempo(texto, sexo) {
+  const fat = { M: { 15: 2.33, 20: 1.75, 25: 1.4 }, F: { 15: 2.0, 20: 1.5, 25: 1.2 } }[sexo === "F" ? "F" : "M"], corte = "2019-11-13", L = [], av = [], normais = [];
+  let dias = 0, convExtra = 0;
+  for (const l of String(texto || "").split(/\r?\n/)) {
+    if (!l.trim()) continue;
+    const x = /(\d{2})\/(\d{2})\/(\d{4})\s*(?:a|até|-|–)\s*(\d{2})\/(\d{2})\/(\d{4})(?:\s*[;,]?\s*(?:esp(?:ecial)?\s*)?(15|20|25))?/i.exec(l);
+    if (!x) { av.push("Linha ignorada: “" + l.trim() + "”"); continue; }
+    const ini = x[3] + "-" + x[2] + "-" + x[1], fim = x[6] + "-" + x[5] + "-" + x[4]; if (fim < ini) { av.push("Período invertido ignorado: “" + l.trim() + "”"); continue; }
+    const d = clcDias(ini, fim) + 1; let conv = d;
+    if (x[7]) { const f = fat[+x[7]], antes = ini > corte ? 0 : clcDias(ini, fim < corte ? fim : corte) + (fim < corte ? 1 : 0), depois = d - antes; conv = antes * f + depois; if (depois > 0 && antes === 0) av.push("Período especial posterior a 13/11/2019 não é convertido (EC 103/2019): " + l.trim()); }
+    else normais.push([ini, fim]);
+    dias += conv; if (x[7]) convExtra += conv - d; L.push([br(ini) + " a " + br(fim), d + " dias" + (x[7] ? " · especial " + x[7] + " anos × " + fat[+x[7]] : ""), Math.round(conv)]);
+  }
+  normais.sort(); for (let i = 1; i < normais.length; i++) if (normais[i][0] <= normais[i - 1][1]) av.push("Períodos comuns concomitantes (" + br(normais[i - 1][0]) + " a " + br(normais[i - 1][1]) + " e " + br(normais[i][0]) + " a " + br(normais[i][1]) + "): o tempo concomitante não deve ser somado em duplicidade.");
+  const t = Math.round(dias), a = Math.floor(t / 365), m = Math.floor((t - a * 365) / 30), d = t - a * 365 - m * 30;
+  return { linhas: L, dias: t, anos: a, meses: m, diasR: d, convExtra: Math.round(convExtra), avisos: av };
+}
+
+
+/* ===== 48-calculos-ui: tela "Cálculos" (cível, trabalhista, previdenciário, tributário e índices) ===== */
+const CU = { aba: "civel", sub: { trab: "atual", prev: "atrasos", trib: "debito" }, res: null, d: {}, busy: false };
+const CU_ABAS = [["civel", "Cível e atualização"], ["trab", "Trabalhista"], ["prev", "Previdenciário"], ["trib", "Tributário"], ["indices", "Índices"]];
+const CU_CORR = [["inpc", "INPC (índice oficial do TJSC)"], ["ipca", "IPCA"], ["ipcae", "IPCA-E"], ["igpm", "IGP-M"], ["selic", "Selic"], ["tr", "TR"], ["", "Sem correção"]];
+
+// ---------- campos (o estado de cada campo fica em CU.d e sobrevive à troca de abas)
+function cuCampo(ch, rot, o) {
+  o = o || {}; const d = CU.d; if (d[ch] === undefined) d[ch] = o.p !== undefined ? o.p : o.t === "sel" ? (Array.isArray(o.ops[0]) ? o.ops[0][0] : o.ops[0]) : ""; let i;
+  if (o.t === "chk") { const [l, c] = intCheck(rot, d[ch]); c.onchange = () => { d[ch] = c.checked; }; if (o.dica) l.appendChild(el("span", "hint", o.dica)); return l; }
+  if (o.t === "sel") { i = optsSel(el("select"), o.ops); i.value = d[ch]; i.onchange = () => { d[ch] = i.value; if (o.rer) cuDesenhar(); }; }
+  else if (o.t === "area") { i = el("textarea"); i.rows = o.rows || 5; i.value = d[ch]; i.placeholder = o.ph || ""; i.oninput = () => { d[ch] = i.value; }; }
+  else { i = el("input"); i.type = o.t === "date" ? "date" : "text"; i.value = d[ch]; i.placeholder = o.ph || ""; if (o.t === "num") i.inputMode = "decimal"; i.autocomplete = "off"; i.oninput = () => { d[ch] = i.value; }; }
+  const l = intCampo(rot, i, o.dica); if (o.larg) l.style.gridColumn = "1/-1"; return l;
+}
+const cuNum = ch => { const s = String(CU.d[ch] == null ? "" : CU.d[ch]).trim(); if (!s) return 0; if (/^\d{1,3}(\.\d{3})+$/.test(s)) return +s.replace(/\./g, ""); const neg = /^-/.test(s), v = lerValorBR(s); return v == null ? 0 : neg ? -v : v; };
+const cuTxt = ch => String(CU.d[ch] == null ? "" : CU.d[ch]).trim();
+const cuBool = ch => !!CU.d[ch];
+const cuDtBr = s => { const m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(s) || /^(\d{4})-(\d{2})-(\d{2})$/.exec(s); if (!m) return ""; const iso = m[1].length === 4 ? s : m[3] + "-" + m[2].padStart(2, "0") + "-" + m[1].padStart(2, "0"); return isNaN(clcD(iso)) || clcD(iso).toISOString().slice(0, 10) !== iso ? "" : iso; };
+function cuParcelas(texto) {
+  const ps = [], erros = [];
+  for (const l of String(texto || "").split(/\r?\n/)) {
+    if (!l.trim()) continue; const m = /^\s*(\d{1,2}\/\d{1,2}\/\d{4}|\d{4}-\d{2}-\d{2})\s*[;\t ]\s*(?:R\$\s*)?(-?[\d.,]+)\s*[;\t ]?\s*(.*)$/.exec(l), dt = m ? cuDtBr(m[1]) : "", v = m ? (/^\d{1,3}(\.\d{3})+$/.test(m[2]) ? +m[2].replace(/\./g, "") : lerValorBR(m[2])) : null;
+    if (!m || !dt || v == null || !(v > 0)) { erros.push(l.trim()); continue; } ps.push({ ini: dt, valor: v, rot: m[3].trim() || ("Parcela de " + br(dt)) });
+  }
+  return { ps, erros };
+}
+const cuSeriesDe = (...l) => [...new Set(l.filter(Boolean))];
+async function cuGarantir(series) {
+  const erros = await clcCarregar(series), sem = series.filter(s => !clcUltimoMes(s));
+  if (sem.length) throw new Error("Não foi possível obter " + sem.map(s => CLC_SERIES[s][1]).join(", ") + " do Banco Central" + (erros.length ? " (" + erros[0] + ")" : "") + ". Tente de novo ou cole os índices na aba “Índices”.");
+}
+function cuAvisosIndices(motor, series, fim, incl) {
+  const av = [], alvo = incl ? clcMes(fim) : clcMesAdd(clcMes(fim), -1);
+  for (const s of series) { const u = clcUltimoMes(s); if (u && u < alvo) av.push("O último mês publicado de " + CLC_SERIES[s][1] + " é " + u.slice(5) + "/" + u.slice(0, 4) + ": os meses seguintes até a data do cálculo não entram (importe-os na aba Índices, se já saíram)."); }
+  return av;
+}
+
+// ---------- resultado
+const CU_ASSINATURA = "Cálculo de apoio gerado em " + "{data}" + " no App Organização. É estimativa: confira premissas, índices e a decisão/título executivo antes de usar em peça ou acordo.";
+function cuResumoCalc(r, rotCorr) {
+  const s = r.soma, L = [["Principal original", clcBrl(s.valor)], [rotCorr || "Correção monetária", clcBrl(s.corrigido - s.valor)], ["Juros", clcBrl(s.juros)]];
+  if (s.comp) L.push(["Juros compensatórios", clcBrl(s.comp)]); if (s.multaMora) L.push(["Multa de mora", clcBrl(s.multaMora)]);
+  for (const x of r.extras) L.push([x[0], clcBrl(x[1])]); return L;
+}
+function cuTabParcelas(r) {
+  const comp = r.soma.comp > 0, mm = r.soma.multaMora > 0, cab = ["Parcela", "Data-base", "Valor original", "Fator de correção", "Valor corrigido", "Juros %", "Juros R$"]; if (comp) cab.push("Compensatórios"); if (mm) cab.push("Multa de mora"); cab.push("Total");
+  const linhas = r.linhas.map(L => { const x = [L.rot, br(L.ini), clcBrl(L.valor), clcFat(L.fator), clcBrl(L.corrigido), clcPct(L.jurosPct), clcBrl(L.juros)]; if (comp) x.push(clcBrl(L.comp)); if (mm) x.push(clcBrl(L.multaMora) + " (" + clcPct(L.multaPct) + ")"); x.push(clcBrl(L.total)); return x; });
+  const s = r.soma, t = ["Total", "", clcBrl(s.valor), "", clcBrl(s.corrigido), "", clcBrl(s.juros)]; if (comp) t.push(clcBrl(s.comp)); if (mm) t.push(clcBrl(s.multaMora)); t.push(clcBrl(r.sub));
+  return { titulo: "Atualização por parcela", cab, linhas: linhas.concat([t]), n: cab.map((_, i) => i >= 2) };
+}
+function cuTabIndices(r, multi) {
+  const d = r.detUnico; if (!d || (!d.det.length && !d.jdet.length)) return null;
+  const nm = { fim: "Complemento do mês do cálculo" }, linhas = [];
+  for (const x of d.det) linhas.push(["Correção", x.mes.slice(5) + "/" + x.mes.slice(0, 4), nm[x.serie] || (CLC_SERIES[x.serie] || [0, x.serie])[1], clcPct(x.taxa, 4), "× " + clcFat(x.acum)]);
+  const rj = { simples: "Juros simples", composto: "Juros compostos", selic: "Juros pela Selic", taxalegal: "Taxa legal (Selic – IPCA)", poup: "Juros da poupança", trd: "Juros pela TR", fim: "Juros do mês do cálculo (1%)" };
+  for (const x of d.jdet) linhas.push(["Juros", x.mes.slice(5) + "/" + x.mes.slice(0, 4), (rj[x.tipo] || x.tipo) + (x.dias ? " (" + x.dias + " dias)" : ""), clcPct(x.taxa, 4), "Σ " + clcPct(x.acum, 4)]);
+  return { titulo: "Memória mensal — " + (multi ? "1ª parcela (exemplo)" : "índices aplicados"), cab: ["Tipo", "Mês", "Índice", "Taxa", "Acumulado"], linhas, n: [false, false, false, true, true] };
+}
+function cuMostrar(r) { r.aba = CU.aba; CU.res = r; cuRes(); const e = $("cuRes"); if (e && e.scrollIntoView) e.scrollIntoView({ block: "start" }); }
+function cuMemoria(r) {
+  const o = [(crmCfg().escritorio || "") + " — " + r.titulo, ""];
+  for (const [a, b] of r.dados || []) o.push(a + ": " + b); if ((r.dados || []).length) o.push("");
+  if (r.premissas && r.premissas.length) { o.push("PREMISSAS"); r.premissas.forEach(x => o.push("- " + x)); o.push(""); }
+  for (const t of r.tabelas || []) { o.push(t.titulo.toUpperCase()); o.push(t.cab.join(" | ")); t.linhas.forEach(l => o.push(l.join(" | "))); o.push(""); }
+  if (r.resumo && r.resumo.length) { o.push("RESUMO"); r.resumo.forEach(x => o.push(x[0] + ": " + x[1])); o.push(""); }
+  if (r.total) o.push(r.total[0] + ": " + r.total[1]), o.push("");
+  if (r.avisos && r.avisos.length) { o.push("AVISOS"); r.avisos.forEach(x => o.push("- " + x)); o.push(""); }
+  if (r.fundamentos && r.fundamentos.length) { o.push("FUNDAMENTOS"); r.fundamentos.forEach(x => o.push("- " + x)); o.push(""); }
+  o.push(CU_ASSINATURA.replace("{data}", br(hojeIso()))); return o.join("\n");
+}
+function cuCsv(r) {
+  const q = x => '"' + String(x == null ? "" : x).replace(/"/g, '""') + '"', L = [[r.titulo]];
+  for (const d of r.dados || []) L.push(d); L.push([]);
+  for (const x of r.premissas || []) L.push(["Premissa", x]); if ((r.premissas || []).length) L.push([]);
+  for (const t of r.tabelas || []) { L.push([t.titulo]); L.push(t.cab); t.linhas.forEach(l => L.push(l)); L.push([]); }
+  for (const x of r.resumo || []) L.push(x); if (r.total) L.push(r.total); L.push([]); for (const x of r.avisos || []) L.push(["Aviso", x]);
+  return "﻿" + L.map(l => l.map(q).join(";")).join("\r\n");
+}
+function cuHtml(r) {
+  const e = htmlEsc, tab = t => "<h3>" + e(t.titulo) + "</h3><table border=\"1\" cellspacing=\"0\" cellpadding=\"4\"><tr>" + t.cab.map(c => "<th>" + e(c) + "</th>").join("") + "</tr>" + t.linhas.map(l => "<tr>" + l.map(c => "<td>" + e(c) + "</td>").join("") + "</tr>").join("") + "</table>";
+  return "<html><body><h2>" + e(crmCfg().escritorio || "") + " — " + e(r.titulo) + "</h2>" + (r.dados || []).map(d => "<p><b>" + e(d[0]) + ":</b> " + e(d[1]) + "</p>").join("")
+    + ((r.premissas || []).length ? "<h3>Premissas</h3><ul>" + r.premissas.map(x => "<li>" + e(x) + "</li>").join("") + "</ul>" : "") + (r.tabelas || []).map(tab).join("")
+    + ((r.resumo || []).length ? "<h3>Resumo</h3><table border=\"1\" cellspacing=\"0\" cellpadding=\"4\">" + r.resumo.map(x => "<tr><td>" + e(x[0]) + "</td><td align=\"right\">" + e(x[1]) + "</td></tr>").join("") + "</table>" : "")
+    + (r.total ? "<h3>" + e(r.total[0]) + ": " + e(r.total[1]) + "</h3>" : "") + ((r.avisos || []).length ? "<h3>Avisos</h3><ul>" + r.avisos.map(x => "<li>" + e(x) + "</li>").join("") + "</ul>" : "")
+    + ((r.fundamentos || []).length ? "<h3>Fundamentos</h3><ul>" + r.fundamentos.map(x => "<li>" + e(x) + "</li>").join("") + "</ul>" : "") + "<p><i>" + e(CU_ASSINATURA.replace("{data}", br(hojeIso()))) + "</i></p></body></html>";
+}
+function cuIaAcoes() {
+  const base = "Os dados do cálculo estão no contexto. ";
+  return [
+    { rot: "Conferir premissas e índices", prompt: base + "Confira se as premissas (índice de correção, juros, termo inicial, regime legal/jurisprudencial) são adequadas a este tipo de crédito e destaque o que o advogado precisa verificar na decisão ou no título. Não refaça as contas; aponte inconsistências." },
+    { rot: "Redigir texto para a petição", prompt: base + "Redija, em linguagem forense, um parágrafo explicando a metodologia deste cálculo (índices, juros, termo inicial, base legal) para constar da petição de cumprimento/memória de cálculo, com marcadores [CONFERIR] onde houver dependência de decisão." },
+    { rot: "Riscos e pontos de impugnação", prompt: base + "Liste os pontos em que a parte contrária ou a contadoria pode impugnar este cálculo, com o argumento provável de cada um e o que o escritório deve preparar." }
+  ];
+}
+function cuRes() {
+  const box = $("cuRes"); box.textContent = ""; const r = CU.res; if (!r) { box.hidden = true; return; } box.hidden = false;
+  const p = el("div", "panel cu-res"), hd = el("div", "hd"); hd.append(el("h2", "", r.titulo)); p.appendChild(hd);
+  p.appendChild(el("div", "cu-cab", (crmCfg().escritorio || "") + " · gerado em " + br(hojeIso())));
+  if ((r.dados || []).length) { const g = el("div", "cu-dados"); for (const [a, b] of r.dados) { const d = el("div"); d.append(el("span", "", a), el("b", "", b)); g.appendChild(d); } p.appendChild(g); }
+  if ((r.premissas || []).length) { p.appendChild(el("h3", "", "Premissas aplicadas")); const u = el("ul", "cu-ul"); r.premissas.forEach(x => u.appendChild(el("li", "", x))); p.appendChild(u); }
+  for (const t of r.tabelas || []) {
+    p.appendChild(el("h3", "", t.titulo)); const w = el("div", "cu-tw"), tb = el("table", "cu-tab"), th = el("tr"); t.cab.forEach((c, i) => { const h = el("th", t.n && t.n[i] ? "n" : "", c); th.appendChild(h); }); tb.appendChild(th);
+    t.linhas.forEach((l, k) => { const tr = el("tr", t.total && k === t.linhas.length - 1 ? "tot" : ""); l.forEach((c, i) => tr.appendChild(el("td", t.n && t.n[i] ? "n" : "", c))); tb.appendChild(tr); }); w.appendChild(tb); p.appendChild(w);
+  }
+  if ((r.resumo || []).length) { p.appendChild(el("h3", "", "Resumo")); const w = el("div", "cu-tw"), tb = el("table", "cu-tab cu-res-tab"); r.resumo.forEach(x => { const tr = el("tr"); tr.append(el("td", "", x[0]), el("td", "n", x[1])); tb.appendChild(tr); }); w.appendChild(tb); p.appendChild(w); }
+  if (r.total) { const t = el("div", "cu-total"); t.append(el("span", "", r.total[0]), el("b", "", r.total[1])); p.appendChild(t); }
+  if ((r.avisos || []).length) { const a = el("div", "cu-aviso"); a.appendChild(el("b", "", "Atenção")); const u = el("ul"); r.avisos.forEach(x => u.appendChild(el("li", "", x))); a.appendChild(u); p.appendChild(a); }
+  if ((r.fundamentos || []).length) { p.appendChild(el("h3", "", "Fundamentos")); const u = el("ul", "cu-ul"); r.fundamentos.forEach(x => u.appendChild(el("li", "", x))); p.appendChild(u); }
+  p.appendChild(el("div", "cu-nota", CU_ASSINATURA.replace("{data}", br(hojeIso()))));
+  // ações
+  const ac = el("div", "acts noprint"), msg = el("div", "msg noprint"); msg.id = "cuMsg"; msg.hidden = true;
+  ac.append(btn("Imprimir / PDF", () => { document.body.classList.add("pr-calc"); const f = () => { document.body.classList.remove("pr-calc"); window.removeEventListener("afterprint", f); }; window.addEventListener("afterprint", f); setTimeout(() => window.print(), 30); }, ""),
+    btn("Copiar memória", e => copiar(cuMemoria(r), e.target)), btn("Exportar CSV", () => salvar(new Blob([cuCsv(r)], { type: "text/csv;charset=utf-8" }), nomeArq("calculo " + r.arq + " " + hojeIso()) + ".csv")),
+    btn("Conferir com IA", () => iaAbrir({ titulo: "cálculo — " + r.titulo, ctx: iaMascara(cuMemoria(r)), acoes: cuIaAcoes() })));
+  p.appendChild(ac);
+  if (driveAtivo() && !souSecretaria()) {
+    const w = el("div", "acts noprint"), s = el("select"); s.id = "cuProc"; optsSel(s, PROCS.map(x => [x.id, x.numero + (x.cliente ? " · " + x.cliente : "")]), "Escolha o processo para salvar no Drive…");
+    w.append(s, btn("Salvar no Drive (pasta do processo)", async () => {
+      const pr = PROCS.find(x => x.id === s.value); if (!pr) { cuMsg("Escolha o processo.", true); return; }
+      try { cuMsg("Salvando no Drive…"); await driveConectar(); const raiz = await driveGarantirPastaDoAlvo(driveAlvo("proc", pr)), sub = await driveGarantirPasta(DRIVE_SUB_PROC[4], raiz);
+        const f = await driveEnviar({ nome: nomeArq(hojeIso() + " Cálculo - " + r.arq), blob: new Blob([cuHtml(r)], { type: "text/html" }), mime: "text/html", paiId: sub.id, converterPara: GDOC });
+        cuMsg("Salvo em “" + DRIVE_SUB_PROC[4] + "”: " + f.name + (f.webViewLink ? " — " + f.webViewLink : "")); } catch (e) { cuMsg(e.message || String(e), true); } }, ""));
+    p.appendChild(w);
+  }
+  p.appendChild(msg); box.appendChild(p);
+}
+function cuMsg(t, erro) { const m = $("cuMsg"); if (m) intMsg(m, t, erro); }
+async function cuRodar(fn, botao) {
+  if (CU.busy) return; CU.busy = true; if (botao) botao.disabled = true; const m = $("cuErro"); intMsg(m, "");
+  try { intMsg(m, "Obtendo índices e calculando…"); const r = await fn(); intMsg(m, ""); if (r) cuMostrar(r); } catch (e) { intMsg(m, e.message || String(e), true); } finally { CU.busy = false; if (botao) botao.disabled = false; }
+}
+const cuBotao = (rot, fn) => { const b = btn(rot, () => cuRodar(fn, b), " "); b.classList.add("cu-go"); return b; };
+
+// ---------- encargos comuns
+const cuCamposEncargos = (pf, o) => {
+  o = o || {}; const g = el("div", "intgrid"); g.append(
+    cuCampo(pf + "multapct", "Multa contratual/convencional (%)", { t: "num", ph: "ex.: 2" }), cuCampo(pf + "multafixa", "Multa em valor fixo (R$)", { t: "num" }),
+    cuCampo(pf + "honpct", o.honRot || "Honorários advocatícios (%)", { t: "num", ph: "ex.: 10" }), cuCampo(pf + "honfixo", "Honorários em valor fixo (R$)", { t: "num" }),
+    cuCampo(pf + "desp", "Despesas/custas (R$)", { t: "num" }), cuCampo(pf + "astr", "Astreintes (R$)", { t: "num" }));
+  const w = el("div"); w.append(g); if (o.art523 !== false) { w.append(cuCampo(pf + "m523", "Multa de 10% do art. 523, § 1º, do CPC (cumprimento de sentença não pago em 15 dias)", { t: "chk" }), cuCampo(pf + "h523", "Honorários de 10% do art. 523, § 1º, do CPC", { t: "chk" })); } return w;
+};
+const cuLerEncargos = pf => ({ multaPct: cuNum(pf + "multapct"), multaFixa: cuNum(pf + "multafixa"), honPct: cuNum(pf + "honpct"), honFixo: cuNum(pf + "honfixo"), despesas: cuNum(pf + "desp"), astreintes: cuNum(pf + "astr"), m523: cuBool(pf + "m523"), h523: cuBool(pf + "h523") });
+const cuModoSelic = pf => cuCampo(pf + "selic", "Selic: forma de acumular", { t: "sel", ops: [["soma", "Soma das taxas (padrão)"], ["composta", "Capitalizada"]] });
+const cuInclFim = pf => cuCampo(pf + "inclfim", "Incluir o mês da data do cálculo nos índices (padrão: não, só meses completos)", { t: "chk" });
+function cuParcelasCampo(pf, rot, ph) { return cuCampo(pf + "parc", rot || "Parcelas (uma por linha: data; valor; descrição)", { t: "area", rows: 5, ph: ph || "10/03/2022; 1.500,00; Cheque\n10/04/2022; 1.500,00", larg: true, dica: "Data de vencimento (ou da data-base) e valor de cada parcela. Pode colar de planilha (separado por ;, tabulação ou espaço)." }); }
+
+// ---------- CÍVEL E ATUALIZAÇÃO
+function cuFormCivel(box) {
+  const g = el("div", "intgrid");
+  g.append(cuCampo("cv_modo", "Tipo de atualização", { t: "sel", rer: true, ops: [["civel", "Cível — Lei 14.905/2024"], ["livre", "Livre (índice e juros à escolha)"], ["fazenda", "Fazenda Pública (EC 113/2021)"]], p: "civel" }), cuCampo("cv_fim", "Data do cálculo", { t: "date", p: hojeIso() }));
+  const modo = CU.d.cv_modo; g.appendChild(cuParcelasCampo("cv_"));
+  if (modo === "civel") g.append(cuCampo("cv_corr", "Correção até 08/2024 (antes da Lei 14.905)", { t: "sel", ops: CU_CORR, p: "inpc" }), cuCampo("cv_jurosant", "Juros até 08/2024", { t: "sel", ops: [["simples", "Simples (pro rata die, 30 dias)"], ["composto", "Compostos"], ["nenhum", "Sem juros"]], p: "simples" }), cuCampo("cv_taxa", "Taxa de juros até 08/2024 (% ao mês)", { t: "num", p: "1" }));
+  if (modo === "livre") g.append(cuCampo("cv_corr", "Índice de correção", { t: "sel", ops: CU_CORR, p: "inpc" }), cuCampo("cv_juros", "Juros", { t: "sel", ops: [["simples", "Simples (% ao mês, pro rata die)"], ["composto", "Compostos (% ao mês)"], ["selic", "Selic (soma das taxas)"], ["nenhum", "Sem juros"]], p: "simples" }), cuCampo("cv_taxa", "Taxa de juros (% ao mês)", { t: "num", p: "1" }));
+  if (modo === "fazenda") g.append(cuCampo("cv_corrf", "Índice até 11/2021", { t: "sel", ops: [["ipcae", "IPCA-E (cíveis em geral)"], ["inpc", "INPC (previdenciário)"], ["ipca", "IPCA"]], p: "ipcae" }), cuCampo("cv_jantf", "Juros antes de 07/2009 (% a.m., simples)", { t: "num", p: "0,5" }));
+  g.append(cuCampo("cv_cit", "Juros contados desde (opcional: citação/constituição em mora)", { t: "date", dica: "Se vazio, os juros contam do vencimento de cada parcela." }), cuModoSelic("cv_"), cuCampo("cv_comp", "Juros compensatórios (% ao mês, opcional)", { t: "num" }), cuCampo("cv_comptipo", "Compensatórios", { t: "sel", ops: [["simples", "Simples"], ["composto", "Compostos"]], p: "simples" }));
+  box.appendChild(g); box.appendChild(cuInclFim("cv_")); box.appendChild(el("h3", "", "Multas, honorários e despesas")); box.appendChild(cuCamposEncargos("cv_"));
+  box.appendChild(cuBotao("Calcular", async () => {
+    const modo = CU.d.cv_modo, fim = cuDtBr(cuTxt("cv_fim")); if (!fim) throw new Error("Informe a data do cálculo."); const { ps, erros } = cuParcelas(cuTxt("cv_parc")); if (!ps.length) throw new Error("Informe ao menos uma parcela (data; valor)." + (erros.length ? " Linha não entendida: " + erros[0] : "")); const cit = cuDtBr(cuTxt("cv_cit"));
+    let reg, prem = [], fund = [], series, corrRot;
+    if (modo === "civel") {
+      const ca = CU.d.cv_corr || ""; reg = clcRegCivel({ corrAnt: ca, jurosAnt: CU.d.cv_jurosant, taxa: cuNum("cv_taxa") }); series = cuSeriesDe(ca, "ipca", "selic");
+      prem.push(...clcDescReg(reg)); fund.push("Lei 14.905/2024 (arts. 389, parágrafo único, e 406 do Código Civil), em vigor desde 30/08/2024: correção pelo IPCA e juros pela taxa legal (Selic deduzido o IPCA, nunca negativa).", "Antes disso, aplicam-se o índice e os juros que você selecionou (a decisão/título executivo prevalece).");
+    } else if (modo === "livre") {
+      const ju = CU.d.cv_juros; reg = clcRegLivre({ corr: CU.d.cv_corr || null, juros: ju === "nenhum" ? null : ju, taxa: cuNum("cv_taxa") }); series = cuSeriesDe(CU.d.cv_corr, ju === "selic" ? "selic" : ""); prem.push(...clcDescReg(reg)); fund.push("Parâmetros escolhidos pelo usuário (atualização livre).");
+    } else {
+      const cf = CU.d.cv_corrf; reg = clcRegFazenda({ corr: cf, jurosAnt: cuNum("cv_jantf") }); series = cuSeriesDe(cf, "selic", "poup", "tr"); prem.push(...clcDescReg(reg));
+      fund.push("EC 113/2021 (art. 3º): a partir de 12/2021 incide somente a Selic (juros e correção). Até 11/2021: correção pelo índice indicado e juros da poupança (art. 1º-F da Lei 9.494/97), apurados como poupança sem a TR.");
+    }
+    await cuGarantir(series); const enc = cuLerEncargos("cv_");
+    const comp = cuNum("cv_comp") > 0 ? { taxa: cuNum("cv_comp"), tipo: CU.d.cv_comptipo, ini: "", base: "original" } : null;
+    const c = Object.assign({ parcelas: ps, motor: { reg, fim, incluirFim: cuBool("cv_inclfim"), selicModo: CU.d.cv_selic, comp, jurosIni: cit } }, enc), r = clcCalcular(c);
+    if (cit) prem.push("Juros contados desde " + br(cit) + " (quando posterior ao vencimento).");
+    if (comp) prem.push("Juros compensatórios de " + clcPct(comp.taxa) + " a.m. (" + (comp.tipo === "composto" ? "compostos" : "simples") + ") sobre o valor original, do vencimento ao cálculo.");
+    prem.push("Meses de índice: do mês seguinte ao do vencimento até " + (cuBool("cv_inclfim") ? "o mês do cálculo" : "o mês anterior ao do cálculo") + "." + (CU.d.cv_selic === "composta" ? " Selic capitalizada." : " Selic somada mensalmente."));
+    const av = cuAvisosIndices(null, series, fim, cuBool("cv_inclfim")).concat(r.avisos.length ? ["Índices ausentes (não aplicados): " + r.avisos.slice(0, 8).join(", ") + (r.avisos.length > 8 ? "…" : "")] : []);
+    if (erros.length) av.push("Linhas ignoradas (formato): " + erros.slice(0, 3).join(" | "));
+    return { arq: "atualizacao", titulo: "Atualização de débito — " + (modo === "civel" ? "cível (Lei 14.905/2024)" : modo === "livre" ? "livre" : "Fazenda Pública"), dados: [["Data do cálculo", br(fim)], ["Parcelas", String(ps.length)]], premissas: prem, tabelas: [cuTabParcelas(r), cuTabIndices(r, ps.length > 1)].filter(Boolean), resumo: cuResumoCalc(r), total: ["TOTAL ATUALIZADO", clcBrl(r.total)], avisos: av, fundamentos: fund };
+  }));
+}
+
+// ---------- TRABALHISTA
+const CU_TIPO_RESC = [["sjc", "Dispensa sem justa causa"], ["pd", "Pedido de demissão"], ["acordo", "Acordo (art. 484-A da CLT)"], ["jc", "Dispensa por justa causa"]];
+function cuFormTrab(box) {
+  const bar = el("div", "tabs"); for (const [k, n] of [["atual", "Atualização de crédito (ADC 58)"], ["resc", "Verbas rescisórias"], ["he", "Horas extras e reflexos"]]) { const b = el("button", "", n); b.type = "button"; b.setAttribute("aria-selected", CU.sub.trab === k); b.onclick = () => { CU.sub.trab = k; cuDesenhar(); }; bar.appendChild(b); } box.appendChild(bar);
+  const s = CU.sub.trab, g = el("div", "intgrid");
+  if (s === "atual") {
+    g.append(cuCampo("tr_fim", "Data do cálculo", { t: "date", p: hojeIso() }), cuCampo("tr_cit", "Data da citação (ajuizamento, se não houver)", { t: "date", dica: "Até o mês anterior: correção + juros TRD. Daí em diante: Selic." }), cuCampo("tr_pre", "Correção na fase pré-judicial", { t: "sel", ops: [["ipcae", "IPCA-E (ADC 58)"], ["ipca", "IPCA"], ["inpc", "INPC"]], p: "ipcae" }), cuModoSelic("tr_"), cuParcelasCampo("tr_", "Parcelas (data de exigibilidade; valor; descrição)", "05/02/2021; 2.000,00; Horas extras fev/21\n05/03/2021; 2.000,00"));
+    box.appendChild(g); box.appendChild(cuInclFim("tr_")); box.appendChild(el("h3", "", "Honorários, multas e despesas")); box.appendChild(cuCamposEncargos("tr_", { art523: false, honRot: "Honorários de sucumbência (%)" }));
+    box.appendChild(cuBotao("Calcular", async () => {
+      const fim = cuDtBr(cuTxt("tr_fim")), cit = cuDtBr(cuTxt("tr_cit")); if (!fim || !cit) throw new Error("Informe a data do cálculo e a da citação (ou do ajuizamento)."); const { ps, erros } = cuParcelas(cuTxt("tr_parc")); if (!ps.length) throw new Error("Informe ao menos uma parcela (data; valor).");
+      const pre = CU.d.tr_pre, reg = clcRegTrab({ pre, citacao: cit }), series = cuSeriesDe(pre, "tr", "selic"); await cuGarantir(series);
+      const r = clcCalcular(Object.assign({ parcelas: ps, motor: { reg, fim, incluirFim: cuBool("tr_inclfim"), selicModo: CU.d.tr_selic } }, cuLerEncargos("tr_")));
+      const av = cuAvisosIndices(null, series, fim, cuBool("tr_inclfim")); if (r.avisos.length) av.push("Índices ausentes (não aplicados): " + r.avisos.slice(0, 8).join(", ")); if (erros.length) av.push("Linhas ignoradas: " + erros.slice(0, 3).join(" | "));
+      av.push("Valores brutos, sem descontos de INSS e IRRF. A decisão pode determinar outra data inicial dos juros, outro índice ou a Selic desde o ajuizamento: ajuste a data da citação.");
+      return { arq: "trabalhista", titulo: "Atualização de crédito trabalhista (ADC 58/ADI 5867)", dados: [["Data do cálculo", br(fim)], ["Citação/ajuizamento", br(cit)], ["Parcelas", String(ps.length)]], premissas: clcDescReg(reg).concat(["Fase pré-judicial: correção pelo " + CLC_ROT_CORR[pre] + " e juros pela TR (soma das taxas) até o mês anterior ao da citação. Da citação em diante: Selic (juros e correção)."]), tabelas: [cuTabParcelas(r), cuTabIndices(r, ps.length > 1)].filter(Boolean), resumo: cuResumoCalc(r), total: ["TOTAL ATUALIZADO", clcBrl(r.total)], avisos: av, fundamentos: ["STF, ADC 58 e ADI 5867 (18/12/2020): IPCA-E + juros da TR na fase pré-judicial; Selic a partir da citação.", "CLT, art. 879, § 7º (Reforma Trabalhista, parte declarada inconstitucional pelo STF quanto à TR)."] };
+    }));
+  } else if (s === "resc") {
+    g.append(cuCampo("rs_tipo", "Modalidade", { t: "sel", ops: CU_TIPO_RESC, p: "sjc" }), cuCampo("rs_adm", "Admissão", { t: "date" }), cuCampo("rs_desl", "Último dia trabalhado / desligamento", { t: "date" }), cuCampo("rs_rem", "Remuneração mensal (R$)", { t: "num", dica: "Inclua adicionais habituais e médias." }),
+      cuCampo("rs_aviso", "Aviso prévio", { t: "sel", ops: [["indenizado", "Indenizado (projeta a data de saída)"], ["trabalhado", "Trabalhado"], ["naocumprido", "Não cumprido pelo empregado (pedido de demissão)"], ["nenhum", "Não se aplica"]], p: "indenizado" }), cuCampo("rs_13", "13º salário já pago no ano (R$)", { t: "num" }),
+      cuCampo("rs_fv", "Períodos de férias vencidas simples (nº)", { t: "num", p: "0" }), cuCampo("rs_fvd", "Períodos de férias vencidas em dobro (nº)", { t: "num", p: "0" }), cuCampo("rs_fgts", "Saldo do FGTS depositado (R$, para a multa)", { t: "num" }));
+    box.appendChild(g); box.appendChild(cuCampo("rs_477", "Incluir multa do art. 477, § 8º, da CLT (1 remuneração, pagamento fora do prazo)", { t: "chk" }));
+    box.appendChild(cuBotao("Calcular verbas", async () => {
+      const adm = cuDtBr(cuTxt("rs_adm")), desl = cuDtBr(cuTxt("rs_desl")), rem = cuNum("rs_rem"); if (!adm || !desl || !(rem > 0)) throw new Error("Informe admissão, desligamento e remuneração.");
+      const x = clcRescisao({ tipo: CU.d.rs_tipo, adm, desl, rem, aviso: CU.d.rs_aviso, decimoPago: cuNum("rs_13"), fvSimples: Math.round(cuNum("rs_fv")), fvDobro: Math.round(cuNum("rs_fvd")), fgts: cuNum("rs_fgts"), multa477: cuBool("rs_477") }); if (x.erro) throw new Error(x.erro);
+      const nome = CU_TIPO_RESC.find(t => t[0] === CU.d.rs_tipo)[1];
+      return { arq: "verbas rescisorias", titulo: "Verbas rescisórias — " + nome, dados: [["Admissão", br(adm)], ["Desligamento", br(desl)], ["Remuneração", clcBrl(rem)], ["Tempo de serviço", x.anos + " ano(s) completo(s)"], ["Aviso prévio proporcional", x.avisoDias + " dias"]], tabelas: [{ titulo: "Verbas", cab: ["Verba", "Cálculo", "Valor"], linhas: x.linhas.map(l => [l[0], l[1], clcBrl(l[2])]), n: [false, false, true] }], resumo: [["Verbas rescisórias", clcBrl(x.totalVerbas)], ["FGTS e multa do FGTS", clcBrl(x.totalFgts)]], total: ["TOTAL", clcBrl(x.total)], avisos: x.avisos, fundamentos: ["CLT arts. 477, 478, 484-A, 487; Lei 12.506/2011 (aviso proporcional); Lei 8.036/90 art. 18; Súmula 450 do TST (férias em dobro)."] };
+    }));
+  } else {
+    g.append(cuCampo("he_sal", "Salário-base mensal (R$)", { t: "num" }), cuCampo("he_div", "Divisor da hora", { t: "num", p: "220", dica: "220 (44 h semanais), 200 (40 h) ou o da norma coletiva." }), cuCampo("he_h50", "Horas extras 50% por mês", { t: "num", p: "0" }), cuCampo("he_a50", "Adicional (%)", { t: "num", p: "50" }), cuCampo("he_h100", "Horas extras 100% por mês", { t: "num", p: "0" }), cuCampo("he_a100", "Adicional (%)", { t: "num", p: "100" }),
+      cuCampo("he_du", "Dias úteis do mês", { t: "num", p: "25", dica: "Inclui sábados; exclui domingos e feriados." }), cuCampo("he_df", "Domingos e feriados do mês", { t: "num", p: "5" }), cuCampo("he_meses", "Quantidade de meses", { t: "num", p: "12" }));
+    box.appendChild(g); box.appendChild(cuCampo("he_40", "Incluir multa de 40% do FGTS sobre os reflexos", { t: "chk" }));
+    box.appendChild(cuBotao("Calcular", async () => {
+      const sal = cuNum("he_sal"), div = cuNum("he_div"); if (!(sal > 0) || !(div > 0)) throw new Error("Informe salário e divisor.");
+      const x = clcHorasExtras({ sal, div, h50: cuNum("he_h50"), a50: cuNum("he_a50"), h100: cuNum("he_h100"), a100: cuNum("he_a100"), diasUteis: cuNum("he_du"), domFer: cuNum("he_df"), meses: Math.max(1, Math.round(cuNum("he_meses"))), multaFgts: cuBool("he_40") });
+      return { arq: "horas extras", titulo: "Horas extras e reflexos", dados: [["Salário-base", clcBrl(sal)], ["Divisor", String(div)], ["Meses", String(x.meses)]], tabelas: [{ titulo: "Valores mensais", cab: ["Verba", "Cálculo", "Valor"], linhas: x.linhas.map(l => [l[0], l[1], clcBrl(l[2])]), n: [false, false, true] }], resumo: [["Total mensal com reflexos", clcBrl(x.totalMes)]], total: ["TOTAL (" + x.meses + " meses, sem correção)", clcBrl(x.total)], avisos: x.avisos, fundamentos: ["CLT art. 59 e CF art. 7º, XVI; Súmula 172 do TST (DSR); Súmula 264 do TST (hora extra); reflexos em 13º, férias + 1/3 e FGTS. Para atualizar o total, use “Atualização de crédito (ADC 58)”."] };
+    }));
+  }
+}
+
+// ---------- PREVIDENCIÁRIO
+const CU_ESP = [["programada", "Aposentadoria programada (regra geral, EC 103/2019)"], ["incap", "Aposentadoria por incapacidade permanente (comum)"], ["incapacid", "Aposentadoria por incapacidade — acidente/doença do trabalho (100%)"], ["temp", "Auxílio por incapacidade temporária (91%)"], ["acidente", "Auxílio-acidente (50%)"], ["pensao", "Pensão por morte (50% + 10% por dependente)"]];
+function cuFormPrev(box) {
+  const bar = el("div", "tabs"); for (const [k, n] of [["atrasos", "Atrasados (diferenças)"], ["rmi", "RMI estimada"], ["tempo", "Tempo de contribuição"]]) { const b = el("button", "", n); b.type = "button"; b.setAttribute("aria-selected", CU.sub.prev === k); b.onclick = () => { CU.sub.prev = k; cuDesenhar(); }; bar.appendChild(b); } box.appendChild(bar);
+  const s = CU.sub.prev, g = el("div", "intgrid");
+  if (s === "atrasos") {
+    g.append(cuCampo("pv_dib", "DIB (início das diferenças)", { t: "date" }), cuCampo("pv_ate", "Diferenças até (data da implantação/sentença)", { t: "date", p: hojeIso() }), cuCampo("pv_dif", "Diferença mensal (R$)", { t: "num", dica: "RMI devida menos o que foi pago." }), cuCampo("pv_fim", "Data do cálculo", { t: "date", p: hojeIso() }),
+      cuCampo("pv_marco", "Ajuizamento (prescrição quinquenal, opcional)", { t: "date", dica: "Parcelas anteriores a 5 anos desta data são excluídas (Súmula 85 do STJ)." }), cuCampo("pv_cit", "Citação (juros de mora desde)", { t: "date", dica: "Tema 905 do STJ: juros desde a citação; antes só correção." }),
+      cuCampo("pv_corr", "Índice de correção até 11/2021", { t: "sel", ops: [["inpc", "INPC (Tema 905/Lei 8.213 art. 41-A)"], ["ipcae", "IPCA-E"], ["ipca", "IPCA"]], p: "inpc" }), cuCampo("pv_jant", "Juros antes de 07/2009 (% a.m., simples)", { t: "num", p: "1" }), cuModoSelic("pv_"),
+      cuCampo("pv_honpct", "Honorários (%) sobre parcelas até a sentença", { t: "num", ph: "ex.: 10" }), cuCampo("pv_sent", "Data da sentença/acórdão (limite — Súmula 111 do STJ)", { t: "date" }));
+    box.appendChild(g); box.appendChild(cuCampo("pv_13", "Incluir o 13º salário (abono anual) de cada ano", { t: "chk", p: true })); box.appendChild(cuInclFim("pv_"));
+    box.appendChild(cuBotao("Calcular atrasados", async () => {
+      const dib = cuDtBr(cuTxt("pv_dib")), ate = cuDtBr(cuTxt("pv_ate")), fim = cuDtBr(cuTxt("pv_fim")), dif = cuNum("pv_dif"); if (!dib || !ate || !fim || !(dif > 0)) throw new Error("Informe DIB, data final das diferenças, data do cálculo e a diferença mensal.");
+      if (ate < dib) throw new Error("A data final é anterior à DIB."); const marco = cuDtBr(cuTxt("pv_marco")), cit = cuDtBr(cuTxt("pv_cit")), sent = cuDtBr(cuTxt("pv_sent"));
+      const pa = clcParcelasAtrasados({ dib, ate: clcMes(ate), marco, dif, treze: cuBool("pv_13") }); if (!pa.parcelas.length) throw new Error("Nenhuma parcela no período (confira as datas).");
+      const reg = clcRegFazenda({ corr: CU.d.pv_corr, jurosAnt: cuNum("pv_jant") }), series = cuSeriesDe(CU.d.pv_corr, "selic", "poup", "tr"); await cuGarantir(series);
+      const hp = cuNum("pv_honpct"), r = clcCalcular({ parcelas: pa.parcelas, motor: { reg, fim, incluirFim: cuBool("pv_inclfim"), selicModo: CU.d.pv_selic, jurosIni: cit } });
+      if (hp) { const lim = sent ? clcMes(sent) : ""; let b = 0; r.linhas.forEach(L => { if (!lim || clcMes(L.ini) <= lim) b += L.corrigido + L.juros; }); const h = clcR2(b * hp / 100); r.extras.push(["Honorários advocatícios (" + clcPct(hp) + " sobre as parcelas até " + (sent ? br(sent) : "o cálculo") + ": " + clcBrl(b) + ")", h]); r.total = clcR2(r.total + h); }
+      const prem = clcDescReg(reg).concat(["Competências de " + clcMes(pa.parcelas[0].ini).slice(5) + "/" + clcMes(pa.parcelas[0].ini).slice(0, 4) + " a " + clcMes(ate).slice(5) + "/" + clcMes(ate).slice(0, 4) + ", " + pa.parcelas.length + " parcela(s)" + (cuBool("pv_13") ? " (inclui 13º)" : "") + ".", cit ? "Juros de mora a partir de " + br(cit) + "; antes disso, apenas correção." : "Sem data de citação: os juros foram contados do vencimento de cada parcela (confira a sentença)."]);
+      const av = cuAvisosIndices(null, series, fim, cuBool("pv_inclfim")); if (pa.prescrito) av.push("Prescrição quinquenal aplicada: parcelas anteriores a " + clcMes(pa.corte).slice(5) + "/" + clcMes(pa.corte).slice(0, 4) + " foram excluídas."); if (r.avisos.length) av.push("Índices ausentes (não aplicados): " + r.avisos.slice(0, 8).join(", "));
+      av.push("Cada parcela vence no mês seguinte à competência; este cálculo usa o 1º dia da competência como data-base (conferir com a decisão). Confira também descontos de benefícios inacumuláveis e valores já pagos.");
+      const t = cuTabParcelas(r); return { arq: "atrasados previdenciarios", titulo: "Atrasados previdenciários", dados: [["DIB", br(dib)], ["Diferenças até", br(ate)], ["Diferença mensal", clcBrl(dif)], ["Data do cálculo", br(fim)]], premissas: prem, tabelas: [t, cuTabIndices(r, true)].filter(Boolean), resumo: cuResumoCalc(r), total: ["TOTAL ATUALIZADO", clcBrl(r.total)], avisos: av, fundamentos: ["STJ, Tema 905 (REsp 1.495.146): INPC na correção e juros da poupança (art. 1º-F da Lei 9.494/97) até 11/2021; EC 113/2021: Selic desde 12/2021.", "Súmula 85 do STJ (prescrição quinquenal das parcelas); Súmula 111 do STJ (honorários sobre parcelas até a sentença)."] };
+    }));
+  } else if (s === "rmi") {
+    g.append(cuCampo("rm_esp", "Espécie", { t: "sel", ops: CU_ESP, p: "programada" }), cuCampo("rm_sexo", "Sexo (para o tempo exigido)", { t: "sel", ops: [["M", "Homem (20 anos)"], ["F", "Mulher (15 anos)"]], p: "M" }), cuCampo("rm_media", "Média salarial / base de cálculo (R$)", { t: "num", dica: "100% dos salários de contribuição desde 07/1994, corrigidos. Calcule à parte e informe aqui." }),
+      cuCampo("rm_anos", "Tempo de contribuição — anos", { t: "num", p: "0" }), cuCampo("rm_meses", "Meses", { t: "num", p: "0" }), cuCampo("rm_dep", "Dependentes (pensão)", { t: "num", p: "1" }), cuCampo("rm_sm", "Salário mínimo vigente (R$)", { t: "num", p: "1.621,00" }), cuCampo("rm_teto", "Teto do RGPS vigente (R$)", { t: "num", p: "8.475,55", dica: "Confira o valor atual da portaria interministerial." }));
+    box.appendChild(g); box.appendChild(cuCampo("rm_prop", "Considerar meses proporcionais no acréscimo de 2% (alguns julgados admitem)", { t: "chk" }));
+    box.appendChild(cuBotao("Calcular RMI", async () => {
+      const media = cuNum("rm_media"); if (!(media > 0)) throw new Error("Informe a média salarial.");
+      const x = clcRMI({ esp: CU.d.rm_esp, sexo: CU.d.rm_sexo, media, anos: Math.round(cuNum("rm_anos")), meses: Math.round(cuNum("rm_meses")), prop: cuBool("rm_prop"), deps: Math.max(0, Math.round(cuNum("rm_dep"))), salmin: cuNum("rm_sm"), teto: cuNum("rm_teto") || 1e12 });
+      return { arq: "rmi", titulo: "Renda mensal inicial (estimativa)", dados: [["Espécie", x.nome], ["Média salarial", clcBrl(media)], ["Tempo de contribuição", Math.round(cuNum("rm_anos")) + " ano(s) e " + Math.round(cuNum("rm_meses")) + " mês(es)"]], tabelas: [{ titulo: "Apuração", cab: ["Item", "Detalhe"], linhas: x.linhas.map(l => [l[0], l[1]]), n: [false, false] }, { titulo: "Resultado", cab: ["Item", "Valor"], linhas: [["Coeficiente", clcPct(x.pct, 2)], ["Média × coeficiente", clcBrl(x.bruto)], ["RMI após mínimo/teto", clcBrl(x.rmi)]], n: [false, true], total: true }], total: ["RMI ESTIMADA", clcBrl(x.rmi)], avisos: x.avisos, fundamentos: ["EC 103/2019, arts. 23, 26 e 27; Lei 8.213/91, arts. 29, 44, 61 e 86."] };
+    }));
+  } else {
+    g.append(cuCampo("tc_sexo", "Sexo (fatores de conversão)", { t: "sel", ops: [["M", "Homem"], ["F", "Mulher"]], p: "M" }), cuCampo("tc_per", "Períodos (um por linha: dd/mm/aaaa a dd/mm/aaaa [; 25|20|15 para atividade especial])", { t: "area", rows: 6, larg: true, ph: "01/03/1995 a 30/06/2001\n01/07/2001 a 31/12/2005 ; 25\n01/02/2006 a 15/05/2019" }));
+    box.appendChild(g); box.appendChild(cuBotao("Somar tempo", async () => {
+      const x = clcTempo(cuTxt("tc_per"), CU.d.tc_sexo); if (!x.linhas.length) throw new Error("Informe ao menos um período (ex.: 01/03/1995 a 30/06/2001).");
+      return { arq: "tempo de contribuicao", titulo: "Tempo de contribuição", dados: [["Total", x.anos + " ano(s), " + x.meses + " mês(es) e " + x.diasR + " dia(s)"], ["Dias (convertidos)", String(x.dias)]], premissas: ["Ano = 365 dias; mês = 30 dias.", "Conversão de tempo especial em comum só para períodos até 13/11/2019 (EC 103/2019). Fatores: homem 1,40 (25 anos), 1,75 (20), 2,33 (15); mulher 1,20 (25), 1,50 (20), 2,00 (15)."], tabelas: [{ titulo: "Períodos", cab: ["Período", "Contagem", "Dias computados"], linhas: x.linhas.map(l => [l[0], l[1], String(l[2])]), n: [false, false, true] }], resumo: x.convExtra ? [["Acréscimo por conversão de tempo especial", x.convExtra + " dias"]] : [], total: ["TEMPO TOTAL", x.anos + " a " + x.meses + " m " + x.diasR + " d"], avisos: x.avisos, fundamentos: ["Lei 8.213/91, art. 57 e 58; Decreto 3.048/99, art. 70; EC 103/2019, art. 25, § 2º."] };
+    }));
+  }
+}
+
+// ---------- TRIBUTÁRIO
+function cuFormTrib(box) {
+  const bar = el("div", "tabs"); for (const [k, n] of [["debito", "Débito em atraso (multa + Selic)"], ["rest", "Restituição / compensação (Selic)"]]) { const b = el("button", "", n); b.type = "button"; b.setAttribute("aria-selected", CU.sub.trib === k); b.onclick = () => { CU.sub.trib = k; cuDesenhar(); }; bar.appendChild(b); } box.appendChild(bar);
+  const g = el("div", "intgrid");
+  if (CU.sub.trib === "debito") {
+    g.append(cuCampo("tb_fim", "Data do pagamento / do cálculo", { t: "date", p: hojeIso() }), cuParcelasCampo("tb_", "Débitos (vencimento; valor; descrição)", "20/03/2023; 4.800,00; COFINS 02/2023\n20/04/2023; 5.100,00; COFINS 03/2023"), cuCampo("tb_multa", "Multa de mora (% ao dia)", { t: "num", p: "0,33" }), cuCampo("tb_max", "Limite da multa (%)", { t: "num", p: "20" }), cuCampo("tb_enc", "Encargo/honorários sobre o débito consolidado (%)", { t: "num", dica: "Ex.: 20% (DL 1.025/69) quando o débito está inscrito em dívida ativa." }), cuModoSelic("tb_"));
+    box.appendChild(g);
+    box.appendChild(cuBotao("Calcular", async () => {
+      const fim = cuDtBr(cuTxt("tb_fim")); if (!fim) throw new Error("Informe a data do pagamento/cálculo."); const { ps, erros } = cuParcelas(cuTxt("tb_parc")); if (!ps.length) throw new Error("Informe ao menos um débito (vencimento; valor)."); await cuGarantir(["selic"]);
+      const r = clcCalcular({ parcelas: ps, motor: { reg: clcRegTrib(), fim, incluirFim: false, selicModo: CU.d.tb_selic, fimEm: "juros", fimPct: 1 }, multaMora: { dia: cuNum("tb_multa"), max: cuNum("tb_max") }, honPct: cuNum("tb_enc") });
+      const av = cuAvisosIndices(null, ["selic"], fim, false); if (r.avisos.length) av.push("Selic ausente (não aplicada): " + r.avisos.slice(0, 8).join(", ")); if (erros.length) av.push("Linhas ignoradas: " + erros.slice(0, 3).join(" | "));
+      av.push("Débito pago no mesmo mês do vencimento: não há juros, apenas a multa de mora. Verifique prazos de vencimento (dia útil seguinte) e a base legal de cada tributo (estadual/municipal têm taxas próprias).");
+      return { arq: "tributario debito", titulo: "Débito tributário federal em atraso", dados: [["Data do pagamento", br(fim)], ["Parcelas", String(ps.length)]], premissas: ["Multa de mora de " + clcPct(cuNum("tb_multa")) + " ao dia, limitada a " + clcPct(cuNum("tb_max")) + ", sobre o principal original, contada do dia seguinte ao vencimento.", "Juros pela Selic acumulada: do mês seguinte ao vencimento até o mês anterior ao do pagamento, mais 1% no mês do pagamento." + (CU.d.tb_selic === "composta" ? " Selic capitalizada." : " Selic somada mensalmente.")], tabelas: [cuTabParcelas(r), cuTabIndices(r, ps.length > 1)].filter(Boolean), resumo: cuResumoCalc(r, "Correção monetária (não há; juros pela Selic)"), total: ["TOTAL A PAGAR", clcBrl(r.total)], avisos: av, fundamentos: ["Lei 9.430/96, art. 61 (multa de mora) e art. 5º, § 3º, e 61, § 3º (juros pela Selic); Lei 8.981/95, art. 84."] };
+    }));
+  } else {
+    g.append(cuCampo("rt_pag", "Data do pagamento indevido", { t: "date" }), cuCampo("rt_val", "Valor pago indevidamente (R$)", { t: "num" }), cuCampo("rt_fim", "Data da restituição / compensação", { t: "date", p: hojeIso() }), cuModoSelic("rt_"));
+    box.appendChild(g);
+    box.appendChild(cuBotao("Calcular", async () => {
+      const pag = cuDtBr(cuTxt("rt_pag")), fim = cuDtBr(cuTxt("rt_fim")), val = cuNum("rt_val"); if (!pag || !fim || !(val > 0)) throw new Error("Informe a data do pagamento, o valor e a data da restituição."); await cuGarantir(["selic"]);
+      const r = clcCalcular({ parcelas: [{ ini: pag, valor: val, rot: "Pagamento de " + br(pag) }], motor: { reg: clcRegRest(), fim, incluirFim: false, selicModo: CU.d.rt_selic, fimEm: "corr", fimPct: 1 } });
+      const av = cuAvisosIndices(null, ["selic"], fim, false); if (r.avisos.length) av.push("Selic ausente (não aplicada): " + r.avisos.slice(0, 8).join(", "));
+      av.push("A Selic substitui correção e juros (Lei 9.250/95, art. 39, § 4º). Para repetição de indébito em juízo, confira se a sentença fixou termo inicial diferente (ex.: trânsito em julgado, Súmula 188 do STJ).");
+      return { arq: "restituicao", titulo: "Restituição / compensação de tributo", dados: [["Pagamento indevido", br(pag) + " — " + clcBrl(val)], ["Restituição/compensação", br(fim)]], premissas: ["Selic acumulada: do mês seguinte ao pagamento até o mês anterior ao da restituição, mais 1% no mês da restituição." + (CU.d.rt_selic === "composta" ? " Selic capitalizada." : " Selic somada mensalmente.")], tabelas: [cuTabParcelas(r), cuTabIndices(r, false)].filter(Boolean), resumo: [["Valor original", clcBrl(val)], ["Selic acumulada", clcBrl(r.soma.corrigido - val)]], total: ["TOTAL A RESTITUIR", clcBrl(r.total)], avisos: av, fundamentos: ["Lei 9.250/95, art. 39, § 4º; Lei 9.430/96, art. 74 (compensação); CTN, art. 167, parágrafo único."] };
+    }));
+  }
+}
+
+// ---------- ÍNDICES
+function cuFormIndices(box) {
+  const p = el("div", "panel"); p.appendChild(el("div", "hint", "Índices mensais oficiais vindos do Banco Central (SGS). São baixados automaticamente ao calcular (1 vez por dia) e guardados neste navegador. Você pode corrigir ou complementar qualquer mês colando os valores."));
+  const w = el("div", "cu-tw"), tb = el("table", "cu-tab"), th = el("tr"); ["Índice", "Série", "Último mês", "Último valor", "Meses"].forEach((c, i) => th.appendChild(el("th", i > 2 ? "n" : "", c))); tb.appendChild(th);
+  for (const s of Object.keys(CLC_SERIES)) { const u = clcUltimoMes(s), n = Object.keys(Object.assign({}, CX.idx[s] || {}, CX.manual[s] || {})).length, tr = el("tr"); tr.append(el("td", "", CLC_SERIES[s][1]), el("td", "", "SGS " + CLC_SERIES[s][0]), el("td", "", u ? u.slice(5) + "/" + u.slice(0, 4) : "—"), el("td", "n", u ? (s === "salmin" ? clcBrl(clcTaxa(s, u)) : clcPct(clcTaxa(s, u), 4)) : "—"), el("td", "n", String(n))); tb.appendChild(tr); }
+  w.appendChild(tb); p.appendChild(w); const m = el("div", "msg"); m.hidden = true; m.id = "cuIdxMsg";
+  const ac = el("div", "acts"); ac.append(btn("Atualizar do Banco Central", async e => { e.target.disabled = true; intMsg(m, "Baixando…"); try { const er = await clcCarregar(Object.keys(CLC_SERIES), true); intMsg(m, er.length ? "Não baixou: " + er.join("; ") : "Índices atualizados.", !!er.length); } finally { e.target.disabled = false; setTimeout(cuDesenhar, 800); } }, ""), btn("Limpar ajustes manuais", () => { CX.manual = {}; LS.setLocal("indices_manual", {}); cuDesenhar(); }));
+  p.append(ac, m);
+  const g = el("div", "intgrid"); g.append(cuCampo("ix_serie", "Índice a ajustar", { t: "sel", ops: Object.keys(CLC_SERIES).map(s => [s, CLC_SERIES[s][1]]), p: "inpc" }), cuCampo("ix_txt", "Valores (um por linha: mm/aaaa; taxa %)", { t: "area", rows: 5, ph: "09/2026; 0,48\n10/2026; 0,39", larg: true }));
+  const mm = el("div", "msg"); mm.hidden = true; p.appendChild(el("h3", "", "Colar índices manualmente")); p.appendChild(g);
+  const a2 = el("div", "acts"); a2.append(btn("Importar valores", () => { const n = clcImportarManual(CU.d.ix_serie, CU.d.ix_txt); intMsg(mm, n ? n + " mês(es) importado(s)." : "Nenhuma linha entendida (formato: 09/2026; 0,48).", !n); if (n) setTimeout(cuDesenhar, 900); }, "")); p.append(a2, mm); box.appendChild(p);
+}
+
+// ---------- tela
+function cuDesenhar() {
+  const box = $("cuCorpo"); if (!box) return; box.textContent = ""; const bar = el("div", "tabs noprint"); bar.setAttribute("role", "tablist");
+  for (const [k, n] of CU_ABAS) { const b = el("button", "", n); b.type = "button"; b.setAttribute("role", "tab"); b.setAttribute("aria-selected", CU.aba === k); b.onclick = () => { CU.aba = k; cuDesenhar(); }; bar.appendChild(b); }
+  box.appendChild(bar); const p = el("div", "panel noprint cu-form"); box.appendChild(p);
+  p.appendChild(el("div", "hint", "Cálculos de apoio: confira sempre as premissas e a decisão/título que manda no caso. Nada é enviado a terceiros, exceto a consulta pública de índices ao Banco Central."));
+  if (CU.aba === "civel") cuFormCivel(p); else if (CU.aba === "trab") cuFormTrab(p); else if (CU.aba === "prev") cuFormPrev(p); else if (CU.aba === "trib") cuFormTrib(p); else cuFormIndices(p);
+  const er = el("div", "msg"); er.id = "cuErro"; er.hidden = true; p.appendChild(er);
+  const rs = el("div"); rs.id = "cuRes"; rs.hidden = true; box.appendChild(rs); if (CU.res && CU.res.aba === CU.aba) cuRes();
+}
+
+
 /* ===== 50-app: navegação, painel inicial, backup e inicialização ===== */
 const VIEWS = {
   meu: ["Meu painel", ""],
@@ -3990,7 +4587,8 @@ const VIEWS = {
   relatorios: ["Relatórios", "Indicadores e gráficos do cliente pesquisado, prontos para imprimir ou apresentar"],
   advogados: ["Advogados", "Publicações do DJEN em nome de Fábio (OAB/SC 15.044) e Davi (OAB/SC 39.336)"],
   organizacao: ["Organização", "Tarefas, prazos e rotina do escritório"],
-  integracoes: ["Integrações", "Google Drive (pastas, modelos, backup) e assistentes de IA (Claude e Gemini)"],
+  calculos: ["Cálculos", "Atualização de débitos, verbas trabalhistas, atrasados e RMI previdenciários, tributos e índices oficiais"],
+  integracoes: ["Integrações", "Google Drive (pastas, modelos, backup) e assistentes de IA (Claude, Gemini e JusIA)"],
   usuarios: ["Usuários", "Pedidos de acesso e perfis de cada pessoa"]
 };
 function vistaAtual() { const v = (location.hash || "").replace("#", ""); return VIEWS[v] && podeVer(v) ? v : homeDoPapel(); }
@@ -4005,6 +4603,7 @@ function desenharVista(v) {
   if (v === "meu") meuDesenhar();
   if (v === "secretaria") secDesenhar();
   if (v === "integracoes") intDesenhar();
+  if (v === "calculos") cuDesenhar();
   if (v === "usuarios") usuariosAtualizar();
 }
 function atualizarTudo() { desenharVista(vistaAtual()); atualizarBadges(); }
@@ -4047,7 +4646,7 @@ function inicioDesenhar() {
 
 // ---- backup dos dados deste navegador
 $("bkExp").onclick = () => {
-  const dados = {}; try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k.startsWith("djen.") && k !== "djen.ultima" && k !== "djen.ia") dados[k] = localStorage.getItem(k); } } catch (e) {}
+  const dados = {}; try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k.startsWith("djen.") && k !== "djen.ultima" && k !== "djen.ia" && k !== "djen.indices") dados[k] = localStorage.getItem(k); } } catch (e) {}
   salvar(new Blob([JSON.stringify({ app: "radar-djen-lunelli", versao: 1, geradoEm: new Date().toISOString(), dados })], { type: "application/json" }), "backup-app-organizacao-" + hojeIso() + ".json");
 };
 $("bkImp").onclick = () => $("bkFile").click();
