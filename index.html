@@ -225,6 +225,35 @@ fieldset.calc legend{font-size:12px;color:var(--muted);padding:0 6px}
 #v-processos .hd .acts input,#v-processos .hd .acts select{width:auto;min-width:0}
 #pBusca{min-width:200px}
 
+/* ---- Login, papéis e telas por perfil */
+.nav a[hidden]{display:none}
+.side .foot .userbox{border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:2px}
+.userbox .un{color:#fff;font-weight:600;overflow-wrap:anywhere}
+.userbox .up{font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.8;margin-bottom:4px}
+body.sem-sessao .app{visibility:hidden}
+.login{position:fixed;inset:0;z-index:50;background:linear-gradient(160deg,#000065,#00003a);display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto}
+.lg-card{background:var(--surface);color:var(--ink);border-radius:14px;width:min(430px,100%);box-shadow:0 20px 60px rgba(0,0,0,.4);overflow:hidden}
+.lg-top{background:#000065;padding:20px 24px 16px;display:flex;flex-direction:column;gap:8px}
+.lg-top .logo{width:170px}
+.lg-sub{color:#b7bde6;font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+.lg-body{padding:22px 24px 24px;display:flex;flex-direction:column;gap:12px}
+.lg-body h2{margin:0;font-size:19px}
+.lg-body form,.lg-body #lgEspera{display:flex;flex-direction:column;gap:12px}
+.lg-body label{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--muted)}
+.lg-body label.inl{flex-direction:row;align-items:center;gap:6px;color:var(--ink);font-size:14px}
+.lg-body input[type=email],.lg-body input[type=password],.lg-body input[type=text]{width:100%}
+.lg-fn{border:1px solid var(--line);border-radius:8px;display:flex;gap:18px;padding:6px 12px 8px}
+.lg-fn legend{font-size:12px;color:var(--muted);padding:0 4px}
+.lg-links{display:flex;justify-content:space-between;font-size:13px}
+.lg-links a{color:var(--accent)}
+.nvaviso{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:60;background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn);border-radius:8px;padding:8px 14px;font-size:13px;max-width:92vw;box-shadow:var(--shadow)}
+.nvaviso.err{background:var(--crit-soft);color:var(--crit);border-color:var(--crit)}
+.ucard{border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin-bottom:8px}
+.ucard .info{flex:1 1 240px;min-width:0;overflow-wrap:anywhere}
+.ucard select{width:auto}
+#v-secretaria .tk{margin:0}
+@media print{#login,.nvaviso{display:none!important}}
+
 </style>
 </head>
 <body>
@@ -233,24 +262,61 @@ fieldset.calc legend{font-size:12px;color:var(--muted);padding:0 6px}
   <div><span class="logo" role="img" aria-label="Lunelli Advocacia"></span></div>
   <div class="tagline">Advocacia Empresarial</div>
   <nav class="nav" id="nav" aria-label="Seções">
+    <a href="#meu" data-v="meu" hidden><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>Meu painel<span class="bd red" id="bdMeu" hidden></span></a>
+    <a href="#secretaria" data-v="secretaria" hidden><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Secretaria<span class="bd red" id="bdSec" hidden></span></a>
     <a href="#inicio" data-v="inicio"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>Início</a>
     <a href="#consulta" data-v="consulta"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>Consulta</a>
     <a href="#processos" data-v="processos"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Processos<span class="bd" id="bdProc" hidden></span></a>
     <a href="#relatorios" data-v="relatorios"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Relatórios</a>
     <a href="#advogados" data-v="advogados"><svg viewBox="0 0 24 24"><path d="M12 3v18M5 7h14M5 7l-3 7a3 3 0 006 0zM19 7l-3 7a3 3 0 006 0z"/></svg>Advogados<span class="bd" id="bdAdv" hidden></span></a>
     <a href="#organizacao" data-v="organizacao"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="10" rx="1"/><rect x="17" y="4" width="4" height="6" rx="1"/></svg>Organização<span class="bd red" id="bdOrg" hidden></span></a>
+    <a href="#usuarios" data-v="usuarios" hidden><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.6 3-6 7-6s7 2.4 7 6M17 5a3.5 3.5 0 010 7M22 20c0-2.8-1.8-4.8-4.5-5.6"/></svg>Usuários<span class="bd red" id="bdUsr" hidden></span></a>
   </nav>
   <div class="foot">
+    <div class="userbox" id="userBox" hidden><div class="un" id="userNome"></div><div class="up" id="userPapel"></div><button type="button" id="btnSair">Sair</button></div>
     <button type="button" id="bkExp">Baixar backup dos dados</button>
     <button type="button" id="bkImp">Restaurar backup…</button>
     <input type="file" id="bkFile" accept="application/json,.json" hidden>
-    <span>Os dados (nomes salvos, tarefas, marcações) ficam só neste navegador.</span>
+    <span id="footTexto">Os dados (nomes salvos, tarefas, marcações) ficam só neste navegador.</span>
   </div>
 </aside>
 
 <div class="main">
 <header class="topbar"><div><h1 id="titulo">Início</h1><p class="sub" id="subtitulo"></p></div><div class="acts noprint" id="topActs"></div></header>
 <main class="content">
+
+<!-- ===================== MEU PAINEL (cada advogado) ===================== -->
+<section class="view" id="v-meu" hidden>
+  <div class="kpis" id="meuKpis"></div>
+  <div class="cols2">
+    <div class="panel"><h2>Minha agenda <span class="hint">atrasados e próximos 14 dias</span></h2><div id="meuAgenda"></div></div>
+    <div class="panel"><h2>Minhas tarefas <button class="btn sm" id="meuNovaTarefa" type="button">Nova tarefa</button></h2><div id="meuTarefas"></div></div>
+  </div>
+  <div class="panel"><h2>Publicações novas para mim <a class="btn sec sm" href="#advogados">Abrir todas</a></h2><div class="list" id="meuPubs"></div></div>
+  <div class="panel"><h2>Minhas pastas <button class="btn sec sm" id="meuTodasPastas" type="button">Ver todas</button></h2><div id="meuPastas"></div></div>
+</section>
+
+<!-- ===================== SECRETARIA ===================== -->
+<section class="view" id="v-secretaria" hidden>
+  <div class="kpis" id="secKpis"></div>
+  <div class="panel"><h2>Registrar rapidamente</h2>
+    <div class="grid"><label class="wide">Processo <select id="secProc"></select></label></div>
+    <div class="acts"><button class="btn" id="secAud" type="button">Audiência</button><button class="btn" id="secPrazo" type="button">Prazo</button><button class="btn" id="secTarefa" type="button">Tarefa</button><a class="btn sec" href="#processos">Cadastrar processo pelo número</a></div>
+    <div class="hint">Escolha o processo e o tipo de registro. Para um processo novo, use “Cadastrar processo pelo número”: o site busca os dados no DJEN sozinho.</div>
+  </div>
+  <div class="cols2">
+    <div class="panel"><h2>Agenda dos próximos 14 dias</h2><div id="secAgenda"></div></div>
+    <div class="panel"><h2>Tarefas da secretaria <button class="btn sm" id="secNovaTarefa" type="button">Nova tarefa</button></h2><div class="list" id="secTarefas"></div></div>
+  </div>
+  <div class="panel"><h2>Publicações recentes dos advogados <a class="btn sec sm" href="#processos">Pastas</a></h2><div class="list" id="secPubs"></div></div>
+</section>
+
+<!-- ===================== USUÁRIOS (administrador) ===================== -->
+<section class="view" id="v-usuarios" hidden>
+  <div class="panel"><h2>Pedidos de acesso pendentes</h2><div id="usPend"></div></div>
+  <div class="panel"><h2>Usuários com acesso</h2><div id="usAtivos"></div></div>
+  <div class="panel"><h2>Dados antigos deste navegador</h2><div id="usLocais"></div></div>
+</section>
 
 <!-- ===================== INÍCIO ===================== -->
 <section class="view" id="v-inicio" hidden>
@@ -333,7 +399,7 @@ fieldset.calc legend{font-size:12px;color:var(--muted);padding:0 6px}
       <textarea id="pNums" placeholder="Ex.: 0001234-56.2026.8.24.0023"></textarea>
       <div class="grid">
         <label>Cliente (pasta) <input type="text" id="pCli" list="dlClientes" autocomplete="off" placeholder="Opcional: se vazio, tenta reconhecer pelos nomes salvos"></label>
-        <label>Responsável <select id="pResp"><option>Davi</option><option>Fábio</option><option>Equipe</option></select></label>
+        <label>Responsável <select id="pResp"><option>Davi</option><option>Fábio</option><option>Equipe</option><option>Secretaria</option></select></label>
       </div>
       <div class="acts"><button class="btn" id="pBuscar" type="button">Buscar no DJEN e cadastrar</button><button class="btn danger" id="pParar" type="button" hidden>Parar</button><span class="hint" id="pStatus"></span></div>
       <ul class="mini" id="pRelat"></ul>
@@ -341,7 +407,7 @@ fieldset.calc legend{font-size:12px;color:var(--muted);padding:0 6px}
     </div>
     <div class="panel">
       <div class="hd"><h2>Pastas de processos <span class="hint" id="pContagem"></span></h2>
-        <div class="acts"><input type="text" id="pBusca" placeholder="Buscar nº, cliente, parte…" aria-label="Buscar nas pastas"><select id="pStatusF" aria-label="Situação"><option value="ativo">Ativos</option><option value="arquivado">Arquivados</option><option value="todos">Todos</option></select><button class="btn sec sm" id="pAtualizarTodas" type="button">Atualizar andamentos</button></div></div>
+        <div class="acts"><input type="text" id="pBusca" placeholder="Buscar nº, cliente, parte…" aria-label="Buscar nas pastas"><select id="pRespF" aria-label="Responsável"><option value="">Todos os responsáveis</option><option>Fábio</option><option>Davi</option><option>Equipe</option><option>Secretaria</option></select><select id="pStatusF" aria-label="Situação"><option value="ativo">Ativos</option><option value="arquivado">Arquivados</option><option value="todos">Todos</option></select><button class="btn sec sm" id="pAtualizarTodas" type="button">Atualizar andamentos</button></div></div>
       <div class="acts" id="pPastas"></div>
       <div class="list" id="pTabela"></div>
     </div>
@@ -399,7 +465,7 @@ fieldset.calc legend{font-size:12px;color:var(--muted);padding:0 6px}
   <div class="panel">
     <div class="hd"><h2>Quadro de tarefas</h2>
       <div class="acts"><label style="flex-direction:row;align-items:center;gap:6px;color:var(--ink)">Responsável
-        <select id="orgResp" style="width:auto"><option value="">Todos</option><option value="Fábio">Fábio</option><option value="Davi">Davi</option><option value="Equipe">Equipe</option></select></label>
+        <select id="orgResp" style="width:auto"><option value="">Todos</option><option value="Fábio">Fábio</option><option value="Davi">Davi</option><option value="Equipe">Equipe</option><option value="Secretaria">Secretaria</option></select></label>
         <button class="btn sm" id="orgNova" type="button">Nova tarefa</button></div></div>
     <div class="board" id="board"></div>
     <div class="hint">Arraste os cartões entre as colunas (ou use as setas). Clique no título para editar. Tarefas também podem ser criadas a partir de uma publicação, na tela Advogados.</div>
@@ -417,6 +483,43 @@ fieldset.calc legend{font-size:12px;color:var(--muted);padding:0 6px}
 </div>
 </div>
 
+<div id="nvAviso" class="nvaviso" role="status" hidden></div>
+<div id="login" class="login" hidden>
+  <div class="lg-card">
+    <div class="lg-top"><span class="logo" role="img" aria-label="Lunelli Advocacia"></span><div class="lg-sub">Radar DJEN · área restrita</div></div>
+    <div class="lg-body">
+      <div id="lgCarregando"><p>Conectando…</p></div>
+      <form id="fEntrar" hidden>
+        <h2>Entrar</h2>
+        <label>E-mail <input type="email" id="lgEmail" required autocomplete="username"></label>
+        <label>Senha <input type="password" id="lgSenha" required autocomplete="current-password"></label>
+        <button class="btn" type="submit" id="lgEntrarBtn">Entrar</button>
+        <div class="lg-links"><a href="#" id="lgEsqueci">Esqueci a senha</a><a href="#" id="lgIrPedir">Pedir acesso</a></div>
+      </form>
+      <form id="fPedir" hidden>
+        <h2>Pedir acesso</h2>
+        <p class="hint">O pedido é analisado pelo administrador. Você recebe o acesso depois da aprovação.</p>
+        <label>Nome completo <input type="text" id="pdNome" required autocomplete="name"></label>
+        <label>E-mail <input type="email" id="pdEmail" required autocomplete="email"></label>
+        <fieldset class="lg-fn"><legend>Função</legend>
+          <label class="inl"><input type="radio" name="pdFuncao" value="advogado" checked> Advogado(a)</label>
+          <label class="inl"><input type="radio" name="pdFuncao" value="secretaria"> Secretaria</label>
+        </fieldset>
+        <label id="pdOabBox">OAB (número/UF) <input type="text" id="pdOab" placeholder="Ex.: 15.044/SC" autocomplete="off"></label>
+        <label>Senha (mínimo 8 caracteres) <input type="password" id="pdSenha" required minlength="8" autocomplete="new-password"></label>
+        <label>Repita a senha <input type="password" id="pdSenha2" required minlength="8" autocomplete="new-password"></label>
+        <button class="btn" type="submit" id="pdBtn">Enviar pedido</button>
+        <div class="lg-links"><a href="#" id="lgIrEntrar">← Já tenho acesso</a></div>
+      </form>
+      <div id="lgEspera" hidden>
+        <h2 id="lgEsTitulo"></h2><p id="lgEsTexto"></p>
+        <div class="acts"><button class="btn" type="button" id="lgJa">Já confirmei meu e-mail</button><button class="btn sec" type="button" id="lgReenviar">Reenviar e-mail de confirmação</button><button class="btn" type="button" id="lgPedido">Enviar pedido de acesso</button><button class="btn" type="button" id="lgRecarregar">Tentar de novo</button><button class="btn sec" type="button" id="lgSair">Sair</button></div>
+      </div>
+      <div id="lgMsg" class="msg" hidden></div>
+    </div>
+  </div>
+</div>
+
 <dialog id="dlgAud">
   <form method="dialog" id="fAud">
     <h2>Audiência</h2>
@@ -424,7 +527,7 @@ fieldset.calc legend{font-size:12px;color:var(--muted);padding:0 6px}
     <div class="grid">
       <label>Data <input type="date" id="auData" required></label>
       <label>Hora <input type="time" id="auHora"></label>
-      <label>Responsável <select id="auResp"><option>Fábio</option><option>Davi</option><option>Equipe</option></select></label>
+      <label>Responsável <select id="auResp"><option>Fábio</option><option>Davi</option><option>Equipe</option><option>Secretaria</option></select></label>
     </div>
     <label>Local / link <input type="text" id="auLocal" autocomplete="off" placeholder="Sala, vara ou link da videoconferência"></label>
     <label>Observações <textarea id="auObs"></textarea></label>
@@ -447,7 +550,7 @@ fieldset.calc legend{font-size:12px;color:var(--muted);padding:0 6px}
     </fieldset>
     <div class="grid">
       <label>Vencimento (prazo fatal) <input type="date" id="pzData" required></label>
-      <label>Responsável <select id="pzResp"><option>Fábio</option><option>Davi</option><option>Equipe</option></select></label>
+      <label>Responsável <select id="pzResp"><option>Fábio</option><option>Davi</option><option>Equipe</option><option>Secretaria</option></select></label>
     </div>
     <div class="hint" id="pzInt"></div>
     <label>Observações <textarea id="pzObs"></textarea></label>
@@ -460,7 +563,7 @@ fieldset.calc legend{font-size:12px;color:var(--muted);padding:0 6px}
     <h2 id="dlgTitulo">Nova tarefa</h2>
     <label>Título <input type="text" id="tkTitulo" required autocomplete="off" placeholder="Ex.: Contestação · HCD · 0000000-00.2026.5.12.0000"></label>
     <div class="grid">
-      <label>Responsável <select id="tkResp"><option>Fábio</option><option>Davi</option><option>Equipe</option></select></label>
+      <label>Responsável <select id="tkResp"><option>Fábio</option><option>Davi</option><option>Equipe</option><option>Secretaria</option></select></label>
       <label>Prazo fatal <input type="date" id="tkPrazo"></label>
       <label>Prioridade <select id="tkPrio"><option value="normal">Normal</option><option value="alta">Alta</option><option value="baixa">Baixa</option></select></label>
       <label>Coluna <select id="tkStatus"></select></label>
@@ -501,8 +604,10 @@ function titulo(s) { // "AÇÃO TRABALHISTA - RITO SUMARÍSSIMO" -> "Ação Trab
 
 // ---- armazenamento local (tudo com prefixo djen.)
 const LS = {
+  hook: null, // com login ativo, grava na nuvem as chaves compartilhadas (procs, tarefas, nomes, valores)
   get(k, pad) { try { const v = localStorage.getItem("djen." + k); return v == null ? pad : JSON.parse(v); } catch (e) { return pad; } },
-  set(k, v) { try { localStorage.setItem("djen." + k, JSON.stringify(v)); return true; } catch (e) { return false; } },
+  setLocal(k, v) { try { localStorage.setItem("djen." + k, JSON.stringify(v)); return true; } catch (e) { return false; } },
+  set(k, v) { const ok = LS.setLocal(k, v); if (LS.hook && LS.hook.chaves.has(k)) LS.hook.push(k, v); return ok; },
   del(k) { try { localStorage.removeItem("djen." + k); } catch (e) {} }
 };
 function salvar(blob, nome) { const a = el("a"); a.href = URL.createObjectURL(blob); a.download = nome; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000); }
@@ -638,6 +743,21 @@ function aviso(idMsg, t, erro) { const m = $(idMsg); m.textContent = t || ""; m.
 async function copiar(txt, btn) {
   try { await navigator.clipboard.writeText(txt); if (btn) { const o = btn.textContent; btn.textContent = "copiado"; setTimeout(() => btn.textContent = o, 1500); } } catch (e) {}
 }
+
+
+/* ===== 01-config: login e nuvem =====
+   null  -> o site funciona só neste navegador, sem login (modo atual).
+   objeto -> exige login (e-mail e senha) e compartilha os dados do escritório pela nuvem (Firebase).
+   Passo a passo em docs/CONFIGURAR-FIREBASE.md. Estes valores NÃO são segredos (a proteção está nas regras do Firestore).
+
+const NUVEM_CFG = {
+  firebase: { apiKey: "...", authDomain: "SEU-PROJETO.firebaseapp.com", projectId: "SEU-PROJETO", appId: "..." },
+  admin: "e-mail do administrador (quem aprova os pedidos de acesso)",
+  adminAdvId: "davi",                                  // painel de advogado do administrador (fabio | davi)
+  emailjs: { service: "service_xxx", template: "template_xxx", key: "chave pública" }   // opcional: aviso por e-mail
+};
+*/
+const NUVEM_CFG = null;
 
 
 /* ===== 10-consulta: busca por nome da parte ===== */
@@ -1161,7 +1281,7 @@ function advCard(p) {
   const ex = el("div", "exc", p.texto || "(sem texto)"); ex.title = "Clique para ver o texto completo"; ex.style.cursor = "pointer"; ex.onclick = () => ex.classList.toggle("open"); c.appendChild(ex);
   const ac = el("div", "pubact");
   const bt = el("button", "btn sm" + (nova ? "" : " sec"), nova ? "Marcar como tratada" : "Reabrir"); bt.type = "button";
-  bt.onclick = () => { AD.estado[p.id] = Object.assign(AD.estado[p.id] || {}, { tratada: nova, quando: Date.now() }); advSalvar(); advDesenhar(); };
+  bt.onclick = () => { AD.estado[p.id] = Object.assign(AD.estado[p.id] || {}, { tratada: nova, quando: Date.now() }); advSalvar(); atualizarTudo(); };
   const bk = el("button", "btn sec sm", "Criar tarefa"); bk.type = "button";
   bk.onclick = () => abrirTarefa({ titulo: (p.docTipo || p.tipo) + " · " + p.processo, proc: p.processo, resp: p.quem.length === 1 ? advPor(p.quem[0]).curto : "Equipe", nota: "Origem: publicação de " + br(p.data) + " (" + p.tribunal + ").\n" + (p.link || ""), pubId: p.id });
   ac.append(bt, bk);
@@ -1173,6 +1293,7 @@ function atualizarBadges() {
   b.hidden = !n; b.textContent = n > 99 ? "99+" : n;
   document.title = (n ? "(" + (n > 99 ? "99+" : n) + ") " : "") + TITULO_BASE;
   if (typeof atualizarBadgeOrg === "function") atualizarBadgeOrg();
+  if (typeof badgesPapel === "function") badgesPapel();
 }
 function advIniciar() {
   $("advTabs").addEventListener("click", e => { const b = e.target.closest("button[data-t]"); if (!b) return; AD.aba = b.dataset.t; AD.limite = 60; for (const x of $("advTabs").children) x.setAttribute("aria-selected", x === b); advDesenhar(); });
@@ -1196,11 +1317,11 @@ function advIniciar() {
 
 /* ===== 35-processos: pastas de processos com cadastro automático pelo número (DJEN), audiências, prazos e tarefas ===== */
 let PROCS = LS.get("procs", []);
-const P = { sel: null, aba: "andamento", rodando: false, ctl: { parar: false }, pasta: "", filtroStatus: "ativo" };
+const P = { sel: null, aba: "andamento", rodando: false, ctl: { parar: false }, pasta: "", filtroStatus: "ativo", respF: "" };
 const salvarProcs = () => LS.set("procs", PROCS);
 const chaveDe = s => String(s || "").replace(/\D/g, "");
 const procPorChave = c => PROCS.find(p => p.chave === c);
-const RESPS = ["Fábio", "Davi", "Equipe"];
+const RESPS = ["Fábio", "Davi", "Equipe", "Secretaria"];
 
 // ---------- número CNJ: máscara, dígito verificador, tribunal
 const RE_CNJ = /\d{7}-?\d{2}\.?\d{4}\.?\d\.?\d{2}\.?\d{4}/g;
@@ -1274,7 +1395,7 @@ function poloDoCliente(p) {
   return d ? (d.polo === "P" ? "Passivo" : d.polo === "A" ? "Ativo" : "") : "";
 }
 function novaPasta(chave, opc) {
-  return { id: uid(), numero: mascara(chave), chave, tribunal: tribunalDe(chave), cliente: (opc && opc.cliente) || "", resp: (opc && opc.resp) || "Davi", status: "ativo", polo: "", classe: "", orgao: "", linkPasta: "", nota: "", pubs: [], partes: [], advs: [], audiencias: [], prazos: [], ignoradas: [], criado: Date.now(), atualizado: 0, semDjen: false };
+  return { id: uid(), numero: mascara(chave), chave, tribunal: tribunalDe(chave), cliente: (opc && opc.cliente) || "", resp: (opc && opc.resp) || respPadrao(), status: "ativo", polo: "", classe: "", orgao: "", linkPasta: "", nota: "", pubs: [], partes: [], advs: [], audiencias: [], prazos: [], ignoradas: [], criado: Date.now(), atualizado: 0, semDjen: false };
 }
 // publicações já carregadas na tela Advogados entram nas pastas sem nova consulta
 function procsMesclarAdv() {
@@ -1392,7 +1513,7 @@ function pLista() {
   const bt = (rot, val, n) => { const b = el("button", "btn sm" + (P.pasta === val ? "" : " sec"), rot + " (" + n + ")"); b.type = "button"; b.onclick = () => { P.pasta = val; pLista(); }; ch.appendChild(b); };
   bt("Todas as pastas", "", PROCS.length);
   for (const c of clientes) bt(c || "Sem cliente", c || "§sem", PROCS.filter(x => (x.cliente || "") === c).length);
-  const filtro = x => (!P.pasta || (P.pasta === "§sem" ? !x.cliente : x.cliente === P.pasta)) && (P.filtroStatus === "todos" || (x.status || "ativo") === P.filtroStatus) && (!q || norm(x.numero + " " + x.cliente + " " + x.classe + " " + x.partes.map(d => d.nome).join(" ")).includes(q));
+  const filtro = x => (!P.respF || x.resp === P.respF) && (!P.pasta || (P.pasta === "§sem" ? !x.cliente : x.cliente === P.pasta)) && (P.filtroStatus === "todos" || (x.status || "ativo") === P.filtroStatus) && (!q || norm(x.numero + " " + x.cliente + " " + x.classe + " " + x.partes.map(d => d.nome).join(" ")).includes(q));
   const lista = PROCS.filter(filtro).sort((a, b) => { const ea = procEventoProximo(a), eb = procEventoProximo(b); return (ea ? ea.data : "9999").localeCompare(eb ? eb.data : "9999") || (b.pubs[0] ? b.pubs[0].data : "").localeCompare(a.pubs[0] ? a.pubs[0].data : ""); });
   $("pContagem").textContent = lista.length + " processo(s)";
   if (!lista.length) { box.appendChild(el("div", "empty", PROCS.length ? "Nenhum processo com estes filtros." : "Nenhum processo cadastrado. Cole os números acima e clique em “Buscar no DJEN e cadastrar”.")); return; }
@@ -1419,7 +1540,8 @@ function pDetalhe(p) {
   const bu = el("button", "btn sm", "Atualizar andamento"); bu.type = "button"; bu.onclick = async () => { if (P.rodando) return; bu.disabled = true; P.rodando = true; let m = "", er = false; try { const n = await atualizarPasta(p, { parar: false }); m = n ? n + " publicação(ões) nova(s) no DJEN." : "Sem publicações novas no DJEN."; } catch (e) { [m, er] = erroAmigavel(e); } P.rodando = false; pDetalhe(p); aviso("pMsg", m, er); };
   const ba = el("button", "btn sec sm", p.status === "arquivado" ? "Reativar" : "Arquivar"); ba.type = "button"; ba.onclick = () => { p.status = p.status === "arquivado" ? "ativo" : "arquivado"; salvar(); pDetalhe(p); };
   const bd = el("button", "btn danger sm", "Excluir pasta"); bd.type = "button"; bd.onclick = () => { if (!confirm("Excluir a pasta deste processo (audiências e prazos cadastrados também)? As tarefas do quadro são mantidas.")) return; PROCS = PROCS.filter(x => x.id !== p.id); salvarProcs(); P.sel = null; procDesenhar(); atualizarBadges(); };
-  ac.append(bc, bu, ba, bd); t1.append(tl, ac); hd.append(vb, t1);
+  if (souSecretaria()) ac.append(bc, bu); else ac.append(bc, bu, ba, bd);
+  t1.append(tl, ac); hd.append(vb, t1);
   const msg = el("div", "msg"); msg.id = "pMsg"; msg.hidden = true; hd.appendChild(msg);
   // dados
   const g = el("div", "grid");
@@ -1430,10 +1552,12 @@ function pDetalhe(p) {
   const iCls = el("input"); iCls.type = "text"; iCls.value = p.classe; iCls.onchange = () => { p.classe = iCls.value.trim(); p.classeEditada = true; salvar(); };
   const iLink = el("input"); iLink.type = "text"; iLink.placeholder = "https://… (pasta no Drive, rede ou link do processo)"; iLink.value = p.linkPasta; iLink.onchange = () => { p.linkPasta = iLink.value.trim(); salvar(); pDetalhe(p); };
   const lk = campo("Link da pasta de arquivos", iLink); lk.classList.add("wide");
-  g.append(campo("Cliente (pasta)", iCli), campo("Responsável", sResp), campo("Polo do cliente", sPolo), campo("Valor da causa (R$)", iVal), campo("Classe", iCls), lk);
+  if (souSecretaria()) g.append(campo("Cliente (pasta)", iCli), campo("Responsável", sResp), campo("Classe", iCls), lk);
+  else g.append(campo("Cliente (pasta)", iCli), campo("Responsável", sResp), campo("Polo do cliente", sPolo), campo("Valor da causa (R$)", iVal), campo("Classe", iCls), lk);
   hd.appendChild(g);
   if (/^https?:\/\//.test(p.linkPasta)) { const a = el("a", "btn sec sm", "Abrir pasta de arquivos"); a.href = p.linkPasta; a.target = "_blank"; a.rel = "noopener noreferrer"; a.style.width = "fit-content"; hd.appendChild(a); }
-  const nt = el("textarea"); nt.placeholder = "Observações do caso"; nt.value = p.nota; nt.onchange = () => { p.nota = nt.value; salvar(); }; hd.appendChild(campo("Observações", nt));
+  const nt = el("textarea"); nt.placeholder = "Observações do caso"; nt.value = p.nota; nt.onchange = () => { p.nota = nt.value; salvar(); }; if (!souSecretaria()) hd.appendChild(campo("Observações", nt));
+  if (p._por) hd.appendChild(el("div", "hint", "Última alteração: " + p._por + (p._em ? " em " + new Date(p._em).toLocaleString("pt-BR") : "")));
   box.appendChild(hd);
   // abas
   const tarefas = TAREFAS.filter(t => chaveDe(t.proc) === p.chave), sg = sugestoes(p);
@@ -1504,7 +1628,7 @@ $("fAud").addEventListener("submit", e => {
   const d = { tipo: $("auTipo").value.trim(), data: $("auData").value, hora: $("auHora").value, local: $("auLocal").value.trim(), resp: $("auResp").value, obs: $("auObs").value.trim() }; if (!d.data) return;
   if (audEd) Object.assign(p.audiencias.find(x => x.id === audEd) || {}, d); else p.audiencias.push(Object.assign({ id: uid() }, d));
   if (audPub) p.ignoradas.push(audPub);
-  salvarProcs(); $("dlgAud").close(); pDetalhe(p); atualizarBadges();
+  salvarProcs(); $("dlgAud").close(); atualizarTudo();
 });
 function abrirPrazo(p, v, id) {
   procDlg = p; prazoEd = id || null; prazoPub = (v && v.pubId) || null; v = v || {};
@@ -1525,7 +1649,7 @@ $("fPrazo").addEventListener("submit", e => {
   const d = { desc: $("pzDesc").value.trim(), data: $("pzData").value, resp: $("pzResp").value, obs: $("pzObs").value.trim() }; if (!d.desc || !d.data) return;
   if (prazoEd) Object.assign(p.prazos.find(x => x.id === prazoEd) || {}, d); else p.prazos.push(Object.assign({ id: uid() }, d));
   if (prazoPub) p.ignoradas.push(prazoPub);
-  salvarProcs(); $("dlgPrazo").close(); pDetalhe(p); atualizarBadges();
+  salvarProcs(); $("dlgPrazo").close(); atualizarTudo();
 });
 
 function procIniciar() {
@@ -1538,6 +1662,7 @@ function procIniciar() {
   $("pAtualizarTodas").onclick = atualizarTodas;
   $("pBusca").addEventListener("input", pLista);
   $("pStatusF").addEventListener("change", () => { P.filtroStatus = $("pStatusF").value; pLista(); });
+  $("pRespF").addEventListener("change", () => { P.respF = $("pRespF").value; pLista(); });
   procsMesclarAdv();
 }
 
@@ -1559,7 +1684,7 @@ function prazoInterno(fatal) {
 
 function abrirTarefa(preset, id) {
   const dlg = $("dlgTarefa"), t = id ? TAREFAS.find(x => x.id === id) : null; tkEditando = t ? t.id : null; tkPubId = (preset && preset.pubId) || null;
-  const v = t || Object.assign({ titulo: "", proc: "", cli: "", resp: "Davi", prazo: "", prio: "normal", status: "fazer", nota: "" }, preset || {});
+  const v = t || Object.assign({ titulo: "", proc: "", cli: "", resp: respPadrao(), prazo: "", prio: "normal", status: "fazer", nota: "" }, preset || {});
   $("dlgTitulo").textContent = t ? "Editar tarefa" : "Nova tarefa";
   $("tkTitulo").value = v.titulo; $("tkProc").value = v.proc || ""; $("tkCli").value = v.cli || ""; $("tkResp").value = v.resp; $("tkPrazo").value = v.prazo || ""; $("tkPrio").value = v.prio || "normal"; $("tkNota").value = v.nota || "";
   const s = $("tkStatus"); s.textContent = ""; for (const [k, n] of COLS) { const o = el("option", "", n); o.value = k; s.appendChild(o); } s.value = v.status;
@@ -1568,14 +1693,14 @@ function abrirTarefa(preset, id) {
 function tkInterno() { const f = $("tkPrazo").value; $("tkInterno").textContent = f ? "Sugestão de prazo interno (2 dias úteis antes, sem considerar feriados): " + br(prazoInterno(f)) : "Informe o prazo fatal para ver a sugestão de prazo interno."; }
 $("tkPrazo").addEventListener("change", tkInterno);
 $("tkCancel").onclick = () => $("dlgTarefa").close();
-$("tkDel").onclick = () => { if (!tkEditando || !confirm("Excluir esta tarefa?")) return; TAREFAS = TAREFAS.filter(t => t.id !== tkEditando); salvarTarefas(); $("dlgTarefa").close(); orgDesenhar(); };
+$("tkDel").onclick = () => { if (!tkEditando || !confirm("Excluir esta tarefa?")) return; TAREFAS = TAREFAS.filter(t => t.id !== tkEditando); salvarTarefas(); $("dlgTarefa").close(); atualizarTudo(); };
 $("fTarefa").addEventListener("submit", e => {
   e.preventDefault();
   const dados = { titulo: $("tkTitulo").value.trim(), proc: $("tkProc").value.trim(), cli: $("tkCli").value.trim(), resp: $("tkResp").value, prazo: $("tkPrazo").value, prio: $("tkPrio").value, status: $("tkStatus").value, nota: $("tkNota").value.trim() };
   if (!dados.titulo) return;
   if (tkEditando) { const t = TAREFAS.find(x => x.id === tkEditando); if (t) { Object.assign(t, dados); if (dados.status === "concluida" && !t.concluidaEm) t.concluidaEm = Date.now(); } }
-  else { const t = Object.assign({ id: uid(), criada: Date.now() }, dados); if (tkPubId) { t.pubId = tkPubId; if (AD.pubs[tkPubId]) { AD.estado[tkPubId] = Object.assign(AD.estado[tkPubId] || {}, { tratada: true, quando: Date.now() }); advSalvar(); advDesenhar(); } } TAREFAS.push(t); }
-  salvarTarefas(); $("dlgTarefa").close(); orgDesenhar();
+  else { const t = Object.assign({ id: uid(), criada: Date.now() }, dados); if (tkPubId) { t.pubId = tkPubId; if (AD.pubs[tkPubId]) { AD.estado[tkPubId] = Object.assign(AD.estado[tkPubId] || {}, { tratada: true, quando: Date.now() }); advSalvar(); } } TAREFAS.push(t); }
+  salvarTarefas(); $("dlgTarefa").close(); atualizarTudo();
 });
 $("orgNova").onclick = () => abrirTarefa({});
 
@@ -1589,7 +1714,7 @@ function tkCard(t) {
   c.appendChild(m);
   if (t.proc) { const dm = el("div", "m", t.proc + " "), pp = PROCS.find(x => x.chave === chaveDe(t.proc)); if (pp) { const a = el("a", "", "abrir pasta"); a.href = "#processos"; a.onclick = e => { e.preventDefault(); abrirPasta(pp.id); }; dm.appendChild(a); } c.appendChild(dm); }
   const mv = el("div", "mv"), i = COLS.findIndex(x => x[0] === t.status);
-  const bt = (txt, d, tit) => { const b = el("button", "btn sec sm", txt); b.type = "button"; b.title = tit; b.onclick = () => { t.status = COLS[i + d][0]; if (t.status === "concluida") t.concluidaEm = Date.now(); salvarTarefas(); orgDesenhar(); }; return b; };
+  const bt = (txt, d, tit) => { const b = el("button", "btn sec sm", txt); b.type = "button"; b.title = tit; b.onclick = () => { t.status = COLS[i + d][0]; if (t.status === "concluida") t.concluidaEm = Date.now(); salvarTarefas(); atualizarTudo(); }; return b; };
   if (i > 0) mv.appendChild(bt("←", -1, "Mover para " + COLS[i - 1][1])); if (i < COLS.length - 1) mv.appendChild(bt("→", 1, "Mover para " + COLS[i + 1][1]));
   c.appendChild(mv);
   c.addEventListener("dragstart", e => { e.dataTransfer.setData("text/plain", t.id); e.dataTransfer.effectAllowed = "move"; });
@@ -1668,24 +1793,378 @@ function ideiasDesenhar() {
 function orgIniciar() { $("orgResp").addEventListener("change", orgDesenhar); orgDesenhar(); rotinaDesenhar(); ideiasDesenhar(); }
 
 
+/* ===== 45-nuvem: login (Firebase Auth), dados compartilhados (Firestore) e perfis de acesso =====
+   Sem NUVEM_CFG o site continua no modo local (sem login). Com NUVEM_CFG: tela de login, aprovação pelo administrador,
+   pastas/tarefas/clientes/valores compartilhados entre todos, e telas por perfil (advogado, secretaria, administrador). */
+const NV = { ativo: !!NUVEM_CFG, user: null, perfil: null, papel: "local", advId: null, db: null, auth: null, unsubs: [], mapas: {}, sessao: false, cadastrando: false, users: [] };
+const ACESSO = {
+  local: ["inicio", "consulta", "processos", "relatorios", "advogados", "organizacao"],
+  admin: ["meu", "inicio", "secretaria", "consulta", "processos", "relatorios", "advogados", "organizacao", "usuarios"],
+  advogado: ["meu", "inicio", "consulta", "processos", "relatorios", "advogados", "organizacao"],
+  secretaria: ["secretaria", "processos"]
+};
+const PAPEL_ROT = { admin: "Administrador", advogado: "Advogado(a)", secretaria: "Secretaria", local: "" };
+const souAdvogado = () => NV.papel !== "secretaria";
+const souSecretaria = () => NV.papel === "secretaria";
+const meuAdv = () => ADVS.find(a => a.id === NV.advId) || null;
+const respPadrao = () => { const a = meuAdv(); return a ? a.curto : NV.papel === "local" ? "Davi" : "Equipe"; };
+const podeVer = v => (ACESSO[NV.papel] || []).includes(v) && (v !== "meu" || !!meuAdv());
+const homeDoPapel = () => NV.papel === "secretaria" ? "secretaria" : meuAdv() ? "meu" : "inicio";
+const ARR = { procs: () => PROCS, tarefas: () => TAREFAS };
+const CHAVES_NUVEM = ["procs", "tarefas", "nomes", "valores"];
+if (NV.ativo) document.body.classList.add("sem-sessao");
+
+// ---------- utilidades
+const ERROS_AUTH = {
+  "auth/invalid-credential": "E-mail ou senha incorretos.", "auth/wrong-password": "E-mail ou senha incorretos.", "auth/user-not-found": "E-mail ou senha incorretos.",
+  "auth/invalid-email": "E-mail inválido.", "auth/email-already-in-use": "Este e-mail já tem cadastro. Use “Entrar” ou “Esqueci a senha”.",
+  "auth/weak-password": "Senha fraca: use pelo menos 8 caracteres.", "auth/too-many-requests": "Muitas tentativas. Aguarde alguns minutos e tente de novo.",
+  "auth/network-request-failed": "Sem conexão com a internet.", "auth/user-disabled": "Este acesso foi desativado."
+};
+const msgAuth = e => ERROS_AUTH[e && e.code] || ("Não foi possível concluir (" + ((e && (e.code || e.message)) || "erro") + ").");
+function igual(a, b) {
+  if (a === b) return true; if (a == null || b == null || typeof a !== "object" || typeof b !== "object") return false;
+  if (Array.isArray(a) !== Array.isArray(b)) return false;
+  const ka = Object.keys(a).filter(k => a[k] !== undefined), kb = Object.keys(b).filter(k => b[k] !== undefined);
+  return ka.length === kb.length && ka.every(k => igual(a[k], b[k]));
+}
+function msgLogin(t, erro) { const m = $("lgMsg"); m.textContent = t || ""; m.hidden = !t; m.className = "msg" + (erro ? " err" : ""); }
+let avisoT = 0;
+function nuvemAviso(t, erro) { const a = $("nvAviso"); a.textContent = t; a.hidden = !t; a.className = "nvaviso" + (erro ? " err" : ""); clearTimeout(avisoT); if (t) avisoT = setTimeout(() => { a.hidden = true; }, 9000); }
+function mostrarLogin(estado) {
+  $("login").hidden = false; document.body.classList.add("sem-sessao");
+  $("lgCarregando").hidden = estado !== "carregando"; $("fEntrar").hidden = estado !== "entrar"; $("fPedir").hidden = estado !== "pedir"; $("lgEspera").hidden = estado !== "espera";
+  if (estado === "entrar") $("lgEmail").focus();
+}
+function esperaPainel(titulo, texto, botoes) {
+  mostrarLogin("espera"); $("lgEsTitulo").textContent = titulo; $("lgEsTexto").textContent = texto;
+  const mapa = { ja: "lgJa", reenviar: "lgReenviar", pedido: "lgPedido", recarregar: "lgRecarregar", sair: "lgSair" };
+  for (const k in mapa) $(mapa[k]).hidden = !botoes.includes(k);
+}
+const carregarScript = src => new Promise((ok, err) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = () => err(new Error("script " + src)); document.head.appendChild(s); });
+async function carregarFirebase() {
+  const base = "https://www.gstatic.com/firebasejs/10.12.2/firebase-";
+  for (const m of ["app", "auth", "firestore"]) await carregarScript(base + m + "-compat.js");
+}
+
+// ---------- início e estados de sessão
+async function nuvemIniciar() {
+  mostrarLogin("carregando");
+  try { await carregarFirebase(); firebase.initializeApp(NUVEM_CFG.firebase); NV.auth = firebase.auth(); NV.db = firebase.firestore(); }
+  catch (e) { esperaPainel("Sem conexão com o serviço de login", "Verifique a internet e tente de novo. Se o problema continuar, avise o administrador.", ["recarregar"]); return; }
+  NV.auth.onAuthStateChanged(onAuth);
+}
+function limparOuvintes() { NV.unsubs.forEach(f => { try { f(); } catch (e) {} }); NV.unsubs = []; }
+const ehAdminEmail = u => !!u && (u.email || "").toLowerCase() === (NUVEM_CFG.admin || "").toLowerCase();
+function onAuth(user) {
+  limparOuvintes(); NV.user = user; NV.perfil = null;
+  if (!user) { if (NV.sessao) { location.reload(); return; } msgLogin(""); mostrarLogin("entrar"); return; }
+  if (ehAdminEmail(user)) {
+    if (!user.emailVerified) { esperaPainel("Confirme seu e-mail", "Enviamos um link de confirmação para " + user.email + ". Clique nele e depois em “Já confirmei meu e-mail”. (Olhe também o spam.)", ["ja", "reenviar", "sair"]); return; }
+    entrar({ papel: "admin", advId: NUVEM_CFG.adminAdvId || "davi", nome: user.displayName || "Administrador", email: user.email, status: "ativo" }); return;
+  }
+  NV.unsubs.push(NV.db.collection("users").doc(user.uid).onSnapshot(d => {
+    if (!d.exists) { if (!NV.cadastrando) esperaPainel("Cadastro incompleto", "Seu acesso existe, mas o pedido de aprovação não foi registrado. Clique para enviá-lo ao administrador.", ["pedido", "sair"]); return; }
+    const p = d.data();
+    if (p.status === "ativo" && (p.papel === "advogado" || p.papel === "secretaria")) {
+      if (!NV.sessao) entrar(Object.assign({}, p)); else if (p.papel !== NV.papel || (p.advId || null) !== NV.advId) location.reload();
+      return;
+    }
+    if (NV.sessao) { location.reload(); return; }
+    if (p.status === "bloqueado") esperaPainel("Acesso não liberado", "O administrador não liberou este acesso. Em caso de dúvida, fale com ele.", ["sair"]);
+    else esperaPainel("Pedido enviado", "Seu pedido de acesso está aguardando a aprovação do administrador. Esta tela atualiza sozinha quando ele for aprovado.", ["sair"]);
+  }, e => esperaPainel("Não foi possível verificar seu cadastro", (e && e.code === "permission-denied" ? "Permissão negada pelo serviço. Avise o administrador." : "Verifique a internet e tente de novo."), ["recarregar", "sair"])));
+}
+function guardarDadosLocaisAntigos() {
+  try {
+    if (localStorage.getItem("djen.nuvem.ok")) return;
+    for (const k of CHAVES_NUVEM) { const v = localStorage.getItem("djen." + k); if (v && v !== "[]" && v !== "{}") localStorage.setItem("djen.pre." + k, v); }
+    localStorage.setItem("djen.nuvem.ok", "1");
+  } catch (e) {}
+}
+function limparCacheNuvem() { LS.hook = null; try { for (const k of CHAVES_NUVEM) localStorage.removeItem("djen." + k); } catch (e) {} }
+function entrar(perfil) {
+  NV.perfil = perfil; NV.sessao = true; NV.papel = perfil.papel; NV.advId = perfil.advId || null;
+  guardarDadosLocaisAntigos();
+  LS.hook = { chaves: new Set(CHAVES_NUVEM), push: nuvemPush };
+  $("login").hidden = true; document.body.classList.remove("sem-sessao");
+  aplicarPapel(); sincronizar(); iniciarApp();
+}
+function aplicarPapel() {
+  document.body.dataset.papel = NV.papel;
+  for (const a of document.querySelectorAll("#nav a")) a.hidden = !podeVer(a.dataset.v);
+  const ub = $("userBox"); ub.hidden = NV.papel === "local";
+  if (NV.papel !== "local") {
+    $("userNome").textContent = NV.perfil.nome || NV.perfil.email || ""; const a = meuAdv();
+    $("userPapel").textContent = PAPEL_ROT[NV.papel] + (a ? " · " + a.rot : "");
+    $("footTexto").textContent = "Dados do escritório compartilhados na nuvem.";
+    $("bkImp").hidden = true;
+  }
+  $("pResp").value = respPadrao();
+  if (meuAdv() && $("advFiltro").querySelector('option[value="' + NV.advId + '"]')) $("advFiltro").value = NV.advId;
+}
+
+// ---------- ações de login
+async function sair() { limparCacheNuvem(); try { await NV.auth.signOut(); } catch (e) {} location.reload(); }
+function ligarLogin() {
+  const alterna = pedir => { msgLogin(""); mostrarLogin(pedir ? "pedir" : "entrar"); };
+  $("lgIrPedir").onclick = e => { e.preventDefault(); alterna(true); }; $("lgIrEntrar").onclick = e => { e.preventDefault(); alterna(false); };
+  document.querySelectorAll("input[name=pdFuncao]").forEach(r => r.addEventListener("change", () => { $("pdOabBox").hidden = document.querySelector("input[name=pdFuncao]:checked").value !== "advogado"; }));
+  $("fEntrar").addEventListener("submit", async e => {
+    e.preventDefault(); if (!NV.auth) return; msgLogin(""); const b = $("lgEntrarBtn"); b.disabled = true;
+    try { await NV.auth.signInWithEmailAndPassword($("lgEmail").value.trim(), $("lgSenha").value); } catch (er) { msgLogin(msgAuth(er), true); }
+    b.disabled = false;
+  });
+  $("lgEsqueci").onclick = async e => {
+    e.preventDefault(); const em = $("lgEmail").value.trim(); if (!em) { msgLogin("Digite seu e-mail no campo acima e clique em “Esqueci a senha”.", true); return; }
+    try { await NV.auth.sendPasswordResetEmail(em); msgLogin("Se este e-mail tiver cadastro, enviamos o link para criar uma nova senha. Olhe também o spam."); } catch (er) { msgLogin(msgAuth(er), true); }
+  };
+  $("fPedir").addEventListener("submit", async e => {
+    e.preventDefault(); if (!NV.auth) return; msgLogin("");
+    const nome = $("pdNome").value.trim(), email = $("pdEmail").value.trim(), senha = $("pdSenha").value, pedido = document.querySelector("input[name=pdFuncao]:checked").value, oab = pedido === "advogado" ? $("pdOab").value.trim() : "";
+    if (nome.split(/\s+/).length < 2) return msgLogin("Informe o nome completo.", true);
+    if (senha.length < 8) return msgLogin("A senha precisa ter pelo menos 8 caracteres.", true);
+    if (senha !== $("pdSenha2").value) return msgLogin("As duas senhas não são iguais.", true);
+    const b = $("pdBtn"); b.disabled = true; NV.cadastrando = true;
+    try {
+      const cred = await NV.auth.createUserWithEmailAndPassword(email, senha);
+      try { await cred.user.updateProfile({ displayName: nome }); } catch (er) {}
+      await NV.db.collection("users").doc(cred.user.uid).set({ nome, email: email.toLowerCase(), pedido, oab, status: "pendente", criado: Date.now() });
+      try { await cred.user.sendEmailVerification(); } catch (er) {}
+      avisarAdmin({ nome, email, pedido, oab });
+    } catch (er) { msgLogin(msgAuth(er), true); }
+    NV.cadastrando = false; b.disabled = false;
+  });
+  $("lgSair").onclick = sair; $("btnSair").onclick = sair; $("lgRecarregar").onclick = () => location.reload();
+  $("lgReenviar").onclick = async () => { try { await NV.user.sendEmailVerification(); msgLogin("E-mail de confirmação reenviado."); } catch (er) { msgLogin(msgAuth(er), true); } };
+  $("lgJa").onclick = async () => { try { await NV.user.reload(); await NV.user.getIdToken(true); onAuth(NV.auth.currentUser); if (NV.auth.currentUser && !NV.auth.currentUser.emailVerified) msgLogin("Ainda não aparece como confirmado. Clique no link do e-mail e tente de novo.", true); } catch (er) { msgLogin(msgAuth(er), true); } };
+  $("lgPedido").onclick = async () => {
+    const u = NV.user; if (!u) return;
+    try { await NV.db.collection("users").doc(u.uid).set({ nome: u.displayName || u.email, email: (u.email || "").toLowerCase(), pedido: "advogado", oab: "", status: "pendente", criado: Date.now() }); avisarAdmin({ nome: u.displayName || u.email, email: u.email, pedido: "advogado", oab: "" }); } catch (er) { msgLogin("Não foi possível registrar o pedido: " + (er.code || er.message), true); }
+  };
+}
+async function avisarAdmin(d) {
+  const c = NUVEM_CFG.emailjs; if (!c) return;
+  try {
+    await fetch("https://api.emailjs.com/api/v1.0/email/send", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ service_id: c.service, template_id: c.template, user_id: c.key, template_params: { nome: d.nome, email: d.email, funcao: d.pedido === "advogado" ? "Advogado(a)" + (d.oab ? " (OAB " + d.oab + ")" : "") : "Secretaria", quando: new Date().toLocaleString("pt-BR"), link: location.origin + location.pathname + "#usuarios" } }) });
+  } catch (e) {}
+}
+
+// ---------- sincronização dos dados com o Firestore
+function sincronizar() {
+  const erro = col => e => nuvemAviso("Não foi possível ler “" + col + "” da nuvem (" + ((e && (e.code || e.message)) || "erro") + ").", true);
+  for (const col of ["procs", "tarefas"]) NV.unsubs.push(NV.db.collection(col).onSnapshot(s => receberColecao(col, s), erro(col)));
+  for (const k of souSecretaria() ? ["nomes"] : ["nomes", "valores"]) { const campo = k === "nomes" ? "lista" : "mapa"; NV.unsubs.push(NV.db.collection("config").doc(k).onSnapshot(d => receberDoc(k, campo, d), erro(k))); }
+  if (NV.papel === "admin") NV.unsubs.push(NV.db.collection("users").onSnapshot(s => { NV.users = []; s.forEach(d => NV.users.push(Object.assign({ uid: d.id }, d.data()))); usuariosAtualizar(); }, erro("users")));
+}
+function receberColecao(col, snap) {
+  const arr = ARR[col](), mapa = {}, vistos = new Set();
+  snap.forEach(d => {
+    const dados = d.data(); mapa[d.id] = JSON.parse(JSON.stringify(dados)); vistos.add(d.id);
+    const novo = Object.assign({}, dados, { id: d.id }), ex = arr.find(x => x.id === d.id);
+    if (!ex) arr.push(novo);
+    else if (!igual(ex, novo)) { for (const k of Object.keys(ex)) delete ex[k]; Object.assign(ex, novo); } // mantém a identidade do objeto (telas abertas continuam válidas)
+  });
+  for (let i = arr.length - 1; i >= 0; i--) if (!vistos.has(arr[i].id)) arr.splice(i, 1);
+  NV.mapas[col] = mapa; LS.setLocal(col, arr);
+  if (!snap.metadata.hasPendingWrites) redesenharRemoto();
+}
+function receberDoc(k, campo, d) {
+  const vazio = k === "nomes" ? [] : {}, v = d.exists && d.data()[campo] != null ? d.data()[campo] : vazio;
+  NV.mapas[k] = JSON.stringify(v); LS.setLocal(k, v);
+  if (!d.metadata.hasPendingWrites) redesenharRemoto();
+}
+function erroEscrita(e) { nuvemAviso(e && e.code === "permission-denied" ? "Sem permissão para salvar esta alteração." : "Não foi possível salvar na nuvem: " + ((e && (e.code || e.message)) || "erro") + ". Verifique a conexão.", true); }
+function nuvemPush(k, v) {
+  if (!NV.db || !NV.sessao) return;
+  if (k === "procs" || k === "tarefas") return pushColecao(k, v);
+  const json = JSON.stringify(v); if (NV.mapas[k] === json) return; NV.mapas[k] = json;
+  NV.db.collection("config").doc(k).set({ [k === "nomes" ? "lista" : "mapa"]: JSON.parse(json), _por: NV.perfil.nome || "", _em: Date.now() }).catch(erroEscrita);
+}
+function pushColecao(col, arr) {
+  const atual = {}; for (const o of arr) if (o && o.id) atual[o.id] = JSON.parse(JSON.stringify(o));
+  const antigo = NV.mapas[col] || {}, ops = [], ref = id => NV.db.collection(col).doc(id), meta = () => ({ _por: NV.perfil.nome || NV.perfil.email || "", _em: Date.now() });
+  for (const id in atual) {
+    const n = atual[id], v = antigo[id];
+    if (!v) { ops.push(b => b.set(ref(id), Object.assign({}, n, meta()))); continue; }
+    const dif = {}; for (const k in n) if (k !== "id" && !igual(n[k], v[k])) dif[k] = n[k];
+    if (Object.keys(dif).length) ops.push(b => b.set(ref(id), Object.assign(dif, meta()), { merge: true }));
+  }
+  for (const id in antigo) if (!(id in atual)) ops.push(b => b.delete(ref(id)));
+  NV.mapas[col] = atual;
+  for (let i = 0; i < ops.length; i += 400) { const b = NV.db.batch(); ops.slice(i, i + 400).forEach(f => f(b)); b.commit().catch(erroEscrita); }
+}
+let rdT = 0, rdTent = 0;
+function redesenharRemoto() { clearTimeout(rdT); rdTent = 0; rdT = setTimeout(tentarRedesenhar, 250); }
+function tentarRedesenhar() {
+  const f = document.activeElement, editando = document.querySelector("dialog[open]") || (f && /^(INPUT|TEXTAREA|SELECT)$/.test(f.tagName) && f.closest(".content"));
+  if (editando && rdTent++ < 20) { rdT = setTimeout(tentarRedesenhar, 1500); return; }
+  desenharVista(vistaAtual()); atualizarBadges(); desenharInicioClientes(); if (typeof desenharChips === "function") desenharChips();
+}
+
+// ---------- tela de administração de usuários
+const rotPerfil = u => u.papel === "secretaria" ? "Secretaria" : "Advogado(a)" + (u.advId ? " · " + (ADVS.find(a => a.id === u.advId) || { curto: u.advId }).curto : "");
+const valorPerfil = u => u.papel === "secretaria" ? "sec" : "adv:" + (u.advId || "");
+function opcoesPerfil(sel) {
+  const s = el("select"); for (const [v, n] of [["adv:fabio", "Advogado(a) · Fábio"], ["adv:davi", "Advogado(a) · Davi"], ["adv:", "Advogado(a) · outro(a), sem painel de OAB"], ["sec", "Secretaria"]]) s.appendChild(Object.assign(el("option", "", n), { value: v }));
+  s.value = sel; return s;
+}
+function sugerePerfil(u) {
+  if (u.pedido === "secretaria") return "sec"; const o = (u.oab || "").replace(/\D/g, "");
+  return o === "15044" ? "adv:fabio" : o === "39336" ? "adv:davi" : "adv:";
+}
+function definirAcesso(u, perfil, status) {
+  const dados = { status }; if (status === "ativo") { const sec = perfil === "sec"; Object.assign(dados, { papel: sec ? "secretaria" : "advogado", advId: sec ? null : (perfil.slice(4) || null), aprovadoEm: Date.now(), aprovadoPor: NV.perfil.email }); }
+  NV.db.collection("users").doc(u.uid).update(dados).catch(erroEscrita);
+}
+function usuariosAtualizar() {
+  const lista = NV.users.filter(u => !ehAdminEmail({ email: u.email })), pend = lista.filter(u => u.status === "pendente"), ativos = lista.filter(u => u.status === "ativo" || u.status === "bloqueado");
+  const b = $("bdUsr"); b.hidden = !pend.length; b.textContent = pend.length;
+  const pb = $("usPend"), ab = $("usAtivos"); if (!pb || !ab) return; pb.textContent = ""; ab.textContent = "";
+  if (!pend.length) pb.appendChild(el("div", "hint", "Nenhum pedido pendente."));
+  for (const u of pend.sort((x, y) => (y.criado || 0) - (x.criado || 0))) {
+    const c = el("div", "ucard"), i = el("div", "info"); i.append(el("b", "", u.nome), el("div", "hint", u.email + " · pediu acesso como " + (u.pedido === "secretaria" ? "secretaria" : "advogado(a)" + (u.oab ? " (OAB " + u.oab + ")" : "")) + " em " + new Date(u.criado || 0).toLocaleString("pt-BR")));
+    const s = opcoesPerfil(sugerePerfil(u)), ok = btn("Aprovar", () => definirAcesso(u, s.value, "ativo"), ""), no = btn("Recusar", () => { if (confirm("Recusar o pedido de " + u.nome + "?")) definirAcesso(u, "", "bloqueado"); }, "danger");
+    c.append(i, s, ok, no); pb.appendChild(c);
+  }
+  if (!ativos.length) ab.appendChild(el("div", "hint", "Ainda não há outros usuários."));
+  for (const u of ativos.sort((x, y) => (x.nome || "").localeCompare(y.nome || "", "pt"))) {
+    const c = el("div", "ucard"), i = el("div", "info"), bloq = u.status === "bloqueado";
+    i.append(el("b", "", u.nome), el("div", "hint", u.email + " · " + (bloq ? "acesso bloqueado" : rotPerfil(u))));
+    c.appendChild(i);
+    if (!bloq) { const s = opcoesPerfil(valorPerfil(u)); s.onchange = () => definirAcesso(u, s.value, "ativo"); c.appendChild(s); c.appendChild(btn("Bloquear", () => { if (confirm("Bloquear o acesso de " + u.nome + "?")) definirAcesso(u, "", "bloqueado"); }, "danger")); }
+    else c.appendChild(btn("Reativar como…", () => definirAcesso(u, sugerePerfil(u), "ativo")));
+    ab.appendChild(c);
+  }
+  locaisDesenhar();
+}
+function preLocais() { const g = k => { try { return JSON.parse(localStorage.getItem("djen.pre." + k)); } catch (e) { return null; } }; return { procs: g("procs") || [], tarefas: g("tarefas") || [], nomes: g("nomes") || [], valores: g("valores") || {} }; }
+function locaisDesenhar() {
+  const box = $("usLocais"); if (!box) return; box.textContent = ""; const p = preLocais(), n = p.procs.length + p.tarefas.length + p.nomes.length + Object.keys(p.valores).length;
+  if (!n) { box.appendChild(el("div", "hint", "Não há dados antigos neste navegador para enviar.")); return; }
+  box.appendChild(el("div", "hint", "Antes do login, este navegador guardou " + p.procs.length + " pasta(s), " + p.tarefas.length + " tarefa(s), " + p.nomes.length + " cliente(s) monitorado(s) e " + Object.keys(p.valores).length + " valor(es) de causa. Você pode enviá-los para a nuvem (o que já existe lá é mantido)."));
+  box.appendChild(btn("Enviar para a nuvem", () => {
+    for (const x of p.procs) if (x && x.id && !PROCS.some(y => y.id === x.id || y.chave === x.chave)) PROCS.push(x);
+    for (const x of p.tarefas) if (x && x.id && !TAREFAS.some(y => y.id === x.id)) TAREFAS.push(x);
+    const nomes = lerLista().slice(); for (const x of p.nomes) if (x && x.nome && !nomes.some(y => norm(y.nome) === norm(x.nome))) nomes.push(x);
+    salvarProcs(); salvarTarefas(); gravarLista(nomes); LS.set("valores", Object.assign({}, p.valores, LS.get("valores", {})));
+    for (const k of CHAVES_NUVEM) try { localStorage.removeItem("djen.pre." + k); } catch (e) {}
+    nuvemAviso("Dados enviados para a nuvem."); atualizarTudo();
+  }, ""));
+}
+
+// ---------- ponto de entrada
+if (NV.ativo) { ligarLogin(); nuvemIniciar(); }
+
+
+/* ===== 46-telas: "Meu painel" (uma tela por advogado) e "Secretaria" ===== */
+const porPrazo = (a, b) => (a.prazo || "9999").localeCompare(b.prazo || "9999");
+function liPasta(p) {
+  const li = el("li"), a = el("a", "num", p.numero); a.href = "#processos"; a.onclick = e => { e.preventDefault(); abrirPasta(p.id); };
+  const ev = procEventoProximo(p); li.append(a, document.createTextNode((p.cliente ? p.cliente + " · " : "") + (p.classe || "")));
+  if (ev) li.appendChild(el("span", "tag" + (agendaAtrasada(ev) ? " crit" : ""), ev.tipo + " " + br(ev.data))); return li;
+}
+function badgesPapel() {
+  const m = $("bdMeu"), s = $("bdSec"), a = meuAdv();
+  if (m) { const n = a ? Object.values(AD.pubs).filter(p => ehNova(p) && p.quem.includes(a.id)).length : 0; m.hidden = !n; m.textContent = n > 99 ? "99+" : n; }
+  if (s) { const n = TAREFAS.filter(t => t.resp === "Secretaria" && t.status !== "concluida").length; s.hidden = !n; s.textContent = n; }
+}
+function meuDesenhar() {
+  const a = meuAdv(); if (!a) return;
+  const hoje = hojeIso(), lim = somaDias(hoje, 14), minha = r => r === a.curto;
+  $("subtitulo").textContent = "Olá, " + a.curto + " · " + a.rot;
+  const todos = agendaItens(), ag = todos.filter(e => (minha(e.resp) || e.resp === "Equipe") && e.data <= lim);
+  const pubs = Object.values(AD.pubs).filter(p => ehNova(p) && p.quem.includes(a.id)).sort((x, y) => y.data.localeCompare(x.data));
+  const tarefas = TAREFAS.filter(t => t.status !== "concluida" && minha(t.resp)).sort(porPrazo);
+  const pastas = PROCS.filter(p => p.status !== "arquivado" && minha(p.resp));
+  const k = $("meuKpis"); k.textContent = "";
+  const K = (v, l, s) => { const d = el("div", "kpi"); d.append(el("div", "v", v), el("div", "l", l)); if (s) d.appendChild(el("div", "s", s)); return d; };
+  k.append(K(pubs.length, "Publicações novas", "para você, ainda não tratadas"), K(tarefas.length, "Tarefas em aberto"), K(ag.filter(agendaAtrasada).length, "Atrasados", "prazos e tarefas"),
+    K(todos.filter(e => e.tipo === "Audiência" && minha(e.resp) && e.data >= hoje && e.data <= lim).length, "Audiências em 14 dias"), K(pastas.length, "Pastas ativas"));
+  const ba = $("meuAgenda"); ba.textContent = "";
+  if (!ag.length) ba.appendChild(el("div", "hint", "Nada atrasado nem agendado para os próximos 14 dias.")); else { const ul = el("ul", "mini"); for (const e of ag) ul.appendChild(agendaLi(e)); ba.appendChild(ul); }
+  const bt = $("meuTarefas"); bt.textContent = ""; bt.className = tarefas.length ? "list" : "";
+  if (!tarefas.length) bt.appendChild(el("div", "hint", "Nenhuma tarefa em aberto para você."));
+  for (const t of tarefas.slice(0, 8)) bt.appendChild(tkCard(t)); if (tarefas.length > 8) bt.appendChild(el("div", "hint", "e mais " + (tarefas.length - 8) + " na tela Organização."));
+  const bp = $("meuPubs"); bp.textContent = "";
+  if (!pubs.length) bp.appendChild(el("div", "hint", AD.meta.ultima ? "Nenhuma publicação nova para você. Tudo tratado." : "As publicações são carregadas ao abrir o site."));
+  for (const p of pubs.slice(0, 5)) bp.appendChild(advCard(p)); if (pubs.length > 5) bp.appendChild(el("div", "hint", "e mais " + (pubs.length - 5) + " na tela Advogados."));
+  const bs = $("meuPastas"); bs.textContent = "";
+  if (!pastas.length) bs.appendChild(el("div", "hint", "Nenhuma pasta em seu nome. Cadastre processos na tela Processos.")); else { const ul = el("ul", "mini"); for (const p of pastas.sort((x, y) => (procEventoProximo(x) ? procEventoProximo(x).data : "9999").localeCompare(procEventoProximo(y) ? procEventoProximo(y).data : "9999")).slice(0, 8)) ul.appendChild(liPasta(p)); bs.appendChild(ul); }
+  badgesPapel();
+}
+function secPubCard(p) {
+  const c = el("article", "card"), top = el("div", "top"), pasta = PROCS.find(x => x.chave === p.chave);
+  top.append(el("b", "", br(p.data)), el("span", "tag", p.quem.map(q => (advPor(q) || { curto: q }).curto).join(" + ")), el("span", "tag" + (/intima/i.test(p.tipo) ? " crit" : ""), p.tipo), el("span", "tag", p.tribunal));
+  const l2 = el("div", "top"), cp = el("button", "copy", "copiar"); cp.type = "button"; cp.onclick = () => copiar(p.processo, cp); l2.append(el("span", "num", p.processo), cp); c.append(top, l2);
+  const r = el("div", "row"); r.append(el("span", "", titulo(p.classe)), el("span", "", p.orgao)); c.appendChild(r);
+  const pz = prazoNoTexto(p.texto); if (pz) c.appendChild(el("div", "partes", "O texto cita prazo de " + pz + ". Confira no processo."));
+  const ac = el("div", "pubact");
+  ac.appendChild(btn(pasta ? "Abrir pasta" : "Criar pasta", () => pasta ? abrirPasta(pasta.id) : cadastrarRapido(p.processo, {}), ""));
+  ac.appendChild(btn("Tarefa para o advogado", () => abrirTarefa({ titulo: (p.docTipo || p.tipo) + " · " + p.processo, proc: p.processo, cli: pasta ? pasta.cliente : "", resp: p.quem.length === 1 ? (advPor(p.quem[0]) || {}).curto || "Equipe" : "Equipe", nota: "Origem: publicação de " + br(p.data) + " (" + p.tribunal + ").\n" + (p.link || "") })));
+  if (/^https:\/\//.test(p.link)) { const a = el("a", "btn sec sm", "Abrir documento"); a.href = p.link; a.target = "_blank"; a.rel = "noopener noreferrer"; ac.appendChild(a); }
+  c.appendChild(ac); return c;
+}
+function secDesenhar() {
+  const hoje = hojeIso(), l7 = somaDias(hoje, 7), l14 = somaDias(hoje, 14), ag = agendaItens();
+  const tSec = TAREFAS.filter(t => t.resp === "Secretaria" && t.status !== "concluida").sort(porPrazo);
+  const k = $("secKpis"); k.textContent = "";
+  const K = (v, l, s) => { const d = el("div", "kpi"); d.append(el("div", "v", v), el("div", "l", l)); if (s) d.appendChild(el("div", "s", s)); return d; };
+  k.append(K(ag.filter(e => e.tipo === "Audiência" && e.data >= hoje && e.data <= l7).length, "Audiências em 7 dias"), K(ag.filter(e => e.tipo === "Prazo" && e.data >= hoje && e.data <= l7).length, "Prazos em 7 dias"), K(ag.filter(agendaAtrasada).length, "Atrasados", "prazos e tarefas de todos"), K(tSec.length, "Tarefas da secretaria"), K(PROCS.filter(p => p.status !== "arquivado").length, "Pastas ativas"));
+  const sel = $("secProc"), atual = sel.value; sel.textContent = ""; sel.appendChild(Object.assign(el("option", "", "Escolha o processo…"), { value: "" }));
+  for (const p of PROCS.filter(x => x.status !== "arquivado").sort((a, b) => (a.cliente || "~").localeCompare(b.cliente || "~", "pt") || a.numero.localeCompare(b.numero))) sel.appendChild(Object.assign(el("option", "", p.numero + " · " + (p.cliente || "sem cliente")), { value: p.id }));
+  sel.value = atual;
+  const ba = $("secAgenda"); ba.textContent = ""; const lista = ag.filter(e => e.data <= l14);
+  if (!lista.length) ba.appendChild(el("div", "hint", "Nada atrasado nem agendado para os próximos 14 dias.")); else { const ul = el("ul", "mini"); for (const e of lista) ul.appendChild(agendaLi(e)); ba.appendChild(ul); }
+  const bt = $("secTarefas"); bt.textContent = ""; if (!tSec.length) bt.appendChild(el("div", "hint", "Nenhuma tarefa atribuída à secretaria."));
+  for (const t of tSec) bt.appendChild(tkCard(t));
+  const bp = $("secPubs"); bp.textContent = "";
+  const pubs = Object.values(AD.pubs).sort((a, b) => b.data.localeCompare(a.data)).slice(0, 10);
+  if (!pubs.length) bp.appendChild(el("div", "hint", AD.meta.ultima ? "Nenhuma publicação recente." : "As publicações são carregadas ao abrir o site."));
+  for (const p of pubs) bp.appendChild(secPubCard(p));
+  badgesPapel();
+}
+function telasIniciar() {
+  const proc = () => { const p = PROCS.find(x => x.id === $("secProc").value); if (!p) nuvemAviso("Escolha o processo primeiro.", true); return p; };
+  $("secAud").onclick = () => { const p = proc(); if (p) abrirAud(p); };
+  $("secPrazo").onclick = () => { const p = proc(); if (p) abrirPrazo(p); };
+  $("secTarefa").onclick = () => { const p = PROCS.find(x => x.id === $("secProc").value); abrirTarefa(p ? { proc: p.numero, cli: p.cliente, resp: "Secretaria" } : { resp: "Secretaria" }); };
+  $("secNovaTarefa").onclick = () => abrirTarefa({ resp: "Secretaria" });
+  $("meuNovaTarefa").onclick = () => abrirTarefa({ resp: respPadrao() });
+  $("meuTodasPastas").onclick = () => { P.respF = respPadrao(); $("pRespF").value = P.respF; P.sel = null; location.hash = "#processos"; };
+}
+
+
 /* ===== 50-app: navegação, painel inicial, backup e inicialização ===== */
 const VIEWS = {
+  meu: ["Meu painel", ""],
+  secretaria: ["Área da secretaria", "Cadastro de processos, audiências, prazos e tarefas"],
   inicio: ["Início", "Visão geral do escritório"],
   consulta: ["Consulta DJEN", "Busca por nome da parte no Diário de Justiça Eletrônico Nacional"],
   processos: ["Processos", "Pastas dos processos: cadastro pelo número, audiências, prazos e tarefas"],
   relatorios: ["Relatórios", "Indicadores e gráficos do cliente pesquisado, prontos para imprimir ou apresentar"],
   advogados: ["Advogados", "Publicações do DJEN em nome de Fábio (OAB/SC 15.044) e Davi (OAB/SC 39.336)"],
-  organizacao: ["Organização", "Tarefas, prazos e rotina do escritório"]
+  organizacao: ["Organização", "Tarefas, prazos e rotina do escritório"],
+  usuarios: ["Usuários", "Pedidos de acesso e perfis de cada pessoa"]
 };
-function irPara() {
-  let v = (location.hash || "").replace("#", ""); if (!VIEWS[v]) v = "inicio";
-  for (const k in VIEWS) $("v-" + k).hidden = k !== v;
-  for (const a of document.querySelectorAll("#nav a")) { if (a.dataset.v === v) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); }
-  $("titulo").textContent = VIEWS[v][0]; $("subtitulo").textContent = VIEWS[v][1];
+function vistaAtual() { const v = (location.hash || "").replace("#", ""); return VIEWS[v] && podeVer(v) ? v : homeDoPapel(); }
+function desenharVista(v) {
   if (v === "relatorios") relatorioAtualizar();
   if (v === "processos") procDesenhar();
   if (v === "inicio") inicioDesenhar();
   if (v === "advogados") advDesenhar();
+  if (v === "organizacao") orgDesenhar();
+  if (v === "meu") meuDesenhar();
+  if (v === "secretaria") secDesenhar();
+  if (v === "usuarios") usuariosAtualizar();
+}
+function atualizarTudo() { desenharVista(vistaAtual()); atualizarBadges(); }
+function irPara() {
+  const v = vistaAtual(); if ((location.hash || "").replace("#", "") !== v) history.replaceState(null, "", "#" + v);
+  for (const k in VIEWS) $("v-" + k).hidden = k !== v;
+  for (const a of document.querySelectorAll("#nav a")) { if (a.dataset.v === v) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); }
+  $("titulo").textContent = VIEWS[v][0]; $("subtitulo").textContent = VIEWS[v][1];
+  desenharVista(v);
   window.scrollTo(0, 0);
 }
 window.addEventListener("hashchange", irPara);
@@ -1734,13 +2213,13 @@ $("bkFile").onchange = async () => {
   $("bkFile").value = "";
 };
 
-// ---- inicialização
-iniciarConsulta();
-desenharInicioClientes();
-orgIniciar();
-procIniciar();
-advIniciar();
-irPara();
+// ---- inicialização (com login ativo, só depois de entrar: ver 45-nuvem.js)
+let appIniciado = false;
+function iniciarApp() {
+  if (appIniciado) return; appIniciado = true;
+  iniciarConsulta(); desenharInicioClientes(); orgIniciar(); procIniciar(); telasIniciar(); advIniciar(); irPara();
+}
+if (!NV.ativo) { aplicarPapel(); iniciarApp(); }
 
 </script>
 </body>
