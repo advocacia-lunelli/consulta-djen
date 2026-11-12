@@ -1,4 +1,4 @@
-/* Service worker do App Organização: abre o app mesmo com internet ruim. Rede primeiro (sempre pega a versão nova); cache só como reserva.
+/* Service worker do Lunelli Office: abre o app mesmo com internet ruim. Rede primeiro (sempre pega a versão nova); cache só como reserva.
    Só guarda arquivos do próprio site; nunca guarda as chamadas ao DJEN, Firebase, Google ou IA. */
 const C = "lunelli-v2";
 self.addEventListener("install", e => { e.waitUntil(caches.open(C).then(c => c.addAll(["./", "icon-192.png"])).then(() => self.skipWaiting())); });
