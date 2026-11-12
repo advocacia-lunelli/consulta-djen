@@ -376,6 +376,19 @@ body{padding-bottom:env(safe-area-inset-bottom)}
 @media (max-width:860px){input,select,textarea{font-size:16px}.btn,button{min-height:36px}}
 @media (display-mode:standalone){html{-webkit-tap-highlight-color:transparent}}
 
+/* ---- alertas */
+.alBanner{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;background:#fff3cd;border-bottom:1px solid #f0d78c;color:#5b4500;padding:8px 26px;font-size:14px}
+@media (max-width:860px){.alBanner{padding:8px 14px}}
+.alsino{position:relative;font-size:16px;padding:4px 10px}
+.alsino .bd{position:absolute;top:-6px;right:-6px}
+#alCorpo h3{margin:10px 0 2px;font-size:14px;color:var(--accent)}
+#dlgAlertas details{margin-top:8px}
+#dlgAlertas .intgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+#dlgAlertas label{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--muted)}
+@media print{.alBanner,.alsino{display:none!important}}
+.alsino .bd{background:#e8b923;color:#1a1a00;border-radius:10px;font-size:11px;font-weight:700;padding:0 6px;min-width:18px;text-align:center}
+.alsino .bd.red{background:#ff6b5e;color:#2a0300}
+
 </style>
 </head>
 <body>
@@ -409,6 +422,7 @@ body{padding-bottom:env(safe-area-inset-bottom)}
 
 <div class="main">
 <header class="topbar"><div><h1 id="titulo">Início</h1><p class="sub" id="subtitulo"></p></div><div class="acts noprint" id="topActs"></div></header>
+<div class="alBanner noprint" id="alBanner" hidden></div>
 <main class="content">
 
 <!-- ===================== MEU PAINEL (cada advogado) ===================== -->
@@ -905,6 +919,16 @@ body{padding-bottom:env(safe-area-inset-bottom)}
     <div class="msg" id="drMsg" hidden></div>
     <div id="drCorpo" class="dlgbody"></div>
     <div class="acts" style="justify-content:flex-end"><button class="btn sec" type="button" id="drFechar">Fechar</button></div>
+  </div>
+</dialog>
+
+<dialog id="dlgAlertas" class="big">
+  <div class="dlgbody">
+    <h2>Alertas</h2>
+    <div class="hint" id="alResumo"></div>
+    <div id="alCorpo"></div>
+    <details><summary>Configurar alertas e avisos do aparelho</summary><div class="intpasso" id="alConfig"></div></details>
+    <div class="acts" style="justify-content:flex-end"><button class="btn sec" type="button" id="alFechar">Fechar</button></div>
   </div>
 </dialog>
 
@@ -1688,6 +1712,7 @@ function atualizarBadges() {
   if (typeof atualizarBadgeOrg === "function") atualizarBadgeOrg();
   if (typeof crmBadge === "function") crmBadge();
   if (typeof badgesPapel === "function") badgesPapel();
+  if (typeof alAtualizar === "function") alAtualizar();
 }
 function advIniciar() {
   $("advTabs").addEventListener("click", e => { const b = e.target.closest("button[data-t]"); if (!b) return; AD.aba = b.dataset.t; AD.limite = 60; for (const x of $("advTabs").children) x.setAttribute("aria-selected", x === b); advDesenhar(); });
@@ -4593,6 +4618,104 @@ function cuDesenhar() {
 }
 
 
+/* ===== 49-alertas: central de alertas (prazos, tarefas, audiências), faixa no topo, contador no ícone e avisos do aparelho =====
+   Tudo roda no aparelho, sem servidor. Os avisos do sistema (notificações) só chegam com o app aberto ou recém-usado:
+   para avisar com o app fechado, use a integração com o calendário (Google/Apple), que cria os lembretes nativos. */
+const AL_PAD = { meus: true, dias: 3, audDias: 7, antes: 120, notif: false, banner: true };
+const alCfg = () => Object.assign({}, AL_PAD, LS.get("alertas", {}));
+const alSalvar = p => LS.setLocal("alertas", Object.assign(alCfg(), p));
+const AL_GRUPOS = [["atrasado", "Atrasados", "crit"], ["hoje", "Hoje", "warn"], ["amanha", "Amanhã", "dist"], ["prox", "Próximos dias", ""]];
+
+function alMinha(e) {
+  const a = meuAdv(); if (NV.papel === "secretaria") return e.resp === "Secretaria" || e.resp === "Equipe";
+  return !a || e.resp === a.curto || e.resp === "Equipe";
+}
+function alItens() {
+  const c = alCfg(), hoje = hojeIso(), out = [];
+  for (const e of agendaItens()) {
+    if (c.meus && !alMinha(e)) continue;
+    const aud = e.tipo === "Audiência", d = clcDias(hoje, e.data); let g = null;
+    if (d < 0) { if (!aud) g = "atrasado"; } else if (d === 0) g = "hoje"; else if (d === 1) g = "amanha"; else if (d <= (aud ? c.audDias : c.dias)) g = "prox";
+    if (g) out.push(Object.assign({ g, d }, e));
+  }
+  return out;
+}
+const alContagem = it => ({ atrasado: it.filter(x => x.g === "atrasado").length, hoje: it.filter(x => x.g === "hoje").length, amanha: it.filter(x => x.g === "amanha").length, prox: it.filter(x => x.g === "prox").length });
+const alTextoResumo = n => { const l = []; if (n.atrasado) l.push(n.atrasado + " atrasado(s)"); if (n.hoje) l.push(n.hoje + " para hoje"); if (n.amanha) l.push(n.amanha + " para amanhã"); return l.join(" · "); };
+
+// ---------- avisos do aparelho
+const alPermissao = () => ("Notification" in window ? Notification.permission : "unsupported");
+async function alNotificar(titulo, corpo, tag) {
+  const op = { body: corpo, tag: tag || undefined, icon: "icon-192.png", badge: "icon-192.png", data: { url: "./#alertas" } };
+  try {
+    const reg = navigator.serviceWorker && navigator.serviceWorker.getRegistration ? await navigator.serviceWorker.getRegistration() : null;
+    if (reg && reg.showNotification) { await reg.showNotification(titulo, op); return true; }
+  } catch (e) { /* sem service worker: usa o aviso comum abaixo */ }
+  try { new Notification(titulo, op); return true; } catch (e) { return false; }
+}
+async function alAtivarNotif() {
+  if (!("Notification" in window)) throw new Error("Este navegador não oferece avisos. No iPhone, instale o app na Tela de Início (Safari) e abra por lá.");
+  const p = await Notification.requestPermission(); if (p !== "granted") throw new Error("Permissão negada. Libere as notificações do app nos Ajustes do aparelho.");
+  alSalvar({ notif: true }); await alNotificar("Avisos ativados", "Você será avisado de prazos do dia e de audiências próximas.", "teste");
+}
+async function alVerificarNotifs(agora) {
+  const c = alCfg(); if (!c.notif || alPermissao() !== "granted") return 0; agora = agora || new Date();
+  const hoje = hojeIso(), env = LS.get("alertas_env", {}); for (const k of Object.keys(env)) if (!k.startsWith(hoje)) delete env[k];
+  const it = alItens(), n = alContagem(it); let enviados = 0; const marca = k => { env[hoje + "|" + k] = 1; };
+  if (!env[hoje + "|resumo"] && (n.atrasado || n.hoje || n.amanha)) { const aud = it.filter(x => x.g === "hoje" && x.tipo === "Audiência").length; marca("resumo"); if (await alNotificar("Resumo do dia — Lunelli", alTextoResumo(n) + (aud ? " · " + aud + " audiência(s) hoje" : ""), "resumo-" + hoje)) enviados++; }
+  const min = agora.getHours() * 60 + agora.getMinutes();
+  for (const e of it) {
+    if (e.g !== "hoje" || e.tipo !== "Audiência" || !/^\d{1,2}:\d{2}$/.test(e.hora || "")) continue;
+    const [h, m] = e.hora.split(":").map(Number), falta = h * 60 + m - min, k = "aud|" + (e.procId || "") + "|" + e.hora;
+    if (falta >= 0 && falta <= c.antes && !env[hoje + "|" + k]) { marca(k); if (await alNotificar("Audiência às " + e.hora, e.titulo + (falta ? " (em " + (falta >= 60 ? Math.round(falta / 60) + " h" : falta + " min") + ")" : ""), k)) enviados++; }
+  }
+  LS.setLocal("alertas_env", env); return enviados;
+}
+
+// ---------- contador (ícone/título), sino e faixa
+function alAtualizar() {
+  if (!$("btnAlertas")) return; const it = alItens(), n = alContagem(it), urg = n.atrasado + n.hoje + n.amanha, b = $("bdAl");
+  b.hidden = !urg; b.textContent = urg > 99 ? "99+" : urg; b.className = "bd" + (n.atrasado || n.hoje ? " red" : "");
+  try { if (navigator.setAppBadge) { if (urg) navigator.setAppBadge(urg).catch(() => {}); else navigator.clearAppBadge().catch(() => {}); } } catch (e) {}
+  const ban = $("alBanner"), cfg = alCfg(), oculto = LS.get("alertas_oculto", "") === hojeIso(), importante = n.atrasado + n.hoje;
+  if (!cfg.banner || oculto || !importante) { ban.hidden = true; return; }
+  ban.textContent = ""; ban.hidden = false; const t = el("span", "", "🔔 " + alTextoResumo(n));
+  ban.append(t, btn("Ver alertas", alAbrir, ""), btn("Dispensar hoje", () => { LS.setLocal("alertas_oculto", hojeIso()); alAtualizar(); }));
+}
+function alAbrir() {
+  const dlg = $("dlgAlertas"), c = alCfg(), box = $("alCorpo"), it = alItens(), n = alContagem(it); box.textContent = "";
+  $("alResumo").textContent = it.length ? alTextoResumo(n) || "Nada urgente: só itens nos próximos dias." : "Nada atrasado nem agendado para os próximos dias.";
+  for (const [g, rot, cls] of AL_GRUPOS) {
+    const lista = it.filter(x => x.g === g); if (!lista.length) continue;
+    const h = el("h3", "", rot + " (" + lista.length + ")"); box.appendChild(h); const ul = el("ul", "mini");
+    for (const e of lista) { const li = agendaLi(e), f = li.onclick; li.onclick = ev => { dlg.close(); f(ev); }; ul.appendChild(li); }
+    box.appendChild(ul);
+  }
+  const cf = $("alConfig"); cf.textContent = "";
+  const [l1, c1] = intCheck("Mostrar só o que é meu (inclui “Equipe”)", c.meus), [l2, c2] = intCheck("Mostrar a faixa de alerta no topo quando houver atrasado ou item de hoje", c.banner);
+  const sD = optsSel(el("select"), [[1, "1 dia"], [2, "2 dias"], [3, "3 dias"], [5, "5 dias"], [7, "7 dias"]]), sA = optsSel(el("select"), [[3, "3 dias"], [7, "7 dias"], [14, "14 dias"], [30, "30 dias"]]), sB = optsSel(el("select"), [[30, "30 min"], [60, "1 hora"], [120, "2 horas"], [240, "4 horas"]]);
+  sD.value = c.dias; sA.value = c.audDias; sB.value = c.antes;
+  const g = el("div", "intgrid"); g.append(intCampo("Prazos e tarefas: avisar com antecedência de", sD), intCampo("Audiências: mostrar até", sA), intCampo("Aviso do aparelho antes da audiência", sB));
+  const salva = () => { alSalvar({ meus: c1.checked, banner: c2.checked, dias: +sD.value, audDias: +sA.value, antes: +sB.value }); alAbrir(); alAtualizar(); };
+  for (const x of [c1, c2, sD, sA, sB]) x.onchange = salva;
+  const ac = el("div", "acts"), ms = el("div", "hint"), perm = alPermissao();
+  const estado = !("Notification" in window) ? "Este navegador não oferece avisos (no iPhone, instale o app pela Tela de Início)." : c.notif && perm === "granted" ? "Avisos do aparelho: ativados." : perm === "denied" ? "Avisos bloqueados nos Ajustes do aparelho." : "Avisos do aparelho: desativados.";
+  ms.textContent = estado + " Eles chegam com o app aberto ou recém-usado; para avisar com o app fechado, use o calendário (Google/Apple).";
+  ac.append(btn(c.notif && perm === "granted" ? "Desativar avisos" : "Ativar avisos do aparelho", async () => { if (c.notif && perm === "granted") { alSalvar({ notif: false }); alAbrir(); return; } try { await alAtivarNotif(); alAbrir(); } catch (e) { ms.textContent = e.message; ms.className = "msg err"; } }, ""),
+    btn("Testar aviso", async () => { const ok = alPermissao() === "granted" && await alNotificar("Teste — Lunelli", "Os avisos estão funcionando neste aparelho.", "teste"); ms.textContent = ok ? "Aviso de teste enviado." : "Ative os avisos primeiro."; }));
+  cf.append(l1, l2, g, ac, ms);
+  if (!dlg.open) dlg.showModal();
+}
+function alIniciar() {
+  const b = btn("🔔", alAbrir, ""); b.id = "btnAlertas"; b.title = "Alertas de prazos e audiências"; b.setAttribute("aria-label", "Alertas"); const bd = el("span", "bd"); bd.id = "bdAl"; bd.hidden = true; b.appendChild(bd); b.classList.add("alsino");
+  $("topActs").prepend(b); $("alFechar").onclick = () => $("dlgAlertas").close();
+  if (location.hash === "#alertas") { history.replaceState(null, "", location.pathname + location.search); setTimeout(alAbrir, 400); }
+  alAtualizar(); alVerificarNotifs();
+  setInterval(() => { alAtualizar(); alVerificarNotifs(); }, 60000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) { alAtualizar(); alVerificarNotifs(); } });
+}
+
+
 /* ===== 50-app: navegação, painel inicial, backup e inicialização ===== */
 const VIEWS = {
   meu: ["Meu painel", ""],
@@ -4683,7 +4806,7 @@ $("bkFile").onchange = async () => {
 let appIniciado = false;
 function iniciarApp() {
   if (appIniciado) return; appIniciado = true;
-  iniciarConsulta(); desenharInicioClientes(); orgIniciar(); procIniciar(); audIniciar(); crmIniciar(); telasIniciar(); advIniciar(); driveIniciar(); irPara();
+  iniciarConsulta(); desenharInicioClientes(); orgIniciar(); procIniciar(); audIniciar(); crmIniciar(); telasIniciar(); advIniciar(); driveIniciar(); alIniciar(); irPara();
 }
 if (!NV.ativo) { aplicarPapel(); iniciarApp(); }
 
