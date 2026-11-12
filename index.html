@@ -525,11 +525,92 @@ input[type=text],input[type=url],input[type=time],input[type=date],input[type=nu
 .hd h2{color:var(--accent)}
 .hint.eq{background:var(--soft);border-radius:8px;padding:8px 10px}
 
+/* ===== Visual v4: menu lateral (≥1100 px), cartões e tabelas mais leves, detalhes dourados ===== */
+:root{--sbw:260px;--radius:14px;--shadow2:0 1px 2px rgba(10,16,60,.05),0 8px 24px rgba(10,16,60,.08);--sb1:#06075a;--sb2:#00003d}
+@media (prefers-color-scheme: dark){:root{--shadow2:0 1px 2px rgba(0,0,0,.35),0 10px 28px rgba(0,0,0,.35);--sb1:#0b0d3f;--sb2:#05061f}}
+html{scrollbar-width:thin;scrollbar-color:rgba(90,102,120,.45) transparent}
+.sbtog{display:none}
+@media (min-width:1100px){
+  .app{display:block}
+  .navbar{position:fixed;top:0;left:0;bottom:0;width:var(--sbw);z-index:50;padding-top:0;background:radial-gradient(120% 60% at 0 0,rgba(176,141,79,.16),transparent 55%),linear-gradient(180deg,var(--sb1),var(--sb2));box-shadow:1px 0 0 rgba(255,255,255,.05) inset,6px 0 28px rgba(0,0,40,.22);transition:width .22s ease}
+  .navin{flex-direction:column;align-items:stretch;flex-wrap:nowrap;height:100%;min-height:0;max-width:none;margin:0;padding:20px 14px 14px;gap:14px}
+  .brand{flex-direction:column;align-items:flex-start;gap:9px;height:auto;padding:4px 8px 16px;border-bottom:1px solid rgba(255,255,255,.1)}
+  .brand .logo{width:150px;height:40px}
+  .brand .tagline{display:block;border:0;padding:0;font-size:10px;letter-spacing:.2em;color:var(--gold);opacity:.95}
+  .nav{order:0;flex:1 1 auto;flex-direction:column;align-items:stretch;gap:3px;height:auto;margin:0;padding:2px 0;border:0;overflow-y:auto;overflow-x:hidden;align-self:stretch;scroll-snap-type:none}
+  .nav::-webkit-scrollbar{width:0}
+  .nav a{height:auto;flex:none;gap:12px;padding:10px 12px;border-radius:11px;font-size:14px;font-weight:500;letter-spacing:0;color:#c9cff3;scroll-snap-align:none}
+  .nav a svg{display:block;width:19px;height:19px;opacity:.9}
+  .nav a:hover{background:rgba(255,255,255,.08);color:#fff}
+  .nav a[aria-current=page]{background:linear-gradient(90deg,rgba(255,255,255,.16),rgba(255,255,255,.06));color:#fff;font-weight:600}
+  .nav a[aria-current=page] svg{color:var(--gold);opacity:1}
+  .nav a[aria-current=page]::after{left:-14px;right:auto;top:9px;bottom:9px;width:3px;height:auto;border-radius:0 3px 3px 0;background:var(--gold)}
+  .nav .bd{margin-left:auto}
+  .navend{height:auto;margin:0;padding-top:12px;border-top:1px solid rgba(255,255,255,.1);justify-content:space-between;gap:8px}
+  .contaBtn{flex:1;min-width:0;padding:5px 12px 5px 5px;border-radius:14px;border-color:rgba(255,255,255,.16)}
+  .contaNome{display:block;max-width:none;flex:1;text-align:left}
+  .contaBtn>svg{display:block;margin-left:auto}
+  .contaMenu{top:auto;bottom:calc(100% + 10px);left:0;right:auto;width:min(290px,calc(100vw - 24px))}
+  .main{margin-left:var(--sbw);transition:margin-left .22s ease}
+  .topbar{position:sticky;top:0;z-index:30;padding:22px 36px 14px;background:color-mix(in srgb,color-mix(in srgb,var(--canvas-top),var(--bg) 25%) 90%,transparent);-webkit-backdrop-filter:saturate(1.4) blur(12px);backdrop-filter:saturate(1.4) blur(12px)}
+  .alBanner,.content{margin-left:0}
+  .cfgnav{top:96px}
+  .sbtog{display:grid;place-items:center;position:absolute;top:22px;right:-13px;width:26px;height:26px;padding:0;min-height:0;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:var(--sb1);color:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,40,.35);z-index:2}
+  .sbtog svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s}
+  .sbtog:hover{background:#1a1c7a}
+  body.sb-min{--sbw:78px}
+  body.sb-min .brand{display:none}
+  body.sb-min .navin{padding:64px 12px 14px;align-items:center}
+  body.sb-min .nav{align-self:stretch}
+  body.sb-min .nav a{font-size:0;gap:0;justify-content:center;padding:12px 0;position:relative}
+  body.sb-min .nav a svg{width:21px;height:21px}
+  body.sb-min .nav .bd{position:absolute;top:3px;right:6px;margin:0;font-size:10px;min-width:16px;line-height:16px;padding:0 4px}
+  body.sb-min .navend{flex-direction:column-reverse;border-top:1px solid rgba(255,255,255,.1)}
+  body.sb-min .contaBtn{flex:none;padding:3px}
+  body.sb-min .contaNome,body.sb-min .contaBtn>svg{display:none}
+  body.sb-min .contaMenu{left:0}
+  body.sb-min .sbtog svg{transform:rotate(180deg)}
+  body.sb-min .sbtog{right:-13px;top:20px}
+}
+@media (min-width:1100px) and (max-width:1340px){.navbar{top:0}}
+
+/* cartões, tabelas, botões e campos */
+.panel{border-radius:var(--radius);box-shadow:var(--shadow2);padding:20px 22px}
+.card,.kpi,.tk,.ucard{border-radius:var(--radius);box-shadow:var(--shadow2)}
+.card:hover,.tk:hover{transform:translateY(-1px);border-color:color-mix(in srgb,var(--accent) 22%,var(--line))}
+.kpi{border-top:0;position:relative;overflow:hidden;padding:18px 20px}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--gold),color-mix(in srgb,var(--gold) 35%,transparent))}
+.kpi .v{font-size:34px}
+.panel>h2{border-bottom:0;padding-bottom:2px}
+.btn{border-radius:10px;padding:9px 18px;background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 92%,#fff),var(--accent));box-shadow:0 1px 2px rgba(0,0,60,.25),0 4px 12px rgba(0,0,101,.16)}
+.btn:hover:not(:disabled){background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 80%,#fff),color-mix(in srgb,var(--accent) 92%,#fff));transform:translateY(-1px)}
+.btn.sec,.btn.danger{background:var(--surface)}
+.btn.danger{background:transparent}
+.btn.sec{box-shadow:none}
+.btn.sec:hover:not(:disabled){background:var(--soft)}
+@media (prefers-color-scheme: dark){.btn{box-shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(163,177,255,.14)}.btn.sec{box-shadow:none}}
+input[type=text],input[type=url],input[type=time],input[type=date],input[type=number],input[type=email],input[type=password],select,textarea{border-radius:10px;padding:9px 12px}
+input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);box-shadow:var(--ring)}
+.tag,.chip{border-radius:999px}
+table th{background:color-mix(in srgb,var(--soft) 75%,transparent);font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;font-weight:700;color:var(--muted);border-bottom:1px solid var(--line)}
+table td{border-bottom:1px solid color-mix(in srgb,var(--line) 70%,transparent)}
+table tbody tr{transition:background .12s}
+table tbody tr:hover{background:color-mix(in srgb,var(--soft) 55%,transparent)}
+.tblwrap{border-radius:var(--radius);border:1px solid var(--line);box-shadow:var(--shadow2);background:var(--surface);overflow:auto}
+.tabs button{border-radius:10px 10px 0 0}
+.cfgnav{border-radius:var(--radius);box-shadow:var(--shadow2)}
+.cfgi{border-radius:10px}
+.alBanner{border-radius:12px}
+body{background:radial-gradient(900px 380px at 88% -80px,color-mix(in srgb,var(--gold) 16%,transparent),transparent 70%),linear-gradient(180deg,var(--canvas-top) 0,var(--bg) 360px) no-repeat,var(--bg)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media print{.main{margin-left:0!important}.navbar,.sbtog{display:none!important}}
+
 </style>
 </head>
 <body>
 <div class="app">
 <header class="navbar noprint">
+  <button type="button" class="sbtog" id="sbToggle" aria-label="Recolher ou expandir o menu" title="Recolher/expandir o menu" aria-expanded="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
   <div class="navin">
     <a class="brand" href="#inicio" aria-label="Lunelli Advocacia — início"><span class="logo" role="img" aria-label="Lunelli Advocacia"></span><span class="tagline">Advocacia Empresarial</span></a>
     <nav class="nav" id="nav" aria-label="Seções">
@@ -6952,7 +7033,7 @@ function instalarPainel() {
 }
 
 
-/* ===== 49-menu: barra superior (menu de conta, avatar e rolagem do item ativo no celular) ===== */
+/* ===== 49-menu: menu (conta, avatar, menu lateral recolhível e rolagem do item ativo no celular) ===== */
 const PESSOA = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>';
 function menuIniciar() {
   const cb = $("contaBtn"), cm = $("contaMenu"), nav = $("nav"); if (!cb || cb.dataset.ok) return; cb.dataset.ok = "1";
@@ -6967,6 +7048,11 @@ function menuIniciar() {
   new MutationObserver(conta).observe($("userBox"), { attributes: true, attributeFilter: ["hidden"] });
   new MutationObserver(() => { const a = nav.querySelector("a[aria-current=page]"); if (a && nav.scrollWidth > nav.clientWidth) { const x = a.offsetLeft - (nav.clientWidth - a.offsetWidth) / 2; nav.scrollTo ? nav.scrollTo({ left: x, behavior: "smooth" }) : (nav.scrollLeft = x); } }).observe(nav, { subtree: true, attributes: true, attributeFilter: ["aria-current"] });
   conta();
+  // menu lateral: recolher/expandir (lembra a escolha neste navegador) e dica com o nome de cada item quando recolhido
+  for (const a of nav.querySelectorAll("a")) if (!a.title) a.title = [...a.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent).join("").trim();
+  const sb = $("sbToggle"), mini = v => { document.body.classList.toggle("sb-min", v); sb.setAttribute("aria-expanded", String(!v)); };
+  try { mini(localStorage.getItem("sbmin") === "1"); } catch (e) { mini(false); }
+  sb.onclick = () => { const v = !document.body.classList.contains("sb-min"); mini(v); try { localStorage.setItem("sbmin", v ? "1" : "0"); } catch (e) { } };
 }
 menuIniciar();
 
