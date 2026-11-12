@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <title>Advocacia Lunelli · App Organização</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap">
 <style>
 /* Advocacia Lunelli · App Organização — estilos. Identidade: azul-marinho #000065, fonte Barlow. Layout inspirado em sistemas de gestão jurídica (barra superior de navegação + painéis). */
 :root{
@@ -21,7 +21,7 @@
   --accent:#000065; --accent-ink:#fff; --soft:#e6e8f3;
   --crit:#a8281f; --crit-soft:#f7e1de; --warn:#7a5200; --warn-soft:#f8ebc9; --ok:#1f6b3a; --ok-soft:#dcefe1;
   --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08);
-  --sans:"Barlow","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif; --mono:Consolas,"Cascadia Mono",ui-monospace,monospace;
+  --sans:"Inter","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif; --head:"Manrope","Inter","Segoe UI",system-ui,sans-serif; --mono:Consolas,"Cascadia Mono",ui-monospace,monospace;
 }
 @media (prefers-color-scheme: dark){ :root{
   --bg:#10151d; --surface:#19212c; --ink:#e7ecf3; --muted:#9aa6b8; --line:#2e3948;
@@ -476,6 +476,55 @@ table th{font-weight:600}
 .avatar svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:1}
 @media (min-width:1313px){.topbar,.alBanner{padding-left:calc((100% - 1216px)/2);padding-right:calc((100% - 1216px)/2)}}
 
+
+/* ===== Visual v3: fundo com mais contraste, tipografia de "site" (Inter + Manrope) e tela Configurações ===== */
+:root{--bg:#e4e9f2;--surface:#fff;--line:#d2d9e6;--soft:#e9edf7;--shadow:0 1px 2px rgba(10,16,60,.06),0 4px 14px rgba(10,16,60,.07);--canvas-top:#d6ddec}
+@media (prefers-color-scheme: dark){:root{--bg:#0d1118;--surface:#171e29;--line:#2a3544;--soft:#212b3a;--canvas-top:#0a0e14}}
+body{font-size:14.5px;line-height:1.5;letter-spacing:-.003em;background:linear-gradient(180deg,var(--canvas-top) 0,var(--bg) 340px) no-repeat,var(--bg);background-attachment:scroll}
+h1,h2,h3,.kpi .v,.lg-card h1,.tabs button,.cfgg{font-family:var(--head)}
+h1{font-size:24px;font-weight:800;letter-spacing:-.025em}
+h2{font-size:16.5px;font-weight:700;letter-spacing:-.015em}
+h3{font-size:14.5px;font-weight:700;letter-spacing:-.01em}
+.kpi .v{font-weight:800;letter-spacing:-.035em}
+.kpi .l{font-size:11.5px;font-weight:600;letter-spacing:.08em}
+.topbar{background:transparent;border-bottom:0;padding-top:26px;padding-bottom:6px}
+.topbar .sub{font-size:14px}
+.panel{border:1px solid var(--line);box-shadow:var(--shadow)}
+.panel>h2{font-size:16px}
+.card,.kpi,.tk{box-shadow:var(--shadow)}
+.col{background:rgba(255,255,255,.45)}
+@media (prefers-color-scheme: dark){.col{background:var(--soft)}}
+.nav a{font-size:13px;font-weight:600;letter-spacing:-.005em}
+.btn{font-weight:600;letter-spacing:0}
+.tabs button{font-weight:600;font-size:14px}
+.tag{font-weight:600;font-size:11.5px}
+input[type=text],input[type=url],input[type=time],input[type=date],input[type=number],input[type=email],input[type=password],select,textarea{border-color:#c3cbdb;background:#fff}
+@media (prefers-color-scheme: dark){input[type=text],input[type=url],input[type=time],input[type=date],input[type=number],input[type=email],input[type=password],select,textarea{border-color:var(--line);background:var(--surface)}}
+.alBanner{background:#f6ecc9}
+
+/* tela Configurações */
+.cfg{display:grid;grid-template-columns:248px minmax(0,1fr);gap:22px;align-items:start}
+.cfgnav{position:sticky;top:78px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:10px;display:flex;flex-direction:column;gap:2px}
+.cfgg{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:12px 10px 4px}
+.cfgg:first-child{padding-top:4px}
+.cfgi{display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;background:transparent;border:0;border-radius:9px;padding:9px 10px;color:var(--ink);font-weight:500;font-size:14px;cursor:pointer}
+.cfgi:hover{background:var(--soft)}
+.cfgi[aria-current=true]{background:var(--accent);color:var(--accent-ink);font-weight:600}
+.cfgi .bd{background:#ff6b5e;color:#2a0300;border-radius:10px;font-size:11px;font-weight:700;padding:0 6px;min-width:18px;line-height:18px;text-align:center}
+.cfgbody{min-width:0;display:flex;flex-direction:column;gap:18px}
+.cfgsec{display:flex;flex-direction:column;gap:18px}
+.cfgsec[hidden]{display:none}
+.cfgnome{font-family:var(--head);font-size:18px;font-weight:700;color:var(--accent)}
+.cfgconta{display:flex;flex-direction:column;gap:2px;margin-bottom:6px}
+@media (max-width:900px){
+  .cfg{grid-template-columns:1fr;gap:14px}
+  .cfgnav{position:static;flex-direction:row;overflow-x:auto;gap:6px;padding:8px;scrollbar-width:thin}
+  .cfgg{display:none}
+  .cfgi{white-space:nowrap;flex:none;background:var(--soft)}
+}
+.hd h2{color:var(--accent)}
+.hint.eq{background:var(--soft);border-radius:8px;padding:8px 10px}
+
 </style>
 </head>
 <body>
@@ -495,8 +544,7 @@ table th{font-weight:600}
     <a href="#advogados" data-v="advogados"><svg viewBox="0 0 24 24"><path d="M12 3v18M5 7h14M5 7l-3 7a3 3 0 006 0zM19 7l-3 7a3 3 0 006 0z"/></svg>Advogados<span class="bd" id="bdAdv" hidden></span></a>
     <a href="#organizacao" data-v="organizacao"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="10" rx="1"/><rect x="17" y="4" width="4" height="6" rx="1"/></svg>Organização<span class="bd red" id="bdOrg" hidden></span></a>
     <a href="#calculos" data-v="calculos" hidden><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h2M12 12h2M16 12h0M8 16h2M12 16h2M16 16h0"/></svg>Cálculos</a>
-    <a href="#integracoes" data-v="integracoes" hidden><svg viewBox="0 0 24 24"><path d="M7 18a4 4 0 010-8 5.5 5.5 0 0110.6 1.5A3.3 3.3 0 0117 18z"/></svg>Integrações</a>
-    <a href="#usuarios" data-v="usuarios" hidden><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.6 3-6 7-6s7 2.4 7 6M17 5a3.5 3.5 0 010 7M22 20c0-2.8-1.8-4.8-4.5-5.6"/></svg>Usuários<span class="bd red" id="bdUsr" hidden></span></a>
+    <a href="#configuracoes" data-v="configuracoes"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 01-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 010-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 014 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 010 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg>Configurações<span class="bd red" id="bdUsr" hidden></span></a>
   </nav>
     <div class="navend" id="navEnd">
       <div class="conta" id="conta">
@@ -545,10 +593,20 @@ table th{font-weight:600}
 </section>
 
 <!-- ===================== USUÁRIOS (administrador) ===================== -->
-<section class="view" id="v-usuarios" hidden>
+<section class="view" id="v-configuracoes" hidden>
+  <div class="cfg">
+    <nav class="cfgnav" id="cfgMenu" aria-label="Seções de configurações"></nav>
+    <div class="cfgbody">
+      <div class="cfgsec" id="cfgGeral" hidden></div>
+      <div class="cfgsec" id="cfgAlertas" hidden></div>
+      <div class="cfgsec" id="intCorpo" hidden></div>
+      <div class="cfgsec" id="cfgEquipe" hidden>
   <div class="panel"><h2>Pedidos de acesso pendentes</h2><div id="usPend"></div></div>
   <div class="panel"><h2>Usuários com acesso</h2><div id="usAtivos"></div></div>
   <div class="panel"><h2>Dados antigos deste navegador</h2><div id="usLocais"></div></div>
+</div>
+    </div>
+  </div>
 </section>
 
 <!-- ===================== CÁLCULOS JUDICIAIS ===================== -->
@@ -556,10 +614,7 @@ table th{font-weight:600}
   <div id="cuCorpo"></div>
 </section>
 
-<!-- ===================== INTEGRAÇÕES (Google Drive e IA) ===================== -->
-<section class="view" id="v-integracoes" hidden>
-  <div id="intCorpo"></div>
-</section>
+
 
 <!-- ===================== INÍCIO ===================== -->
 <section class="view" id="v-inicio" hidden>
@@ -3623,7 +3678,7 @@ function agendaLi(e) {
 }
 
 // ---------- telas
-function abrirPasta(id) { P.sel = id; P.aba = "andamento"; if (location.hash !== "#processos") location.hash = "#processos"; else procDesenhar(); }
+function abrirPasta(id, aba) { P.sel = id; P.aba = aba || "andamento"; if (location.hash !== "#processos") location.hash = "#processos"; else procDesenhar(); }
 function pLinha(rot, msg, tipo) {
   const ul = $("pRelat"); const li = el("li"); li.append(el("span", "tag " + (tipo === "ok" ? "ok" : tipo === "err" ? "crit" : "warn"), tipo === "ok" ? "ok" : tipo === "err" ? "erro" : "atenção"));
   if (rot) li.appendChild(el("b", "num", rot)); li.appendChild(document.createTextNode(msg)); ul.appendChild(li);
@@ -3693,12 +3748,13 @@ function pDetalhe(p) {
   box.appendChild(hd);
   // abas
   const tarefas = TAREFAS.filter(t => chaveDe(t.proc) === p.chave), sg = sugestoes(p);
-  const abas = [["andamento", "Andamento (" + p.pubs.length + ")"], ["audiencias", "Audiências (" + p.audiencias.length + (sg.aud.length ? " +" + sg.aud.length : "") + ")"], ["prazos", "Prazos (" + p.prazos.length + (sg.prazos.length ? " +" + sg.prazos.length : "") + ")"], ["tarefas", "Tarefas (" + tarefas.length + ")"], ["partes", "Partes e advogados"]];
+  const abas = [["andamento", "Andamento (" + p.pubs.length + ")"], ["mov", "Movimentações (CNJ)" + (p.mov && p.mov.novas ? " •" : "")], ["audiencias", "Audiências (" + p.audiencias.length + (sg.aud.length ? " +" + sg.aud.length : "") + ")"], ["prazos", "Prazos (" + p.prazos.length + (sg.prazos.length ? " +" + sg.prazos.length : "") + ")"], ["tarefas", "Tarefas (" + tarefas.length + ")"], ["partes", "Partes e advogados"]];
   const tabs = el("div", "tabs"); tabs.setAttribute("role", "tablist");
   for (const [k, n] of abas) { const b = el("button", "", n); b.type = "button"; b.setAttribute("role", "tab"); b.setAttribute("aria-selected", P.aba === k); b.onclick = () => { P.aba = k; pDetalhe(p); }; tabs.appendChild(b); }
   box.appendChild(tabs);
   const corpo = el("div", "panel"); box.appendChild(corpo);
   if (P.aba === "andamento") pAndamento(p, corpo);
+  else if (P.aba === "mov") pMovimentos(p, corpo);
   else if (P.aba === "audiencias") pAudiencias(p, corpo, sg);
   else if (P.aba === "prazos") pPrazos(p, corpo, sg);
   else if (P.aba === "tarefas") pTarefas(p, corpo, tarefas);
@@ -3785,6 +3841,202 @@ function procIniciar() {
   $("pStatusF").addEventListener("change", () => { P.filtroStatus = $("pStatusF").value; pLista(); });
   $("pRespF").addEventListener("change", () => { P.respF = $("pRespF").value; pLista(); });
   procsMesclarAdv();
+}
+
+
+/* ===== 36-andamentos: movimentações dos processos pela API pública do DataJud (CNJ), de todos os tribunais =====
+   • Gratuito: usa a chave pública do CNJ. Como o CNJ não libera chamadas diretas do navegador (CORS), as consultas passam por um
+     pequeno proxy no Google Apps Script da conta do escritório (também gratuito) — veja o painel em Integrações.
+   • O monitor consulta os processos ativos de tempos em tempos (com o app aberto), compara com o que já se conhecia e avisa
+     no sino/alertas quando surge movimentação nova. A primeira consulta de cada processo só forma a base (não gera aviso).
+   • O DataJud não é "tempo real": os tribunais enviam os dados ao CNJ periodicamente (de horas a poucos dias). Intimações e
+     publicações continuam chegando mais cedo pelo DJEN. Processos em segredo de justiça não aparecem.
+   • Configuração em crm_config.datajud (compartilhada com a equipe); o resultado fica em cada processo (p.mov). */
+const DJ_CHAVE = "cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw==";
+const DJ_BASE = "https://api-publica.datajud.cnj.jus.br/api_publica_";
+const DJ_PAD = { proxy: "", token: "", auto: true, horas: 6 };
+const DJ_MAX = 40;
+const djCfg = () => Object.assign({}, DJ_PAD, crmCfg().datajud || {});
+const djSalvarCfg = p => crmSalvarCfg({ datajud: Object.assign(djCfg(), p) });
+const DJ = { rodando: false, erro: "", ciclo: 0 };
+
+// tribunal do número CNJ → nome do endpoint do DataJud ("" quando o DataJud não cobre)
+function djAlias(chave) {
+  if (!/^\d{20}$/.test(chave || "")) return "";
+  const j = chave[13], tr = chave.slice(14, 16), uf = (UF_TR[tr] || "").toLowerCase();
+  if (j === "8") return tr === "07" ? "tjdft" : uf ? "tj" + uf : "";
+  if (j === "5") return tr === "00" ? "tst" : +tr >= 1 && +tr <= 24 ? "trt" + (+tr) : "";
+  if (j === "4") return +tr >= 1 && +tr <= 6 ? "trf" + (+tr) : "";
+  if (j === "3") return "stj";
+  if (j === "6") return tr === "00" ? "tse" : uf ? "tre-" + uf : "";
+  if (j === "7") return "stm";
+  return ""; // STF e CNJ não estão no DataJud
+}
+const djSuportado = p => !!djAlias(p.chave);
+
+// "2026-11-10T14:22:00.000Z" ou "20261110142200" → "10/11/2026 14:22" (sem converter fuso: o tribunal já informa a hora local)
+function djIso(s) { s = String(s || ""); const m = s.match(/^(\d{4})(\d{2})(\d{2})(\d{2})?(\d{2})?(\d{2})?$/); return m ? m[1] + "-" + m[2] + "-" + m[3] + "T" + (m[4] || "00") + ":" + (m[5] || "00") + ":" + (m[6] || "00") : s; }
+function djBr(s) { const m = djIso(s).match(/^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}))?/); return m ? m[3] + "/" + m[2] + "/" + m[1] + (m[4] && (m[4] !== "00" || m[5] !== "00") ? " " + m[4] + ":" + m[5] : "") : ""; }
+function djCompl(m) {
+  const l = (Array.isArray(m.complementosTabelados) ? m.complementosTabelados : []).map(c => [c.nome, c.descricao || c.valor].filter(x => x !== undefined && x !== null && x !== "").join(": ")).filter(Boolean);
+  return l.join("; ").slice(0, 140);
+}
+function djResumir(hits, chave) {
+  const itens = [], graus = new Set(); let upd = "", classe = "", orgao = "";
+  for (const h of hits || []) {
+    const s = (h && h._source) || {}; if (chaveDe(s.numeroProcesso) !== chave) continue;
+    if (s.grau) graus.add(String(s.grau));
+    const u = djIso(s.dataHoraUltimaAtualizacao || ""); if (u > upd) upd = u;
+    if (!classe && s.classe) classe = s.classe.nome || "";
+    if (!orgao && s.orgaoJulgador) orgao = s.orgaoJulgador.nome || "";
+    for (const m of Array.isArray(s.movimentos) ? s.movimentos : []) itens.push({ d: djIso(m.dataHora), c: m.codigo || 0, n: String(m.nome || "Movimento"), g: String(s.grau || ""), x: djCompl(m) });
+  }
+  itens.sort((a, b) => b.d.localeCompare(a.d) || b.c - a.c);
+  return { itens: itens.slice(0, DJ_MAX), total: itens.length, upd, classe, orgao, graus: [...graus], achou: !!itens.length || !!upd };
+}
+
+// ---------- consulta (direta ou pelo proxy)
+async function djBuscar(chave) {
+  const al = djAlias(chave); if (!al) throw new Error("O DataJud não tem dados deste tribunal (" + (tribunalDe(chave) || "desconhecido") + ").");
+  const c = djCfg(), q = { query: { match: { numeroProcesso: chave } }, size: 10 }; let r;
+  try {
+    r = c.proxy ? await fetch(c.proxy, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ t: c.token, a: al, q }) })
+      : await fetch(DJ_BASE + al + "/_search", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "APIKey " + DJ_CHAVE }, body: JSON.stringify(q) });
+  } catch (e) { throw new Error(c.proxy ? "Não foi possível falar com o proxy do DataJud. Confira o endereço em Integrações › Andamentos." : "O CNJ não aceita consultas diretas do navegador. Configure o proxy gratuito em Integrações › Andamentos (DataJud)."); }
+  if (!r.ok) throw new Error("O DataJud respondeu com erro " + r.status + (r.status === 401 || r.status === 403 ? " (chave ou token recusado)" : "") + ".");
+  let j; try { j = await r.json(); } catch (e) { throw new Error("Resposta inválida do DataJud (confira o endereço do proxy)."); }
+  if (j && j.erro) throw new Error(j.erro === "token" ? "Token do proxy incorreto: confira em Integrações › Andamentos." : "Proxy: " + j.erro);
+  return djResumir(j && j.hits && j.hits.hits, chave);
+}
+
+// grava o resultado no processo e devolve os movimentos novos (a 1ª consulta forma a base e não gera aviso)
+function djAplicar(p, r) {
+  const ant = p.mov, conhecidos = new Set(ant && ant.itens ? ant.itens.map(x => x.d + "|" + x.c) : []);
+  const corte = ant && ant.itens && ant.itens.length >= DJ_MAX ? ant.itens[ant.itens.length - 1].d : "";
+  const novos = ant && ant.itens ? r.itens.filter(x => !conhecidos.has(x.d + "|" + x.c) && (!corte || x.d >= corte)) : [];
+  const nk = novos.map(x => x.d + "|" + x.c).concat(ant && ant.nk ? ant.nk : []).slice(0, 20);
+  p.mov = { ts: Date.now(), upd: r.upd, itens: r.itens, total: r.total, graus: r.graus, achou: r.achou, novas: (ant && ant.novas || 0) + novos.length, nk: nk, ult: novos.length ? Date.now() : (ant && ant.ult) || 0 };
+  if (r.classe && !p.classe && !p.classeEditada) p.classe = r.classe;
+  if (r.orgao && !p.orgao) p.orgao = r.orgao;
+  return novos;
+}
+async function djVerificar(p) { const r = await djBuscar(p.chave); return djAplicar(p, r); }
+
+// ---------- monitor de todos os processos ativos
+const djDevidos = (forcar, c) => PROCS.filter(p => p.status !== "arquivado" && djSuportado(p) && (forcar || !p.mov || !p.mov.ts || Date.now() - p.mov.ts > c.horas * 3600000));
+async function djCiclo(forcar, onProg) {
+  const c = djCfg(); if (DJ.rodando || (!forcar && (!c.auto || !c.proxy || document.hidden))) return { n: 0, novos: 0, erros: 0 };
+  const lista = djDevidos(forcar, c).sort((a, b) => ((a.mov && a.mov.ts) || 0) - ((b.mov && b.mov.ts) || 0)).slice(0, forcar ? 400 : 40);
+  if (!lista.length) return { n: 0, novos: 0, erros: 0 };
+  DJ.rodando = true; DJ.erro = ""; let novos = 0, erros = 0, feitos = 0; const com = [];
+  try {
+    for (const p of lista) {
+      try { const n = await djVerificar(p); feitos++; if (n.length) { novos += n.length; com.push([p, n]); } }
+      catch (e) { erros++; DJ.erro = e.message || String(e); if (/proxy|navegador|Token|chave/i.test(DJ.erro)) break; }
+      if (onProg) onProg(feitos + erros, lista.length);
+      await new Promise(r => setTimeout(r, PAUSA_DJ));
+    }
+  } finally { DJ.rodando = false; }
+  if (feitos) salvarProcs();
+  if (com.length) djAvisar(com);
+  if (typeof alAtualizar === "function") alAtualizar();
+  if (typeof atualizarBadges === "function") atualizarBadges();
+  return { n: feitos, novos, erros };
+}
+let PAUSA_DJ = 350;
+function djAvisar(com) {
+  try {
+    const c = alCfg(); if (!c.notif || alPermissao() !== "granted") return;
+    const mine = com.filter(([p]) => !c.meus || alMinha({ resp: p.resp })); if (!mine.length) return;
+    const [p, n] = mine[0];
+    alNotificar(mine.length === 1 ? "Nova movimentação — " + p.numero : mine.length + " processos com movimentação nova", mine.length === 1 ? n[0].n + (p.cliente ? " · " + p.cliente : "") : "Abra o app para ver os andamentos.", "dj-" + Date.now());
+  } catch (e) { /* aviso é opcional */ }
+}
+// processos com movimentação ainda não vista (alimenta o sino e a faixa de alertas)
+function djPendentes() {
+  const c = typeof alCfg === "function" ? alCfg() : { meus: false };
+  return PROCS.filter(p => p.status !== "arquivado" && p.mov && p.mov.novas > 0 && (!c.meus || alMinha({ resp: p.resp })));
+}
+function djMarcarVisto(p) { if (p.mov && p.mov.novas) { p.mov.novas = 0; salvarProcs(); if (typeof alAtualizar === "function") alAtualizar(); } }
+function djIniciar() {
+  const roda = () => { djCiclo(false).catch(() => {}); };
+  setTimeout(roda, 25000); setInterval(roda, 20 * 60000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) setTimeout(roda, 3000); });
+}
+
+// ---------- aba "Movimentações" na pasta do processo
+function pMovimentos(p, c) {
+  const m = p.mov, cfg = djCfg(), msg = el("div", "msg"); msg.hidden = true;
+  const bar = el("div", "acts");
+  const consultar = btn(m ? "Consultar o CNJ agora" : "Consultar no CNJ", async () => {
+    if (DJ.rodando) return; consultar.disabled = true; intMsg(msg, "Consultando o DataJud…");
+    try { const n = await djVerificar(p); salvarProcs(); intMsg(msg, n.length ? n.length + " movimentação(ões) nova(s)." : "Sem movimentações novas."); pDetalhe(p); setTimeout(() => { const mm = $("pMsg"); if (mm) { mm.textContent = n.length ? n.length + " movimentação(ões) nova(s) no CNJ." : "Consulta ao CNJ concluída: nada de novo."; mm.className = "msg"; mm.hidden = false; } }, 0); }
+    catch (e) { intMsg(msg, e.message || String(e), true); consultar.disabled = false; }
+  }, "");
+  if (djSuportado(p)) bar.appendChild(consultar);
+  c.append(bar, msg);
+  if (!djSuportado(p)) { c.appendChild(el("div", "empty", "O DataJud (CNJ) não cobre este tribunal (" + (p.tribunal || "?") + "). Use as publicações do DJEN na aba Andamento.")); return; }
+  if (!cfg.proxy) c.appendChild(el("div", "hint warn", "Para consultar o CNJ é preciso ativar o proxy gratuito uma única vez (um advogado faz isso em Integrações › Andamentos). Sem ele o navegador bloqueia a consulta."));
+  if (!m) { c.appendChild(el("div", "empty", "Este processo ainda não foi consultado no CNJ." + (cfg.proxy && cfg.auto ? " O monitor automático fará a primeira consulta em instantes." : ""))); return; }
+  c.appendChild(el("div", "hint", "Fonte: DataJud/CNJ · consultado em " + new Date(m.ts).toLocaleString("pt-BR") + (m.upd ? " · atualização do tribunal no CNJ: " + djBr(m.upd) : "") + (m.graus && m.graus.length ? " · grau(s): " + m.graus.join(", ") : "") + ". Os tribunais enviam os dados ao CNJ com algum atraso (de horas a dias): para intimações e prazos, vale mais a aba Andamento (DJEN)."));
+  if (!m.itens || !m.itens.length) { c.appendChild(el("div", "empty", m.achou ? "O CNJ conhece o processo, mas ainda não recebeu movimentações." : "O CNJ não tem este processo. Pode ser segredo de justiça, processo muito recente (ainda não enviado) ou número incorreto.")); return; }
+  const novas = new Set(m.nk || []); const ul = el("ul", "mini mov");
+  for (const x of m.itens) {
+    const li = el("li"), nova = novas.has(x.d + "|" + x.c) && m.novas > 0;
+    li.append(el("b", "", djBr(x.d)), document.createTextNode(" " + x.n + (x.x ? " — " + x.x : "")));
+    if (nova) li.appendChild(el("span", "tag crit", "novo")); if (x.g && m.graus && m.graus.length > 1) li.appendChild(el("span", "tag", x.g));
+    ul.appendChild(li);
+  }
+  c.appendChild(ul);
+  if (m.total > m.itens.length) c.appendChild(el("div", "hint", "Mostrando as " + m.itens.length + " movimentações mais recentes de " + m.total + "."));
+  djMarcarVisto(p);
+}
+
+// ---------- painel em Integrações
+function djScript(token) {
+  return [
+    "// Proxy gratuito do DataJud (CNJ) para o App Organização — Advocacia Lunelli",
+    "const CHAVE = '" + DJ_CHAVE + "'; // chave pública do CNJ",
+    "const TOKEN = '" + (token || "COLE-O-TOKEN-AQUI") + "'; // o mesmo token informado no app",
+    "function resp(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }",
+    "function doPost(e) {",
+    "  try {",
+    "    const b = JSON.parse(e.postData.contents);",
+    "    if (b.t !== TOKEN) return resp({ erro: 'token' });",
+    "    if (!/^(tj[a-z]{2,4}|trt\\d{1,2}|trf\\d|tre-[a-z]{2}|stj|tst|tse|stm)$/.test(b.a)) return resp({ erro: 'tribunal inválido' });",
+    "    const r = UrlFetchApp.fetch('" + DJ_BASE + "' + b.a + '/_search', { method: 'post', contentType: 'application/json', headers: { Authorization: 'APIKey ' + CHAVE }, payload: JSON.stringify(b.q), muteHttpExceptions: true });",
+    "    return ContentService.createTextOutput(r.getContentText()).setMimeType(ContentService.MimeType.JSON);",
+    "  } catch (err) { return resp({ erro: String(err) }); }",
+    "}"
+  ].join("\n");
+}
+function djPainel() {
+  const c = djCfg(), p = el("div", "panel"), hd = el("div", "hd"), tag = el("span", "tag " + (c.proxy ? "ok" : "warn"), c.proxy ? (c.auto ? "monitor ativo" : "configurado") : "falta o proxy");
+  hd.append(el("h2", "", "Andamentos de todos os tribunais (DataJud/CNJ)"), tag); p.appendChild(hd);
+  p.appendChild(el("div", "hint", "Consulta gratuita à base nacional do CNJ para os processos cadastrados (TJs, TRFs, TRTs, STJ, TST e outros) e aviso no sino quando surge movimentação nova. Não é tempo real: os tribunais enviam os dados ao CNJ com atraso (horas a dias) e processos em segredo de justiça não aparecem. Intimações e prazos continuam chegando mais cedo pelo DJEN. A configuração é compartilhada com a equipe."));
+  const msg = el("div", "msg"); msg.hidden = true;
+  const iUrl = intTexto(c.proxy, "https://script.google.com/macros/s/…/exec"), iTok = intTexto(c.token, "token do proxy (clique em Gerar)");
+  const [lAu, cAu] = intCheck("Monitorar automaticamente os processos ativos (com o app aberto)", c.auto), sH = optsSel(el("select"), [[3, "3 horas"], [6, "6 horas"], [12, "12 horas"], [24, "1 dia"]]); sH.value = c.horas;
+  const g = el("div", "intgrid"); g.append(intCampo("Endereço do proxy (Google Apps Script)", iUrl), intCampo("Token do proxy", iTok, "Evita que terceiros usem o proxy do escritório."), intCampo("Consultar cada processo a cada", sH));
+  const salva = () => { const u = iUrl.value.trim(); if (u && !/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(u)) throw new Error("O endereço do proxy deve ser o link “Aplicativo da Web” (termina em /exec)."); djSalvarCfg({ proxy: u, token: iTok.value.trim(), auto: cAu.checked, horas: +sH.value }); tag.className = "tag " + (u ? "ok" : "warn"); tag.textContent = u ? (cAu.checked ? "monitor ativo" : "configurado") : "falta o proxy"; };
+  const exec = fn => async () => { try { const t = await fn(); if (t) intMsg(msg, t); } catch (e) { intMsg(msg, e.message || String(e), true); } };
+  const ac = el("div", "acts");
+  ac.append(btn("Salvar", exec(async () => { salva(); return "Configuração salva e compartilhada com a equipe."; }), ""),
+    btn("Gerar token", () => { const a = new Uint8Array(16); (window.crypto || {}).getRandomValues ? crypto.getRandomValues(a) : a.forEach((_, i) => a[i] = Math.random() * 256); iTok.value = [...a].map(x => x.toString(16).padStart(2, "0")).join(""); cod.value = djScript(iTok.value.trim()); }),
+    btn("Testar com um processo", exec(async () => { salva(); const alvo = PROCS.find(x => x.status !== "arquivado" && djSuportado(x)); if (!alvo) throw new Error("Cadastre antes um processo em Processos."); intMsg(msg, "Consultando " + alvo.numero + "…"); const r = await djBuscar(alvo.chave); return "Funcionou: " + alvo.numero + " — " + (r.achou ? r.total + " movimentação(ões) no CNJ" + (r.upd ? ", atualizado em " + djBr(r.upd) : "") : "o CNJ não tem este processo (segredo de justiça ou muito recente), mas a conexão está ok") + "."; })),
+    btn("Verificar todos agora", exec(async () => { salva(); if (!c.proxy && !iUrl.value.trim()) throw new Error("Configure o proxy primeiro."); const r = await djCiclo(true, (a, b) => intMsg(msg, "Consultando " + a + " de " + b + "…")); if (DJ.erro && !r.n) throw new Error(DJ.erro); return r.n + " processo(s) consultado(s) · " + r.novos + " movimentação(ões) nova(s)" + (r.erros ? " · " + r.erros + " com erro (" + DJ.erro + ")" : "") + "."; })));
+  const cod = el("textarea"); cod.readOnly = true; cod.rows = 12; cod.value = djScript(c.token); cod.spellcheck = false; cod.style.fontFamily = "monospace"; cod.style.fontSize = "12px";
+  const det = el("details"); det.appendChild(el("summary", "", "Como ativar o proxy gratuito (uma vez, ~3 minutos)")); const d = el("div", "intpasso"), ol = el("ol");
+  for (const t of [
+    "Clique em “Gerar token” acima e depois em “Salvar”.",
+    "Abra script.google.com com a conta Google do escritório e clique em “Novo projeto”.",
+    "Apague o código que aparece e cole o código abaixo (ele já leva o seu token). Salve (Ctrl+S).",
+    "Clique em “Implantar › Nova implantação”, tipo “App da Web”. Em “Executar como” deixe “Eu” e em “Quem pode acessar” escolha “Qualquer pessoa”. Autorize quando o Google pedir (aviso de app não verificado: “Avançado › continuar”).",
+    "Copie o URL do “App da Web” (termina em /exec), cole no campo “Endereço do proxy” acima, clique em Salvar e em “Testar com um processo”."
+  ]) ol.appendChild(el("li", "", t));
+  d.append(ol, cod, btn("Copiar código", () => copiar(cod.value, d.lastChild)), el("div", "hint", "O proxy só repassa consultas públicas ao DataJud, com o token do escritório. Custo zero (cota gratuita do Google).")); det.appendChild(d);
+  p.append(g, lAu, ac, msg, det);
+  return p;
 }
 
 
@@ -5216,7 +5468,7 @@ $("drFechar").onclick = () => $("dlgDrive").close();
 
 /* ===== 43-integracoes: tela de configuração do Google Drive e das IAs (Claude/Gemini) ===== */
 function intCampo(rot, input, dica) { const l = el("label", "", rot); l.appendChild(input); if (dica) l.appendChild(el("span", "hint", dica)); return l; }
-function intTexto(valor, ph, tipo) { const i = el("input"); i.type = tipo || "text"; i.value = valor || ""; i.placeholder = ph || ""; i.autocomplete = "off"; i.spellcheck = false; return i; }
+function intTexto(valor, ph, tipo) { const i = el("input"); i.type = tipo || "text"; i.value = valor || ""; i.placeholder = ph || ""; i.autocomplete = (tipo || "text") === "text" ? "nope" : "off"; i.name = "int_" + Math.random().toString(36).slice(2, 8); i.spellcheck = false; return i; }
 function intCheck(rot, marcado) { const l = el("label", "chk"), c = el("input"); c.type = "checkbox"; c.checked = !!marcado; l.append(c, document.createTextNode(rot)); return [l, c]; }
 function intMsg(box, t, erro) { box.textContent = t || ""; box.className = "msg" + (erro ? " err" : ""); box.hidden = !t; }
 const INT_PASSOS = [
@@ -5226,10 +5478,11 @@ const INT_PASSOS = [
   "Em “Credenciais › Criar credenciais › ID do cliente OAuth”, tipo “Aplicativo da Web”. Em “Origens JavaScript autorizadas” coloque exatamente: "
 ];
 function intDesenhar() {
-  const box = $("intCorpo"); box.textContent = "";
+  const box = $("intCorpo"); box.textContent = ""; const SEC = {};
   // ---------------- Google Drive
   const pd = el("div", "panel"), hd = el("div", "hd"); hd.append(el("h2", "", "Google Drive"), el("span", "tag" + (driveConectado() ? " ok" : driveAtivo() ? " dist" : " warn"), driveConectado() ? "conectado" : driveAtivo() ? "configurado · desconectado" : "não configurado")); pd.appendChild(hd);
   pd.appendChild(el("div", "hint", "Pastas por cliente e processo, documentos do caso, peças geradas a partir de modelos do Google Docs, publicações do DJEN salvas como documento, backup diário e planilhas no Google Sheets. A configuração abaixo é compartilhada com a equipe; o login do Google é de cada pessoa, a cada sessão."));
+  pd.appendChild(el("div", "hint eq", "Equipe: o ID de cliente e as pastas abaixo valem para todos. Cada pessoa só precisa clicar em “Conectar ao Google” com o próprio e-mail Google, que deve (1) estar na lista de usuários de teste do projeto no Google Cloud (Auth Platform › Público-alvo) e (2) ter acesso às pastas compartilhadas do escritório."));
   const c = driveCfg(), msg = el("div", "msg"); msg.hidden = true;
   const iCli = intTexto(c.clientId, "123456789-abc….apps.googleusercontent.com"), iRaiz = intTexto(c.raizId ? driveUrlPasta(c.raizId) : "", "Link da pasta “Clientes” no Drive"), iMod = intTexto(c.modelosId ? driveUrlPasta(c.modelosId) : "", "Link da pasta com os modelos (Google Docs)"),
     iBk = intTexto(c.backupId ? driveUrlPasta(c.backupId) : "", "Link da pasta de backups (opcional: usa a raiz)"), iPl = intTexto(c.planilhasId ? driveUrlPasta(c.planilhasId) : "", "Link da pasta de planilhas (opcional: usa a raiz)");
@@ -5255,7 +5508,7 @@ function intDesenhar() {
   ol.appendChild(el("li", "", "Crie no Drive as pastas “Clientes” (raiz), “Modelos” e “Backups”, abra cada uma e copie o endereço da barra do navegador para os campos acima. Quem for usar precisa ter acesso a essas pastas (compartilhe com o e-mail Google de cada um)."));
   ol.appendChild(el("li", "", "Clique em “Conectar ao Google”. Como o app está em modo “Teste”, o Google mostra um aviso de “app não verificado”: use “Avançado › continuar”. A permissão é de acesso ao Drive (necessária para ver as pastas compartilhadas da equipe)."));
   const d = el("div", "intpasso"); d.appendChild(ol); d.appendChild(el("div", "hint", "Campos disponíveis nos modelos: " + DRIVE_CAMPOS_AJUDA)); det.appendChild(d); pd.appendChild(det);
-  box.appendChild(pd);
+  SEC.drive = [pd];
 
   // ---------------- IA
   const pi = el("div", "panel"), h2 = el("div", "hd"), ia = iaCfg(); h2.append(el("h2", "", "Assistentes de IA (Claude, Gemini e JusIA)"), el("span", "tag" + (iaPronta() ? " ok" : " warn"), iaPronta() ? "chave neste navegador" : "sem chave")); pi.appendChild(h2);
@@ -5276,14 +5529,16 @@ function intDesenhar() {
     "Claude.ai (assinatura): a assinatura do claude.ai não vale como chave de API; no modo assistido o pedido (com dados mascarados) é colado por você na sua conta, sob as configurações de privacidade do seu plano. JusIA (Jusbrasil): não há API pública do Jus IA; no modo assistido o app apenas copia o pedido para a área de transferência e recebe de volta o texto que você colar. Nada é enviado automaticamente ao Jusbrasil e a assinatura do JusIA é a sua. Confira sempre cada precedente na fonte.",
     "A chave é pessoal: não a compartilhe nem a cole em mensagens. Se vazar, revogue no console do provedor."
   ]) ul.appendChild(el("li", "", t)); dv.appendChild(ul); pi.appendChild(dv);
-  box.appendChild(pi);
+  SEC.ia = [pi];
   // ---------------- calendários (Google Agenda e Apple Agenda)
-  if (typeof calPainel === "function") box.appendChild(calPainel());
+  SEC.cnj = typeof djPainel === "function" ? [djPainel()] : [];
+  SEC.agenda = typeof calPainel === "function" ? [calPainel()] : [];
   // ---------------- instalar no celular
   const pc = el("div", "panel"), hc = el("div", "hd"), inst = (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone; hc.append(el("h2", "", "Instalar no celular"), el("span", "tag" + (inst ? " ok" : ""), inst ? "instalado" : "opcional")); pc.appendChild(hc);
   pc.appendChild(el("div", "hint", "O App Organização pode ser instalado na tela inicial, sem loja e sem custo. Abre em tela cheia, com o ícone da Lunelli."));
   const ul2 = el("ul", "intpasso"); for (const t of ["iPhone: abra o endereço do app no Safari (não no Chrome), toque em Compartilhar e em “Adicionar à Tela de Início”.", "Android: abra no Chrome, toque nos três pontinhos e em “Instalar app” (ou “Adicionar à tela inicial”).", "Entre com o seu e-mail e senha de sempre. O que está na nuvem (processos, tarefas, CRM) aparece igual; chave da IA e índices dos cálculos ficam só em cada aparelho."]) ul2.appendChild(el("li", "", t));
-  pc.appendChild(ul2); if (typeof instalarPainel === "function") pc.appendChild(instalarPainel()); box.appendChild(pc);
+  pc.appendChild(ul2); if (typeof instalarPainel === "function") pc.appendChild(instalarPainel()); SEC.celular = [pc];
+  for (const x of SEC[CFG.sec] || SEC.drive) box.appendChild(x);
 }
 
 
@@ -5462,10 +5717,10 @@ async function iaResumirPub(p, x) {
    pastas/tarefas/clientes/valores compartilhados entre todos, e telas por perfil (advogado, secretaria, administrador). */
 const NV = { ativo: !!NUVEM_CFG, user: null, perfil: null, papel: "local", advId: null, db: null, auth: null, unsubs: [], mapas: {}, sessao: false, cadastrando: false, users: [] };
 const ACESSO = {
-  local: ["inicio", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "organizacao", "calculos", "integracoes"],
-  admin: ["meu", "inicio", "secretaria", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "organizacao", "calculos", "integracoes", "usuarios"],
-  advogado: ["meu", "inicio", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "organizacao", "calculos", "integracoes"],
-  secretaria: ["secretaria", "audiencias", "processos", "crm"]
+  local: ["inicio", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "organizacao", "calculos", "configuracoes"],
+  admin: ["meu", "inicio", "secretaria", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "organizacao", "calculos", "configuracoes"],
+  advogado: ["meu", "inicio", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "organizacao", "calculos", "configuracoes"],
+  secretaria: ["secretaria", "audiencias", "processos", "crm", "configuracoes"]
 };
 const PAPEL_ROT = { admin: "Administrador", advogado: "Advogado(a)", secretaria: "Secretaria", local: "" };
 const souAdvogado = () => NV.papel !== "secretaria";
@@ -5688,7 +5943,7 @@ function definirAcesso(u, perfil, status) {
 }
 function usuariosAtualizar() {
   const lista = NV.users.filter(u => !ehAdminEmail({ email: u.email })), pend = lista.filter(u => u.status === "pendente"), ativos = lista.filter(u => u.status === "ativo" || u.status === "bloqueado");
-  const b = $("bdUsr"); b.hidden = !pend.length; b.textContent = pend.length;
+  const b = $("bdUsr"); b.hidden = !pend.length; b.textContent = pend.length; const b2 = $("bdUsr2"); if (b2) { b2.hidden = !pend.length; b2.textContent = pend.length; }
   const pb = $("usPend"), ab = $("usAtivos"); if (!pb || !ab) return; pb.textContent = ""; ab.textContent = "";
   if (!pend.length) pb.appendChild(el("div", "hint", "Nenhum pedido pendente."));
   for (const u of pend.sort((x, y) => (y.criado || 0) - (x.criado || 0))) {
@@ -6387,36 +6642,40 @@ async function alVerificarNotifs(agora) {
 
 // ---------- contador (ícone/título), sino e faixa
 function alAtualizar() {
-  if (!$("btnAlertas")) return; const it = alItens(), n = alContagem(it), urg = n.atrasado + n.hoje + n.amanha, b = $("bdAl");
-  b.hidden = !urg; b.textContent = urg > 99 ? "99+" : urg; b.className = "bd" + (n.atrasado || n.hoje ? " red" : "");
+  if (!$("btnAlertas")) return; const it = alItens(), n = alContagem(it), mv = djPendentes().length, urg = n.atrasado + n.hoje + n.amanha + mv, b = $("bdAl");
+  b.hidden = !urg; b.textContent = urg > 99 ? "99+" : urg; b.className = "bd" + (n.atrasado || n.hoje || mv ? " red" : "");
   try { if (navigator.setAppBadge) { if (urg) navigator.setAppBadge(urg).catch(() => {}); else navigator.clearAppBadge().catch(() => {}); } } catch (e) {}
-  const ban = $("alBanner"), cfg = alCfg(), oculto = LS.get("alertas_oculto", "") === hojeIso(), importante = n.atrasado + n.hoje;
+  const ban = $("alBanner"), cfg = alCfg(), oculto = LS.get("alertas_oculto", "") === hojeIso(), importante = n.atrasado + n.hoje + mv;
   if (!cfg.banner || oculto || !importante) { ban.hidden = true; return; }
-  ban.textContent = ""; ban.hidden = false; const t = el("span", "", "Atenção: " + alTextoResumo(n));
+  ban.textContent = ""; ban.hidden = false; const t = el("span", "", "Atenção: " + [alTextoResumo(n), mv ? mv + " processo(s) com movimentação nova" : ""].filter(Boolean).join(" · "));
   ban.append(t, btn("Ver alertas", alAbrir, ""), btn("Dispensar hoje", () => { LS.setLocal("alertas_oculto", hojeIso()); alAtualizar(); }));
+}
+function alConfigMontar(cf, redesenhar) {
+  cf.textContent = ""; const c = alCfg();
+  const [l1, c1] = intCheck("Mostrar só o que é meu (inclui “Equipe”)", c.meus), [l2, c2] = intCheck("Mostrar a faixa de alerta no topo quando houver atrasado ou item de hoje", c.banner);
+  const sD = optsSel(el("select"), [[1, "1 dia"], [2, "2 dias"], [3, "3 dias"], [5, "5 dias"], [7, "7 dias"]]), sA = optsSel(el("select"), [[3, "3 dias"], [7, "7 dias"], [14, "14 dias"], [30, "30 dias"]]), sB = optsSel(el("select"), [[30, "30 min"], [60, "1 hora"], [120, "2 horas"], [240, "4 horas"]]);
+  sD.value = c.dias; sA.value = c.audDias; sB.value = c.antes;
+  const g = el("div", "intgrid"); g.append(intCampo("Prazos e tarefas: avisar com antecedência de", sD), intCampo("Audiências: mostrar até", sA), intCampo("Aviso do aparelho antes da audiência", sB));
+  const salva = () => { alSalvar({ meus: c1.checked, banner: c2.checked, dias: +sD.value, audDias: +sA.value, antes: +sB.value }); redesenhar(); alAtualizar(); };
+  for (const x of [c1, c2, sD, sA, sB]) x.onchange = salva;
+  const ac = el("div", "acts"), ms = el("div", "hint"), perm = alPermissao();
+  const estado = !("Notification" in window) ? "Este navegador não oferece avisos (no iPhone, instale o app pela Tela de Início)." : c.notif && perm === "granted" ? "Avisos do aparelho: ativados." : perm === "denied" ? "Avisos bloqueados nos Ajustes do aparelho." : "Avisos do aparelho: desativados.";
+  ms.textContent = estado + " Eles chegam com o app aberto ou recém-usado; para avisar com o app fechado, use o calendário (Google/Apple).";
+  ac.append(btn(c.notif && perm === "granted" ? "Desativar avisos" : "Ativar avisos do aparelho", async () => { if (c.notif && perm === "granted") { alSalvar({ notif: false }); redesenhar(); return; } try { await alAtivarNotif(); redesenhar(); } catch (e) { ms.textContent = e.message; ms.className = "msg err"; } }, ""),
+    btn("Testar aviso", async () => { const ok = alPermissao() === "granted" && await alNotificar("Teste — Lunelli", "Os avisos estão funcionando neste aparelho.", "teste"); ms.textContent = ok ? "Aviso de teste enviado." : "Ative os avisos primeiro."; }));
+  cf.append(l1, l2, g, ac, ms);
 }
 function alAbrir() {
   const dlg = $("dlgAlertas"), c = alCfg(), box = $("alCorpo"), it = alItens(), n = alContagem(it); box.textContent = "";
-  $("alResumo").textContent = it.length ? alTextoResumo(n) || "Nada urgente: só itens nos próximos dias." : "Nada atrasado nem agendado para os próximos dias.";
+  const mvl = djPendentes(); $("alResumo").textContent = it.length || mvl.length ? [alTextoResumo(n), mvl.length ? mvl.length + " processo(s) com movimentação nova" : ""].filter(Boolean).join(" · ") || "Nada urgente: só itens nos próximos dias." : "Nada atrasado nem agendado para os próximos dias.";
+  if (mvl.length) { box.appendChild(el("h3", "", "Movimentações novas no CNJ (" + mvl.length + ")")); const ul0 = el("ul", "mini"); for (const p of mvl) { const li = el("li"); li.append(el("b", "", p.numero), document.createTextNode(" " + (p.mov.itens[0] ? p.mov.itens[0].n : "movimentação nova") + (p.cliente ? " · " + p.cliente : ""))); li.style.cursor = "pointer"; li.onclick = () => { dlg.close(); abrirPasta(p.id, "mov"); }; ul0.appendChild(li); } box.appendChild(ul0); }
   for (const [g, rot, cls] of AL_GRUPOS) {
     const lista = it.filter(x => x.g === g); if (!lista.length) continue;
     const h = el("h3", "", rot + " (" + lista.length + ")"); box.appendChild(h); const ul = el("ul", "mini");
     for (const e of lista) { const li = agendaLi(e), f = li.onclick; li.onclick = ev => { dlg.close(); f(ev); }; ul.appendChild(li); }
     box.appendChild(ul);
   }
-  const cf = $("alConfig"); cf.textContent = "";
-  const [l1, c1] = intCheck("Mostrar só o que é meu (inclui “Equipe”)", c.meus), [l2, c2] = intCheck("Mostrar a faixa de alerta no topo quando houver atrasado ou item de hoje", c.banner);
-  const sD = optsSel(el("select"), [[1, "1 dia"], [2, "2 dias"], [3, "3 dias"], [5, "5 dias"], [7, "7 dias"]]), sA = optsSel(el("select"), [[3, "3 dias"], [7, "7 dias"], [14, "14 dias"], [30, "30 dias"]]), sB = optsSel(el("select"), [[30, "30 min"], [60, "1 hora"], [120, "2 horas"], [240, "4 horas"]]);
-  sD.value = c.dias; sA.value = c.audDias; sB.value = c.antes;
-  const g = el("div", "intgrid"); g.append(intCampo("Prazos e tarefas: avisar com antecedência de", sD), intCampo("Audiências: mostrar até", sA), intCampo("Aviso do aparelho antes da audiência", sB));
-  const salva = () => { alSalvar({ meus: c1.checked, banner: c2.checked, dias: +sD.value, audDias: +sA.value, antes: +sB.value }); alAbrir(); alAtualizar(); };
-  for (const x of [c1, c2, sD, sA, sB]) x.onchange = salva;
-  const ac = el("div", "acts"), ms = el("div", "hint"), perm = alPermissao();
-  const estado = !("Notification" in window) ? "Este navegador não oferece avisos (no iPhone, instale o app pela Tela de Início)." : c.notif && perm === "granted" ? "Avisos do aparelho: ativados." : perm === "denied" ? "Avisos bloqueados nos Ajustes do aparelho." : "Avisos do aparelho: desativados.";
-  ms.textContent = estado + " Eles chegam com o app aberto ou recém-usado; para avisar com o app fechado, use o calendário (Google/Apple).";
-  ac.append(btn(c.notif && perm === "granted" ? "Desativar avisos" : "Ativar avisos do aparelho", async () => { if (c.notif && perm === "granted") { alSalvar({ notif: false }); alAbrir(); return; } try { await alAtivarNotif(); alAbrir(); } catch (e) { ms.textContent = e.message; ms.className = "msg err"; } }, ""),
-    btn("Testar aviso", async () => { const ok = alPermissao() === "granted" && await alNotificar("Teste — Lunelli", "Os avisos estão funcionando neste aparelho.", "teste"); ms.textContent = ok ? "Aviso de teste enviado." : "Ative os avisos primeiro."; }));
-  cf.append(l1, l2, g, ac, ms);
+  alConfigMontar($("alConfig"), alAbrir);
   if (!dlg.open) dlg.showModal();
 }
 function alIniciar() {
@@ -6598,6 +6857,67 @@ function calPainel() {
 }
 
 
+/* ===== 49-config: tela Configurações (conta, backup, alertas, integrações, app no celular e usuários) =====
+   Reúne em um só lugar o que antes ficava espalhado: Integrações (#integracoes) e Usuários (#usuarios) continuam
+   funcionando como atalhos e abrem a seção correspondente. */
+const CFG_ALIAS = { integracoes: "drive", usuarios: "equipe" };
+const CFG_SECS = [
+  ["geral", "Geral e backup", "Conta"], ["alertas", "Alertas e avisos", "Conta"],
+  ["drive", "Google Drive", "Integrações"], ["cnj", "Andamentos (CNJ)", "Integrações"], ["agenda", "Agenda Google e Apple", "Integrações"], ["ia", "Inteligência artificial", "Integrações"],
+  ["celular", "Aplicativo no celular", "Aplicativo"], ["equipe", "Usuários e acessos", "Equipe"]
+];
+const CFG = { sec: "geral" };
+const cfgPode = s => s === "equipe" ? NV.papel === "admin" : ["drive", "cnj", "agenda", "ia"].includes(s) ? NV.papel !== "secretaria" : CFG_SECS.some(x => x[0] === s);
+
+function cfgAbrir(sec) {
+  if (!cfgPode(sec)) sec = "geral"; CFG.sec = sec;
+  if ((location.hash || "") !== "#configuracoes") history.replaceState(null, "", "#configuracoes");
+  cfgDesenhar();
+}
+function cfgMenu() {
+  const m = $("cfgMenu"); m.textContent = ""; let grupo = "";
+  for (const [id, rot, g] of CFG_SECS) {
+    if (!cfgPode(id)) continue;
+    if (g !== grupo) { grupo = g; m.appendChild(el("div", "cfgg", g)); }
+    const a = el("button", "cfgi", rot); a.type = "button"; a.dataset.s = id; if (id === CFG.sec) a.setAttribute("aria-current", "true");
+    if (id === "equipe") { const b = el("span", "bd red"); b.id = "bdUsr2"; const n = $("bdUsr"); b.textContent = n ? n.textContent : ""; b.hidden = !n || n.hidden; a.appendChild(b); }
+    a.onclick = () => cfgAbrir(id); m.appendChild(a);
+  }
+}
+function cfgDesenhar() {
+  if (!cfgPode(CFG.sec)) CFG.sec = "geral";
+  cfgMenu();
+  const mapa = { geral: "cfgGeral", alertas: "cfgAlertas", equipe: "cfgEquipe", drive: "intCorpo", cnj: "intCorpo", agenda: "intCorpo", ia: "intCorpo", celular: "intCorpo" };
+  for (const id of ["cfgGeral", "cfgAlertas", "intCorpo", "cfgEquipe"]) $(id).hidden = id !== mapa[CFG.sec];
+  if (CFG.sec === "geral") cfgGeral($("cfgGeral"));
+  else if (CFG.sec === "alertas") cfgAlertas($("cfgAlertas"));
+  else if (CFG.sec === "equipe") usuariosAtualizar();
+  else intDesenhar();
+}
+function cfgGeral(box) {
+  box.textContent = "";
+  const pc = el("div", "panel"); pc.appendChild(el("h2", "", "Minha conta"));
+  const nome = NV.papel === "local" ? "Uso local (sem login)" : (NV.perfil && (NV.perfil.nome || NV.perfil.email)) || "";
+  const a = meuAdv(), papel = NV.papel === "local" ? "Os dados ficam só neste navegador." : PAPEL_ROT[NV.papel] + (a ? " · " + a.rot : "");
+  const l = el("div", "cfgconta"); l.append(el("div", "cfgnome", nome), el("div", "hint", papel)); if (NV.perfil && NV.perfil.email && NV.perfil.email !== nome) l.appendChild(el("div", "hint", NV.perfil.email));
+  pc.appendChild(l);
+  if (NV.papel !== "local") pc.appendChild(btn("Sair", () => $("btnSair").click(), ""));
+  box.appendChild(pc);
+  const pb = el("div", "panel"); pb.appendChild(el("h2", "", "Backup dos dados"));
+  pb.appendChild(el("div", "hint", NV.papel === "local" ? "Seus dados (nomes salvos, tarefas, processos e marcações) ficam só neste navegador: baixe um backup de tempos em tempos." : "Os dados do escritório ficam na nuvem, compartilhados entre todos. O backup é uma cópia extra em arquivo (e, com o Google Drive conectado, o app também grava um backup diário para os advogados)."));
+  const ac = el("div", "acts"); ac.appendChild(btn("Baixar backup dos dados", () => $("bkExp").click(), "")); if (!$("bkImp").hidden) ac.appendChild(btn("Restaurar backup…", () => $("bkImp").click())); pb.appendChild(ac);
+  box.appendChild(pb);
+  const pa = el("div", "panel"); pa.appendChild(el("h2", "", "Sobre este app"));
+  pa.appendChild(el("div", "hint", "App Organização — Advocacia Lunelli. Uso interno. Para instalar no celular, veja “Aplicativo no celular”; para integrar Drive, Agenda, CNJ e IA, veja as seções de Integrações."));
+  box.appendChild(pa);
+}
+function cfgAlertas(box) {
+  box.textContent = ""; const p = el("div", "panel"); p.appendChild(el("h2", "", "Alertas e avisos"));
+  p.appendChild(el("div", "hint", "Define o que aparece no sino e na faixa de alerta no topo, e os avisos do aparelho. As mesmas opções ficam no sino, em “Configurar alertas”."));
+  const cf = el("div", "intpasso"); p.appendChild(cf); box.appendChild(p); alConfigMontar(cf, () => { cfgAlertas(box); alAtualizar(); });
+}
+
+
 /* ===== 49-instalar: QR Code para instalar o app no celular (gerado aqui, sem serviço externo) ===== */
 function instalarUrl() { return /^https?:$/.test(location.protocol) ? location.origin + location.pathname.replace(/index\.html$/, "") : ""; }
 function instalarQr(url) {
@@ -6663,10 +6983,13 @@ const VIEWS = {
   advogados: ["Advogados", "Publicações do DJEN em nome de Fábio (OAB/SC 15.044) e Davi (OAB/SC 39.336)"],
   organizacao: ["Organização", "Tarefas, prazos e rotina do escritório"],
   calculos: ["Cálculos", "Atualização de débitos, verbas trabalhistas, atrasados e RMI previdenciários, tributos e índices oficiais"],
-  integracoes: ["Integrações", "Google Drive (pastas, modelos, backup) e assistentes de IA (Claude, Gemini e JusIA)"],
-  usuarios: ["Usuários", "Pedidos de acesso e perfis de cada pessoa"]
+  configuracoes: ["Configurações", "Conta, backup, alertas, integrações (Google, CNJ, IA), aplicativo e usuários"]
 };
-function vistaAtual() { const v = (location.hash || "").replace("#", ""); return VIEWS[v] && podeVer(v) ? v : homeDoPapel(); }
+function vistaAtual() {
+  let v = (location.hash || "").replace("#", "");
+  if (CFG_ALIAS[v]) { if (!cfgPode(CFG_ALIAS[v]) || !podeVer("configuracoes")) return homeDoPapel(); CFG.sec = CFG_ALIAS[v]; v = "configuracoes"; }
+  return VIEWS[v] && podeVer(v) ? v : homeDoPapel();
+}
 function desenharVista(v) {
   if (v === "relatorios") relatorioAtualizar();
   if (v === "processos") procDesenhar();
@@ -6677,9 +7000,8 @@ function desenharVista(v) {
   if (v === "organizacao") orgDesenhar();
   if (v === "meu") meuDesenhar();
   if (v === "secretaria") secDesenhar();
-  if (v === "integracoes") intDesenhar();
+  if (v === "configuracoes") cfgDesenhar();
   if (v === "calculos") cuDesenhar();
-  if (v === "usuarios") usuariosAtualizar();
 }
 function atualizarTudo() { desenharVista(vistaAtual()); atualizarBadges(); }
 function irPara() {
@@ -6740,7 +7062,7 @@ $("bkFile").onchange = async () => {
 let appIniciado = false;
 function iniciarApp() {
   if (appIniciado) return; appIniciado = true;
-  iniciarConsulta(); desenharInicioClientes(); orgIniciar(); procIniciar(); audIniciar(); crmIniciar(); telasIniciar(); advIniciar(); driveIniciar(); alIniciar(); irPara();
+  iniciarConsulta(); desenharInicioClientes(); orgIniciar(); procIniciar(); audIniciar(); crmIniciar(); telasIniciar(); advIniciar(); driveIniciar(); alIniciar(); djIniciar(); irPara();
 }
 if (!NV.ativo) { aplicarPapel(); iniciarApp(); }
 
