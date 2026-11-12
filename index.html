@@ -681,6 +681,7 @@ body{background:radial-gradient(900px 380px at 88% -80px,color-mix(in srgb,var(-
       <div class="cfgsec" id="cfgGeral" hidden></div>
       <div class="cfgsec" id="cfgAlertas" hidden></div>
       <div class="cfgsec" id="intCorpo" hidden></div>
+      <div class="cfgsec" id="cfgAstrea" hidden></div>
       <div class="cfgsec" id="cfgEquipe" hidden>
   <div class="panel"><h2>Pedidos de acesso pendentes</h2><div id="usPend"></div></div>
   <div class="panel"><h2>Usuários com acesso</h2><div id="usAtivos"></div></div>
@@ -3819,10 +3820,14 @@ function pDetalhe(p) {
   const iCls = el("input"); iCls.type = "text"; iCls.value = p.classe; iCls.onchange = () => { p.classe = iCls.value.trim(); p.classeEditada = true; salvar(); };
   const iLink = el("input"); iLink.type = "text"; iLink.placeholder = "https://… (pasta no Drive, rede ou link do processo)"; iLink.value = p.linkPasta; iLink.onchange = () => { p.linkPasta = iLink.value.trim(); salvar(); pDetalhe(p); };
   const lk = campo("Link da pasta de arquivos", iLink); lk.classList.add("wide");
+  const iLt = el("input"); iLt.type = "text"; iLt.placeholder = "https://… (consulta do processo no tribunal)"; iLt.value = p.linkTribunal || ""; iLt.onchange = () => { p.linkTribunal = iLt.value.trim(); salvar(); pDetalhe(p); };
+  const iCh = el("input"); iCh.type = "text"; iCh.autocomplete = "nope"; iCh.name = "k" + Math.random().toString(36).slice(2); iCh.placeholder = "chave/hash do link externo (eproc) · segredo de justiça"; iCh.value = p.chaveAcesso || ""; iCh.onchange = () => { p.chaveAcesso = iCh.value.trim(); salvar(); };
+  const lt = campo("Link do processo no tribunal", iLt); lt.classList.add("wide"); const ch = campo("Chave de acesso (segredo de justiça)", iCh); ch.classList.add("wide");
   if (souSecretaria()) g.append(campo("Cliente (pasta)", iCli), campo("Responsável", sResp), campo("Classe", iCls), lk);
-  else g.append(campo("Cliente (pasta)", iCli), campo("Responsável", sResp), campo("Polo do cliente", sPolo), campo("Valor da causa (R$)", iVal), campo("Classe", iCls), lk);
+  else g.append(campo("Cliente (pasta)", iCli), campo("Responsável", sResp), campo("Polo do cliente", sPolo), campo("Valor da causa (R$)", iVal), campo("Classe", iCls), lk, lt, ch);
   hd.appendChild(g);
   if (/^https?:\/\//.test(p.linkPasta)) { const a = el("a", "btn sec sm", "Abrir pasta de arquivos"); a.href = p.linkPasta; a.target = "_blank"; a.rel = "noopener noreferrer"; a.style.width = "fit-content"; hd.appendChild(a); }
+  if (/^https?:\/\//.test(p.linkTribunal || "") && !souSecretaria()) { const a = el("a", "btn sec sm", "Abrir no tribunal"); a.href = p.linkTribunal; a.target = "_blank"; a.rel = "noopener noreferrer"; a.style.width = "fit-content"; hd.appendChild(a); }
   const dr = el("div", "acts"); dr.appendChild(btn("Documentos no Drive", () => driveAbrir(driveAlvo("proc", p)), "")); if (!souSecretaria()) dr.appendChild(btn("Assistente de IA", () => iaProc(p), "")); hd.appendChild(dr);
   const nt = el("textarea"); nt.placeholder = "Observações do caso"; nt.value = p.nota; nt.onchange = () => { p.nota = nt.value; salvar(); }; if (!souSecretaria()) hd.appendChild(campo("Observações", nt));
   if (p._por) hd.appendChild(el("div", "hint", "Última alteração: " + p._por + (p._em ? " em " + new Date(p._em).toLocaleString("pt-BR") : "")));
@@ -5624,6 +5629,125 @@ function intDesenhar() {
 }
 
 
+/* ===== 44-astrea: importa para as pastas de Processos a planilha "Processos" exportada do Astrea =====
+   O arquivo é lido no próprio navegador (nada é enviado a terceiros). Cada linha com número CNJ vira (ou completa) uma pasta:
+   cliente, polo, classe, vara, valor da causa e da condenação, distribuição, link do tribunal, chave de acesso (num_chave/hash
+   do link do eproc, usada em segredo de justiça), pasta do Drive achada nas observações e responsável do Astrea.
+   Nunca sobrescreve o que já está preenchido numa pasta existente. "Casos" sem número e números fora do padrão não entram:
+   saem num relatório CSV para ajuste manual. */
+const AST = { linhas: null, plano: null, nome: "" };
+const AST_ATIVO = /^(autor|autora|requerente|exequente|reclamante|impetrante|embargante|apelante|recorrente|agravante|credor|promovente|demandante|exeqüente)/i;
+const AST_PASSIVO = /^(r[eé]u|r[eé]|requerid[oa]|executad[oa]|reclamad[oa]|impetrad[oa]|embargad[oa]|apelad[oa]|recorrid[oa]|agravad[oa]|devedor|promovid[oa]|demandad[oa])/i;
+const astTxt = v => { if (v == null) return ""; if (typeof v === "object") { if (v.text != null) return String(v.text).trim(); if (v.richText) return v.richText.map(x => x.text).join("").trim(); if (v.result != null) return String(v.result).trim(); if (v instanceof Date) return v.toISOString(); } return String(v).trim(); };
+const astNum = v => astTxt(v).replace(/\D/g, "");
+function astIso(v) { // "14/04/2025", "2026-03-27T16:50:31.854-03:00" ou Date -> "AAAA-MM-DD"
+  if (v instanceof Date) return isNaN(v) ? "" : v.getFullYear() + "-" + String(v.getMonth() + 1).padStart(2, "0") + "-" + String(v.getDate()).padStart(2, "0");
+  const s = astTxt(v); let m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})/); if (m) return m[3] + "-" + m[2] + "-" + m[1];
+  m = s.match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? m[0] : "";
+}
+function astValor(v) { if (typeof v === "number") return v; const s = astTxt(v).replace(/[^\d.,-]/g, ""); if (!s) return 0; const n = lerValorBR(s); return isFinite(n) && n > 0 ? n : 0; }
+function astPolo(papel) { const s = astTxt(papel); return AST_ATIVO.test(s) ? "Ativo" : AST_PASSIVO.test(s) ? "Passivo" : ""; }
+function astChaveUrl(u) { try { const q = new URL(u).searchParams; return q.get("num_chave") || q.get("hash") || ""; } catch (e) { return ""; } }
+function astResp(nome) { const n = astTxt(nome).toLowerCase(); return /f[aá]bio/.test(n) ? "Fábio" : /^davi\b/.test(n) ? "Davi" : "Equipe"; }
+const astDrive = t => { const m = astTxt(t).match(/https:\/\/drive\.google\.com\/[^\s)>"']+/); return m ? m[0] : ""; };
+function astPartes(txt, cliente, polo) { // "NOME (Autor)\nOUTRO (Réu)" -> [{nome, polo:"A"|"P"}]
+  const out = [], add = (nome, p) => { nome = nome.trim(); if (nome && !out.some(x => norm(x.nome) === norm(nome))) out.push({ nome, polo: p === "Ativo" ? "A" : p === "Passivo" ? "P" : "" }); };
+  for (const parte of astTxt(txt).split(/\n|;/)) { const m = parte.match(/^(.*?)\s*\(([^()]*)\)\s*$/); if (m) add(m[1], astPolo(m[2])); else add(parte, ""); }
+  add(cliente, polo); return out.filter(x => x.polo);
+}
+
+async function astLer(arquivo) {
+  if (!(await carregarExcel())) throw new Error("Não consegui carregar o leitor de planilhas (internet). Tente de novo.");
+  const wb = new ExcelJS.Workbook(); await wb.xlsx.load(await arquivo.arrayBuffer());
+  const ws = wb.getWorksheet("Processos") || wb.worksheets[0]; if (!ws) throw new Error("A planilha não tem nenhuma aba.");
+  const cab = []; ws.getRow(1).eachCell({ includeEmpty: true }, (c, i) => { cab[i] = astTxt(c.value); });
+  if (!cab.includes("Título") || !cab.includes("Cliente")) throw new Error("Este não parece o arquivo exportado do Astrea (faltam as colunas “Título” e “Cliente”). No Astrea: Processos e casos › Exportar.");
+  const linhas = [];
+  ws.eachRow({ includeEmpty: false }, (row, n) => { if (n === 1) return; const o = { _n: n }; row.eachCell({ includeEmpty: false }, (c, i) => { if (cab[i]) o[cab[i]] = c.value; }); linhas.push(o); });
+  return linhas;
+}
+
+// transforma as linhas em um plano: o que cria, o que completa e o que fica de fora
+function astPlano(linhas) {
+  const por = new Map(), fora = []; let casos = 0, dups = 0, dvRuim = 0;
+  for (const r of linhas) {
+    const tipo = astTxt(r["Tipo"]), num = astNum(r["Número"]), titulo = astTxt(r["Título"]);
+    if (/^caso/i.test(tipo) && !num) { casos++; fora.push([r._n, "Caso sem número", titulo, astTxt(r["Cliente"]), ""]); continue; }
+    if (num.length !== 20) { fora.push([r._n, num ? "Número fora do padrão CNJ" : "Sem número", titulo, astTxt(r["Cliente"]), astTxt(r["Número"])]); continue; }
+    if (!dvCnjOk(num)) dvRuim++;
+    if (por.has(num)) { dups++; por.get(num).rows.push(r); } else por.set(num, { chave: num, rows: [r] });
+  }
+  const itens = [...por.values()].map(it => Object.assign(it, { existe: !!procPorChave(it.chave) }));
+  return { itens, fora, casos, dups, dvRuim, novos: itens.filter(x => !x.existe).length, existentes: itens.filter(x => x.existe).length };
+}
+
+// aplica uma ou mais linhas do Astrea a uma pasta; devolve o que mudou
+function astAplicar(p, rows, opc, hoje) {
+  let mudou = 0; const set = (campo, valor) => { if (valor && !p[campo]) { p[campo] = valor; mudou++; } };
+  const notas = [];
+  for (const r of rows) {
+    const cliente = astTxt(r["Cliente"]), polo = astPolo(r["Papel do cliente"]), url = astTxt(r["URL do Processo"]), obs = astTxt(r["Observações"]);
+    if (cliente && !p.cliente) { p.cliente = cliente; mudou++; } else if (cliente && p.cliente && !norm(p.cliente).includes(norm(cliente)) && !norm(cliente).includes(norm(p.cliente))) { p.cliente += " / " + cliente; mudou++; }
+    set("polo", polo); set("classe", astTxt(r["Ação"])); set("orgao", astTxt(r["Vara"]) || astTxt(r["Foro"]));
+    set("linkPasta", astDrive(obs)); if (/^https?:\/\//.test(url)) set("linkTribunal", url);
+    set("chaveAcesso", astChaveUrl(url)); set("distribuicao", astIso(r["Data de distribuição"]));
+    const cond = astValor(r["Valor da condenação"]); if (cond && !p.valorCondenacao) { p.valorCondenacao = cond; mudou++; }
+    const resp = astTxt(r["Responsável"]); if (resp && !p.respAstrea) { p.respAstrea = resp; mudou++; }
+    const enc = astIso(r["Data de Encerramento"]); if (enc && opc.encerrar && !p.encerradoEm) { p.encerradoEm = enc; if (p.status !== "arquivado") { p.status = "arquivado"; mudou++; } }
+    const novasPartes = astPartes(r["Outros envolvidos"], cliente, polo); if (novasPartes.length) { const ja = new Set(p.partes.map(d => norm(d.nome) + "|" + d.polo)); for (const d of novasPartes) if (!ja.has(norm(d.nome) + "|" + d.polo)) { p.partes.push(d); ja.add(norm(d.nome) + "|" + d.polo); mudou++; } }
+    const bloco = [astTxt(r["Objeto"]) && "Objeto: " + astTxt(r["Objeto"]), obs && obs, astTxt(r["Etiquetas"]) && "Etiquetas no Astrea: " + astTxt(r["Etiquetas"]), astTxt(r["Outros clientes"]) && "Outros clientes: " + astTxt(r["Outros clientes"])].filter(Boolean).join("\n");
+    if (bloco) notas.push(bloco);
+  }
+  if (notas.length && !/Importado do Astrea/.test(p.nota || "")) { p.nota = (p.nota ? p.nota + "\n\n" : "") + "Importado do Astrea em " + hoje + (p.respAstrea ? " · responsável lá: " + p.respAstrea : "") + "\n" + notas.join("\n---\n"); mudou++; }
+  return mudou;
+}
+
+async function astImportar(plano, opc, prog) {
+  const hoje = new Date().toLocaleDateString("pt-BR"), vals = {}, valoresAtuais = LS.get("valores", {}); let novos = 0, completados = 0, iguais = 0, k = 0;
+  for (const it of plano.itens) {
+    let p = procPorChave(it.chave); const novo = !p;
+    if (novo) { p = novaPasta(it.chave, { cliente: "", resp: astResp(it.rows[0]["Responsável"]) }); const cr = astIso(it.rows[0]["Data de Criação"]); if (cr) p.criado = Date.parse(cr + "T12:00:00") || p.criado; p.origem = "astrea"; PROCS.push(p); }
+    const m = astAplicar(p, it.rows, opc, hoje);
+    if (novo) { novos++; if (!p.cliente) p.cliente = astTxt(it.rows[0]["Título"]).slice(0, 80); } else if (m) completados++; else iguais++;
+    const v = Math.max(...it.rows.map(r => astValor(r["Valor da causa"])), 0); if (v && typeof valoresAtuais[it.chave] !== "number") vals[it.chave] = v;
+    if (++k % 100 === 0) { prog(k, plano.itens.length); await new Promise(r => setTimeout(r, 0)); }
+  }
+  if (Object.keys(vals).length) LS.set("valores", Object.assign({}, vals, valoresAtuais));
+  salvarProcs(); atualizarBadges(); if (typeof procDesenhar === "function") procDesenhar();
+  return { novos, completados, iguais, valores: Object.keys(vals).length };
+}
+
+function astCsv(fora) {
+  const q = s => '"' + String(s == null ? "" : s).replace(/"/g, '""') + '"';
+  const txt = "﻿" + [["Linha na planilha", "Motivo", "Título", "Cliente", "Número informado"], ...fora].map(r => r.map(q).join(";")).join("\r\n");
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([txt], { type: "text/csv;charset=utf-8" })); a.download = "astrea-nao-importados.csv"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+
+function cfgAstrea(box) {
+  box.textContent = ""; const p = el("div", "panel"); p.appendChild(el("h2", "", "Importar processos do Astrea"));
+  p.appendChild(el("div", "hint", "No Astrea, abra Processos e casos, escolha “Todos” e clique em Exportar. Selecione aqui o arquivo Processo.xlsx baixado. A leitura é feita neste navegador; nada é enviado a terceiros. Pastas que já existem só são completadas (campos vazios), nunca sobrescritas. A consulta ao DJEN/CNJ de cada processo não roda na importação: ela acontece aos poucos depois, pelo monitor."));
+  const f = el("input"); f.type = "file"; f.accept = ".xlsx"; const res = el("div", "intpasso"), msg = el("div", "msg"); msg.hidden = true;
+  const mostra = (t, erro) => { msg.hidden = !t; msg.textContent = t || ""; msg.className = "msg" + (erro ? " err" : ""); };
+  f.onchange = async () => {
+    res.textContent = ""; mostra(""); AST.plano = null; const a = f.files && f.files[0]; if (!a) return; mostra("Lendo “" + a.name + "”…");
+    try {
+      const linhas = await astLer(a), pl = astPlano(linhas); AST.plano = pl; AST.nome = a.name; mostra("");
+      const ul = el("ul", "mini");
+      for (const t of [pl.itens.length + " processo(s) com número CNJ válido na planilha (" + linhas.length + " linhas lidas)", pl.novos + " pasta(s) novas serão criadas", pl.existentes + " pasta(s) já existem e serão apenas completadas", pl.dups ? pl.dups + " linha(s) repetem o mesmo processo (clientes juntados na mesma pasta)" : "", pl.dvRuim ? pl.dvRuim + " número(s) com dígito verificador inválido (importados mesmo assim; confira)" : "", pl.fora.length ? pl.fora.length + " linha(s) ficam de fora (" + pl.casos + " casos sem número e " + (pl.fora.length - pl.casos) + " números fora do padrão): baixe a lista abaixo" : ""].filter(Boolean)) ul.appendChild(el("li", "", t));
+      res.appendChild(ul);
+      const lb = el("label", "ck"); const cb = el("input"); cb.type = "checkbox"; cb.checked = true; lb.append(cb, document.createTextNode(" Arquivar as pastas que o Astrea já marca como encerradas")); res.appendChild(lb);
+      const ac = el("div", "acts"); const bi = btn("Importar " + pl.itens.length + " processos", async () => {
+        if (!confirm("Importar " + pl.itens.length + " processos (" + pl.novos + " novos) para o escritório todo? A equipe passará a vê-los nas pastas.")) return;
+        bi.disabled = true; try { const r = await astImportar(pl, { encerrar: cb.checked }, (k, n) => mostra("Importando… " + k + " de " + n));
+          mostra("Pronto: " + r.novos + " pasta(s) criada(s), " + r.completados + " completada(s), " + r.iguais + " sem mudança" + (r.valores ? ", " + r.valores + " valor(es) de causa gravado(s)" : "") + ". Os dados estão sendo enviados à nuvem para a equipe."); }
+        catch (e) { mostra("Falhou: " + (e.message || e), true); } finally { bi.disabled = false; } }, "pri");
+      ac.appendChild(bi); if (pl.fora.length) ac.appendChild(btn("Baixar lista dos que ficaram de fora (CSV)", () => astCsv(pl.fora), "sec")); res.appendChild(ac);
+    } catch (e) { mostra(e.message || String(e), true); }
+  };
+  p.append(f, msg, res); box.appendChild(p);
+}
+
+
 /* ===== 44-ia: assistentes de IA (Claude e Gemini) =====
    Cada pessoa cola a própria chave de API em Integrações; ela fica só neste navegador (nunca vai para a nuvem do app nem para o backup).
    As chamadas saem direto do navegador para a Anthropic ou para o Google. Por padrão, CPF/CNPJ, telefones e e-mails são mascarados antes do envio.
@@ -6945,11 +7069,11 @@ function calPainel() {
 const CFG_ALIAS = { integracoes: "drive", usuarios: "equipe" };
 const CFG_SECS = [
   ["geral", "Geral e backup", "Conta"], ["alertas", "Alertas e avisos", "Conta"],
-  ["drive", "Google Drive", "Integrações"], ["cnj", "Andamentos (CNJ)", "Integrações"], ["agenda", "Agenda Google e Apple", "Integrações"], ["ia", "Inteligência artificial", "Integrações"],
+  ["drive", "Google Drive", "Integrações"], ["cnj", "Andamentos (CNJ)", "Integrações"], ["astrea", "Importar do Astrea", "Integrações"], ["agenda", "Agenda Google e Apple", "Integrações"], ["ia", "Inteligência artificial", "Integrações"],
   ["celular", "Aplicativo no celular", "Aplicativo"], ["equipe", "Usuários e acessos", "Equipe"]
 ];
 const CFG = { sec: "geral" };
-const cfgPode = s => s === "equipe" ? NV.papel === "admin" : ["drive", "cnj", "agenda", "ia"].includes(s) ? NV.papel !== "secretaria" : CFG_SECS.some(x => x[0] === s);
+const cfgPode = s => s === "equipe" ? NV.papel === "admin" : ["drive", "cnj", "astrea", "agenda", "ia"].includes(s) ? NV.papel !== "secretaria" : CFG_SECS.some(x => x[0] === s);
 
 function cfgAbrir(sec) {
   if (!cfgPode(sec)) sec = "geral"; CFG.sec = sec;
@@ -6969,10 +7093,11 @@ function cfgMenu() {
 function cfgDesenhar() {
   if (!cfgPode(CFG.sec)) CFG.sec = "geral";
   cfgMenu();
-  const mapa = { geral: "cfgGeral", alertas: "cfgAlertas", equipe: "cfgEquipe", drive: "intCorpo", cnj: "intCorpo", agenda: "intCorpo", ia: "intCorpo", celular: "intCorpo" };
-  for (const id of ["cfgGeral", "cfgAlertas", "intCorpo", "cfgEquipe"]) $(id).hidden = id !== mapa[CFG.sec];
+  const mapa = { geral: "cfgGeral", alertas: "cfgAlertas", equipe: "cfgEquipe", astrea: "cfgAstrea", drive: "intCorpo", cnj: "intCorpo", agenda: "intCorpo", ia: "intCorpo", celular: "intCorpo" };
+  for (const id of ["cfgGeral", "cfgAlertas", "intCorpo", "cfgAstrea", "cfgEquipe"]) $(id).hidden = id !== mapa[CFG.sec];
   if (CFG.sec === "geral") cfgGeral($("cfgGeral"));
   else if (CFG.sec === "alertas") cfgAlertas($("cfgAlertas"));
+  else if (CFG.sec === "astrea") cfgAstrea($("cfgAstrea"));
   else if (CFG.sec === "equipe") usuariosAtualizar();
   else intDesenhar();
 }
