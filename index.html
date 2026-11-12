@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-FsGIHdDiNH+hHfYYjM8zulXedcA6HYGaYuq8xT6zSiw=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-7kvOk2PE4pTjtDUHygeeAU+9K8Be0+Hbn3r6Up/h2GI=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#000065">
@@ -5979,7 +5979,8 @@ function cfgAstrea(box) {
    Cada pessoa cola a própria chave de API em Integrações; ela fica só neste navegador (nunca vai para a nuvem do app nem para o backup).
    As chamadas saem direto do navegador para a Anthropic ou para o Google. Por padrão, CPF/CNPJ, telefones e e-mails são mascarados antes do envio.
    Tudo que a IA produz é rascunho para revisão do advogado. Só advogados/administrador usam (a secretaria não vê os botões). */
-const IA_PADRAO = { prov: "claude", chaveClaude: "", chaveGemini: "", modeloClaude: "claude-sonnet-5-5", modeloGemini: "gemini-2.5-flash", mascara: true };
+const IA_PADRAO = { prov: "claude", chaveClaude: "", chaveGemini: "", modeloClaude: "claude-sonnet-5-5", modeloGemini: "gemini-flash-latest", mascara: true };
+const IA_GEMINI_RESERVA = ["gemini-flash-latest", "gemini-flash-lite-latest"]; // apelidos mantidos pelo Google: sempre apontam para um modelo ativo
 const iaCfg = () => Object.assign({}, IA_PADRAO, LS.get("ia", {}));
 const iaSalvarCfg = p => LS.setLocal("ia", Object.assign(iaCfg(), p));
 const IA_ASSIST = { jusia: { nome: "JusIA", url: "https://ia.jusbrasil.com.br", rot: "JusIA (Jusbrasil) · modo assistido" }, claudeai: { nome: "Claude.ai", url: "https://claude.ai/new", rot: "Claude.ai (minha assinatura) · modo assistido" } };
@@ -6001,9 +6002,13 @@ async function iaPerguntar(sistema, mensagens, max) {
   const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 120000); let r, j;
   try {
     if (c.prov === "gemini") {
-      r = await fetch("https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(c.modeloGemini) + ":generateContent?key=" + encodeURIComponent(c.chaveGemini), { method: "POST", signal: ctl.signal, headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ systemInstruction: { parts: [{ text: sistema }] }, contents: mensagens.map(m => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] })), generationConfig: { maxOutputTokens: max || 2000 } }) });
-      j = await r.json().catch(() => ({}));
+      // Se o modelo escolhido estiver sobrecarregado (503/429) ou tiver sido aposentado pelo Google (404), tenta os modelos de reserva.
+      const corpo = JSON.stringify({ systemInstruction: { parts: [{ text: sistema }] }, contents: mensagens.map(m => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] })), generationConfig: { maxOutputTokens: max || 2000 } });
+      for (const modelo of [...new Set([c.modeloGemini].concat(IA_GEMINI_RESERVA))]) {
+        r = await fetch("https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(modelo) + ":generateContent?key=" + encodeURIComponent(c.chaveGemini), { method: "POST", signal: ctl.signal, headers: { "Content-Type": "application/json" }, body: corpo });
+        j = await r.json().catch(() => ({}));
+        if (r.ok || ![404, 429, 500, 503].includes(r.status)) break;
+      }
       if (!r.ok) throw new Error("Gemini (" + r.status + "): " + ((j.error && j.error.message) || r.statusText));
       const txt = ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || "").join(""); if (!txt) throw new Error("O Gemini não devolveu texto" + (j.promptFeedback && j.promptFeedback.blockReason ? " (bloqueado: " + j.promptFeedback.blockReason + ")" : "") + ".");
       return txt;
