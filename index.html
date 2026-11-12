@@ -648,6 +648,12 @@ body{background:radial-gradient(900px 380px at 88% -80px,color-mix(in srgb,var(-
   #marca b{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-32deg);font:800 54pt var(--head);letter-spacing:.18em;color:#202b47;opacity:.08;white-space:nowrap;text-transform:uppercase}
 }
 
+/* ---- aviso de direitos autorais ---- */
+footer.rod .direitos{display:block;margin-top:6px;font-weight:600}
+.login{flex-direction:column;gap:14px}
+.lg-direitos{max-width:520px;margin:0;padding:0 16px;text-align:center;font-size:11.5px;line-height:1.45;color:rgba(255,255,255,.72)}
+@media print{footer.rod .direitos{display:block}}
+
 </style>
 </head>
 <body>
@@ -933,7 +939,7 @@ body{background:radial-gradient(900px 380px at 88% -80px,color-mix(in srgb,var(-
     <div class="ideas" id="ideias"></div></div>
 </section>
 
-<footer class="rod">Advocacia Lunelli · ferramenta de uso interno. Fonte: API pública do DJEN (comunicaapi.pje.jus.br). Aparece apenas o que os tribunais publicam no DJEN; processos em segredo de justiça não constam. O CNJ limita a cerca de 20 consultas por minuto, por isso buscas longas avançam em etapas.</footer>
+<footer class="rod">Advocacia Lunelli · ferramenta de uso interno. Fonte: API pública do DJEN (comunicaapi.pje.jus.br). Aparece apenas o que os tribunais publicam no DJEN; processos em segredo de justiça não constam. O CNJ limita a cerca de 20 consultas por minuto, por isso buscas longas avançam em etapas.<span class="direitos" id="direitos">© 2026 Advocacia Lunelli e criadores do App Organização. Todos os direitos reservados. É proibida a cópia, a reprodução ou a distribuição, total ou parcial, deste sistema, de seu código e de seu conteúdo sem autorização prévia e por escrito dos criadores (Leis nº 9.609/1998 e nº 9.610/1998).</span></footer>
 </main>
 </div>
 </div>
@@ -973,6 +979,7 @@ body{background:radial-gradient(900px 380px at 88% -80px,color-mix(in srgb,var(-
       <div id="lgMsg" class="msg" hidden></div>
     </div>
   </div>
+  <p class="lg-direitos">© 2026 Advocacia Lunelli e criadores do App Organização. Todos os direitos reservados. É proibida a cópia, a reprodução ou a distribuição, total ou parcial, deste sistema, de seu código e de seu conteúdo sem autorização prévia e por escrito dos criadores (Leis nº 9.609/1998 e nº 9.610/1998).</p>
 </div>
 
 <dialog id="dlgAud" class="big">
