@@ -3906,6 +3906,7 @@ async function djBuscar(chave) {
   if (!r.ok) throw new Error("O DataJud respondeu com erro " + r.status + (r.status === 401 || r.status === 403 ? " (chave ou token recusado)" : "") + ".");
   let j; try { j = await r.json(); } catch (e) { throw new Error("Resposta inválida do DataJud (confira o endereço do proxy)."); }
   if (j && j.erro) throw new Error(j.erro === "token" ? "Token do proxy incorreto: confira em Integrações › Andamentos." : "Proxy: " + j.erro);
+  if (j && j.error && !(j.hits && j.hits.hits)) throw new Error("O DataJud (CNJ) está instável ou sobrecarregado agora; o app tenta de novo no próximo ciclo.");
   return djResumir(j && j.hits && j.hits.hits, chave);
 }
 
