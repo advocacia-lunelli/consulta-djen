@@ -605,6 +605,12 @@ body{background:radial-gradient(900px 380px at 88% -80px,color-mix(in srgb,var(-
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media print{.main{margin-left:0!important}.navbar,.sbtog{display:none!important}}
 
+/* possíveis duplicados (CRM) */
+.dupcard{display:grid!important;grid-template-columns:1fr 1fr;gap:6px 16px;align-items:start!important}
+.dupcard .dupcol b{display:block}
+.dupcard>.hint,.dupcard>.acts{grid-column:1/-1}
+@media (max-width:640px){.dupcard{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -1008,6 +1014,13 @@ body{background:radial-gradient(900px 380px at 88% -80px,color-mix(in srgb,var(-
   </form>
 </dialog>
 
+<dialog id="dlgCrmDup" class="big">
+  <h2 id="dupTit">Possíveis duplicados</h2>
+  <div class="hint">O app junta sozinho só o que tem o mesmo nome. Quando há dúvida (CNPJ diferente, nome parecido), você decide: juntar mantendo um dos dois, ou “São diferentes”. Ao juntar, processos, casos e histórico vão para o cadastro mantido.</div>
+  <div id="dupResumo"></div>
+  <ul class="mini" id="dupLista"></ul>
+  <div class="acts"><button class="btn sec" type="button" id="dupFechar">Fechar</button></div>
+</dialog>
 <dialog id="dlgCrmContato" class="big">
   <form method="dialog" id="fCrmC">
     <h2 id="ccTitulo">Novo contato</h2>
@@ -4441,6 +4454,61 @@ function crmNovoContato(d) {
   const c = Object.assign({ id: uid(), criado: hojeIso(), tipo: "PF", nome: "", doc: "", tel: "", tel2: "", email: "", cidade: "", uf: "", empresa: "", cargo: "", status: "lead", origem: "", indicadoPor: "", resp: respPadrao(), tags: [], areas: [], nasc: "", lgpd: false, lgpdEm: "", obs: "" }, d || {});
   CRM_CONTATOS.push(c); return c;
 }
+
+// ---------- duplicados: junta cadastros de nome igual e pergunta nos casos duvidosos ----------
+const CRM_FORMAS = new Set(["LTDA", "EIRELI", "ME", "EPP", "MEI", "CIA"]), CRM_PARTICULAS = new Set(["DE", "DA", "DO", "DAS", "DOS", "E", "SC", "SP", "PR", "RS", "CNPJ", "CPF"]);
+const CRM_DOC_NOME = /\s*[-–]\s*(?:cnpj|cpf)\s*:?\s*([\d.\/-]{11,18})\s*$/i;
+const crmNomeSemDoc = n => String(n || "").replace(CRM_DOC_NOME, "").trim();
+const crmDocDoNome = n => { const m = String(n || "").match(CRM_DOC_NOME); return m ? soDigitos(m[1]) : ""; };
+const crmNomeBase = n => norm(crmNomeSemDoc(n).replace(/\/\s*[a-z]{2}\s*\/?$/i, "")).replace(/ S A$/, "").replace(/ SA$/, "");
+const crmTokens = n => crmNomeBase(n).split(" ").filter(t => t && !CRM_FORMAS.has(t) && !CRM_PARTICULAS.has(t) && !/^\d+$/.test(t));
+const crmFormasDe = n => new Set(crmNomeBase(n).split(" ").filter(t => CRM_FORMAS.has(t) && !["ME", "EPP", "MEI"].includes(t))); // ME/EPP/MEI são porte, não tipo de sociedade: não geram conflito
+const crmInicial = n => { const t = crmNomeBase(n).split(" ").filter(Boolean); return !t.length || t.every(x => x.length <= 1); }; // "A. B." (iniciais, sigilo): nunca junta
+function crmDocsDe(c) { const s = new Set(), d = soDigitos(c.doc), dn = crmDocDoNome(c.nome); if (d.length >= 11) s.add(d); if (dn.length >= 11) s.add(dn); return s; }
+const crmNCampos = c => ["doc", "tel", "tel2", "email", "cidade", "uf", "empresa", "cargo", "nasc"].filter(k => c[k]).length;
+function crmMelhorNome(nomes) { // prefere o nome escrito normalmente, sem "/SC" no fim e com a forma jurídica
+  const lim = [...new Set(nomes.map(crmNomeSemDoc).filter(Boolean))], pts = n => (/[a-zà-ú]/.test(n) ? 4 : 0) + (/\/\s*[a-z]{2}\s*$/i.test(n) ? 0 : 2) + (crmFormasDe(n).size ? 1 : 0) + n.length / 1000;
+  return lim.sort((a, b) => pts(b) - pts(a))[0] || "";
+}
+function crmFundir(p, o) { // passa tudo de o para p, refaz os vínculos e apaga o
+  for (const k of ["doc", "tel", "tel2", "email", "cidade", "uf", "empresa", "cargo", "nasc", "origem", "indicadoPor"]) if (!p[k] && o[k]) p[k] = o[k];
+  const d = crmDocDoNome(o.nome); if (!p.doc && d.length >= 11) p.doc = fmtDoc(d);
+  p.tags = [...new Set([...(p.tags || []), ...(o.tags || [])])]; p.areas = [...new Set([...(p.areas || []), ...(o.areas || [])])];
+  if (o.status === "cliente") p.status = "cliente"; if (o.criado && (!p.criado || o.criado < p.criado)) p.criado = o.criado; if (o.lgpd && !p.lgpd) { p.lgpd = true; p.lgpdEm = o.lgpdEm || ""; }
+  const extra = String(o.obs || "").replace(/\n?Importado do Astrea\s*$/, "").trim(), aka = crmNomeSemDoc(o.nome) !== crmNomeSemDoc(p.nome) ? "Também cadastrado como: " + crmNomeSemDoc(o.nome) : "";
+  const add = [aka && !String(p.obs || "").includes(aka) ? aka : "", extra && !String(p.obs || "").includes(extra) ? extra : ""].filter(Boolean).join("\n"); if (add) p.obs = (p.obs ? p.obs + "\n" : "") + add;
+  for (const x of PROCS) if ((x.clienteIds || []).includes(o.id)) x.clienteIds = [...new Set(x.clienteIds.map(i => i === o.id ? p.id : i))];
+  for (const n of CRM_NEGOCIOS) if (n.contatoId === o.id) n.contatoId = p.id;
+  for (const a of CRM_ATIV) if (a.contatoId === o.id) a.contatoId = p.id;
+  CRM_CONTATOS = CRM_CONTATOS.filter(c => c.id !== o.id);
+}
+function crmJuntarGrupo(lista, manterId) { // junta vários cadastros em um só (o mais completo, ou manterId) e dá o melhor nome
+  const todos = lista.slice(), p = (manterId && todos.find(c => c.id === manterId)) || todos.slice().sort((a, b) => crmNCampos(b) - crmNCampos(a) || crmPastasDoContato(b).length - crmPastasDoContato(a).length)[0];
+  const nome = crmMelhorNome(todos.map(c => c.nome)); for (const o of todos) if (o !== p) crmFundir(p, o);
+  const dn = crmDocDoNome(p.nome); if (!p.doc && dn.length >= 11) p.doc = fmtDoc(dn); p.nome = nome || crmNomeSemDoc(p.nome); return p;
+}
+function crmSalvarTudo() { salvarContatos(); salvarNegocios(); salvarAtiv(); salvarProcs(); }
+function crmDuplicados() { // {certos: [[contato…]], duvidas: [{a, b, motivo}]}
+  const L = CRM_CONTATOS.filter(c => !crmInicial(c.nome)).map(c => { const t = crmTokens(c.nome); return { c, t, k: t.join(" "), docs: crmDocsDe(c), f: crmFormasDe(c.nome) }; });
+  const separado = (a, b) => (a.naoJuntar || []).includes(b.id) || (b.naoJuntar || []).includes(a.id), certos = [], duvidas = [], par = new Set(), addD = (a, b, motivo) => { const k = [a.id, b.id].sort().join("|"); if (par.has(k) || separado(a, b)) return; par.add(k); duvidas.push({ a, b, motivo }); };
+  const grupos = new Map(); for (const x of L) if (x.k) { if (!grupos.has(x.k)) grupos.set(x.k, []); grupos.get(x.k).push(x); }
+  for (const g of grupos.values()) {
+    if (g.length < 2) continue;
+    const docs = new Set(), formas = new Set(); g.forEach(x => { x.docs.forEach(d => docs.add(d)); x.f.forEach(f => formas.add(f)); });
+    const conflito = docs.size > 1 || formas.size > 1 || g.some((x, i) => g.some((y, j) => j > i && separado(x.c, y.c)));
+    if (!conflito) certos.push(g.map(x => x.c));
+    else for (let i = 0; i < g.length; i++) for (let j = i + 1; j < g.length; j++) addD(g[i].c, g[j].c, g[i].docs.size && g[j].docs.size && ![...g[i].docs].some(d => g[j].docs.has(d)) ? "mesmo nome, mas CPF/CNPJ diferentes (matriz/filial?)" : "mesmo nome, mas a forma jurídica é diferente (Ltda × Eireli…)");
+  }
+  const idx = new Map(); for (const x of L) if (x.t.length >= 2) { if (!idx.has(x.t[0])) idx.set(x.t[0], []); idx.get(x.t[0]).push(x); }
+  for (const arr of idx.values()) for (let i = 0; i < arr.length; i++) for (let j = i + 1; j < arr.length; j++) {
+    const x = arr[i], y = arr[j]; if (x.k === y.k) continue; const [s, l] = x.t.length <= y.t.length ? [x, y] : [y, x];
+    if (s.t.length >= 2 && l.t.length <= s.t.length + 2 && s.t.every(t => l.t.includes(t)) && !(x.docs.size && y.docs.size && ![...x.docs].some(d => y.docs.has(d)))) addD(x.c, y.c, "nome parecido (um contém o outro)");
+  }
+  duvidas.sort((p, q) => (crmPastasDoContato(q.a).length + crmPastasDoContato(q.b).length) - (crmPastasDoContato(p.a).length + crmPastasDoContato(p.b).length));
+  return { certos, duvidas };
+}
+function crmJuntarCertos() { const d = crmDuplicados(); let n = 0; for (const g of d.certos) { crmJuntarGrupo(g); n += g.length - 1; } for (const c of CRM_CONTATOS) { const dn = crmDocDoNome(c.nome); if (dn.length >= 11) { if (!c.doc) c.doc = fmtDoc(dn); c.nome = crmNomeSemDoc(c.nome); } } crmSalvarTudo(); return n; }
+
 const crmAtivsDoContato = id => CRM_ATIV.filter(a => a.contatoId === id);
 const crmNegociosDoContato = id => CRM_NEGOCIOS.filter(n => n.contatoId === id);
 function crmUltimoContato(id) { // data da última atividade concluída (ou do cadastro)
@@ -4628,7 +4696,7 @@ function crmBarra() {
     b.append(buscaInput("Buscar nome, CPF/CNPJ, telefone, e-mail…", c.busca, v => { c.busca = v; c.lim = 150; crmLista(); }), selFiltro("Situação", CRM_STATUS, "Todas as situações", c.status, v => { c.status = v; crmLista(); }),
       selFiltro("Tag", tags, "Todas as tags", c.tag, v => { c.tag = v; crmLista(); }), selFiltro("Origem", cfg.origens, "Todas as origens", c.origem, v => { c.origem = v; crmLista(); }),
       selFiltro("Ordenar", [["nome", "Ordem alfabética"], ["recente", "Mais recentes"], ["contato", "Mais tempo sem contato"]], null, c.ord, v => { c.ord = v; crmLista(); }));
-    b.append(btn("Novo contato", () => crmAbrirContato(null), ""), btn("Exportar", () => crmExportar("contatos")), btn("Importar CSV", crmImportar));
+    b.append(btn("Novo contato", () => crmAbrirContato(null), ""), btn("Exportar", () => crmExportar("contatos")), btn("Importar CSV", crmImportar), btn("Possíveis duplicados", crmDupAbrir));
   } else if (CRMUI.aba === "ativ") {
     const a = CRMUI.a;
     b.append(buscaInput("Buscar atividade…", a.busca, v => { a.busca = v; crmLista(); }), selFiltro("Responsável", respOpcoes(), "Todos", a.resp, v => { a.resp = v; crmLista(); }), selFiltro("Tipo", CRM_ATIV_TIPOS, "Todos os tipos", a.tipo, v => { a.tipo = v; crmLista(); }));
@@ -5025,6 +5093,30 @@ function crmIniciar() {
   $("crmTabs").addEventListener("click", e => { const b = e.target.closest("button[data-t]"); if (!b) return; CRMUI.aba = b.dataset.t; crmDesenhar(); });
   crmBadge();
 }
+
+// ---------- possíveis duplicados: o app junta sozinho os de nome igual e pergunta nos casos com dúvida ----------
+function crmDupCard(d, refaz) {
+  const li = el("li", "dupcard"), col = c => { const x = el("div", "dupcol"), np = crmPastasDoContato(c).length, nc = crmNegociosDoContato(c.id).length; x.append(el("b", "", c.nome), el("div", "hint", [c.doc, c.tel, c.email, c.cidade && c.cidade + (c.uf ? "/" + c.uf : "")].filter(Boolean).join(" · ") || "sem dados de contato"), el("div", "hint", np + " processo(s)" + (crmVeValores() ? " · " + nc + " caso(s)" : ""))); return x; };
+  li.append(col(d.a), col(d.b)); const ac = el("div", "acts"); li.appendChild(el("div", "hint", "Motivo: " + d.motivo)); li.appendChild(ac);
+  const junta = manter => { crmJuntarGrupo([d.a, d.b], manter.id); crmSalvarTudo(); refaz(); crmRefazer(); };
+  ac.append(btn("Juntar (manter “" + d.a.nome + "”)", () => junta(d.a), ""), btn("Juntar (manter “" + d.b.nome + "”)", () => junta(d.b), "sec"),
+    btn("São diferentes", () => { d.a.naoJuntar = (d.a.naoJuntar || []).concat(d.b.id); salvarContatos(); refaz(); }, "sec"));
+  return li;
+}
+function crmDupAbrir() {
+  const dlg = $("dlgCrmDup"), box = $("dupLista"), res = $("dupResumo");
+  const pinta = () => {
+    box.textContent = ""; const d = crmDuplicados(); res.textContent = "";
+    if (d.certos.length) { const n = d.certos.reduce((s, g) => s + g.length - 1, 0); res.append(el("div", "msg", n + " cadastro(s) têm exatamente o mesmo nome (ignorando Ltda, “/SC”, CNPJ no nome e maiúsculas) e podem ser juntados sem dúvida. "), btn("Juntar os " + n + " de nome igual", () => { crmJuntarCertos(); pinta(); crmRefazer(); }, "pri")); }
+    else res.appendChild(el("div", "hint", "Nenhum cadastro com nome exatamente igual."));
+    $("dupTit").textContent = "Possíveis duplicados" + (d.duvidas.length ? " (" + d.duvidas.length + " com dúvida)" : "");
+    if (!d.duvidas.length) { box.appendChild(el("div", "empty", "Nada em dúvida. Cadastros de nome parecido aparecem aqui para você decidir.")); return; }
+    for (const x of d.duvidas.slice(0, 25)) box.appendChild(crmDupCard(x, pinta));
+    if (d.duvidas.length > 25) box.appendChild(el("div", "hint", "Mostrando 25 de " + d.duvidas.length + ". Os demais aparecem conforme você decide estes (os com mais processos vêm primeiro)."));
+  };
+  pinta(); if (!dlg.open) dlg.showModal();
+}
+$("dupFechar").onclick = () => $("dlgCrmDup").close();
 
 
 /* ===== 40-organizacao: quadro de tarefas (kanban), rotina e sugestões de organização do escritório ===== */
@@ -5724,7 +5816,7 @@ function astDadosContato(e) {
   const tels = astLista(a && a["Telefone"]).map(astTelefone), emails = astLista(a && a["Email"]).map(astSemRotulo), end = astLista(a && a["Endereço"]).join("; "), cu = astCidadeUf(end);
   const obs = [end && "Endereço: " + end, g("Site") && "Site: " + astSemRotulo(astLista(a["Site"])[0] || ""), g("Apelido/Nome fantasia") && "Nome fantasia/apelido: " + g("Apelido/Nome fantasia"), g("RG/IE") && "RG/IE: " + g("RG/IE"), g("Estado cívil") && "Estado civil: " + g("Estado cívil"), g("Nome do pai") && "Pai: " + g("Nome do pai"), g("Nome da mãe") && "Mãe: " + g("Nome da mãe"), g("Naturalidade") && "Naturalidade: " + g("Naturalidade"), g("Nacionalidade") && "Nacionalidade: " + g("Nacionalidade"), g("Comentários") && g("Comentários")].filter(Boolean).join("\n");
   const status = e.procs > 0 || /^cliente/i.test(g("Tipo")) ? "cliente" : "outro";
-  return { nome, tipo, doc, tel: tels[0] || "", tel2: tels[1] || "", email: emails[0] || "", cidade: cu.cidade, uf: cu.uf, empresa: g("Empresa/Contato"), cargo: g("Profissão/Cargo"), nasc: a ? astIso(a["Nascimento"]) : "", status, origem: "Astrea", resp, criado: (a && astIso(a["Data de cadastro"])) || hojeIso(), obs: obs ? obs + "\nImportado do Astrea" : "Importado do Astrea" };
+  return { nome, tipo, doc, tel: tels[0] || "", tel2: tels[1] || "", email: emails[0] || "", cidade: cu.cidade, uf: cu.uf, empresa: g("Empresa/Contato"), cargo: g("Profissão/Cargo"), nasc: a ? astIso(a["Nascimento"]) : "", status, origem: "", resp, criado: (a && astIso(a["Data de cadastro"])) || hojeIso(), obs };
 }
 const astAcha = e => {
   const d = e.ast ? soDigitos(astTxt(e.ast["CPF/CNPJ"])) : "", fant = e.ast ? astTxt(e.ast["Apelido/Nome fantasia"]) : "";
@@ -5785,7 +5877,7 @@ function astNovoCaso(r, motivo, cad, hoje) {
   if (CRM_NEGOCIOS.some(n => n.astreaKey === key)) return false;
   const cr = astIso(r["Data de Criação"]) || hojeIso(), num = astTxt(r["Número"]), url = astTxt(r["URL do Processo"]);
   const obs = [astTxt(r["Objeto"]), astTxt(r["Observações"]), num && "Número informado no Astrea: " + num, /^https?:\/\//.test(url) && "Link do processo: " + url, astTxt(r["Etiquetas"]) && "Etiquetas no Astrea: " + astTxt(r["Etiquetas"]), "Importado do Astrea em " + hoje + " (" + motivo.toLowerCase() + ")"].filter(Boolean).join("\n\n");
-  crmNovoNegocio({ titulo: titulo || "Caso de " + (nomes[0] || "cliente"), contatoId: e && e.id || "", resp: astResp(r["Responsável"]), origem: "Astrea", status: "ganho", criado: cr, etapaEm: cr, fechadoEm: cr, obs, astreaKey: key });
+  crmNovoNegocio({ titulo: titulo || "Caso de " + (nomes[0] || "cliente"), contatoId: e && e.id || "", resp: astResp(r["Responsável"]), origem: "", status: "ganho", criado: cr, etapaEm: cr, fechadoEm: cr, obs, astreaKey: key });
   return true;
 }
 
@@ -7165,11 +7257,15 @@ function calPainel() {
 const CFG_ALIAS = { integracoes: "drive", usuarios: "equipe" };
 const CFG_SECS = [
   ["geral", "Geral e backup", "Conta"], ["alertas", "Alertas e avisos", "Conta"],
-  ["drive", "Google Drive", "Integrações"], ["cnj", "Andamentos (CNJ)", "Integrações"], ["astrea", "Importar do Astrea", "Integrações"], ["agenda", "Agenda Google e Apple", "Integrações"], ["ia", "Inteligência artificial", "Integrações"],
+  ["drive", "Google Drive", "Integrações"], ["cnj", "Andamentos (CNJ)", "Integrações"], ["agenda", "Agenda Google e Apple", "Integrações"], ["ia", "Inteligência artificial", "Integrações"],
   ["celular", "Aplicativo no celular", "Aplicativo"], ["equipe", "Usuários e acessos", "Equipe"]
 ];
 const CFG = { sec: "geral" };
-const cfgPode = s => s === "equipe" ? NV.papel === "admin" : ["drive", "cnj", "astrea", "agenda", "ia"].includes(s) ? NV.papel !== "secretaria" : CFG_SECS.some(x => x[0] === s);
+// A importação do Astrea já foi feita (o sistema substitui o Astrea): a seção não aparece no menu. Para refazer uma importação,
+// no console do navegador: localStorage.setItem("djen.astrea","1") e recarregue.
+const cfgAstreaLiberado = () => { try { return localStorage.getItem("djen.astrea") === "1"; } catch (e) { return false; } };
+if (cfgAstreaLiberado()) CFG_SECS.splice(CFG_SECS.findIndex(x => x[0] === "cnj") + 1, 0, ["astrea", "Importar do Astrea", "Integrações"]);
+const cfgPode = s => s === "equipe" ? NV.papel === "admin" : s === "astrea" ? cfgAstreaLiberado() && NV.papel !== "secretaria" : ["drive", "cnj", "agenda", "ia"].includes(s) ? NV.papel !== "secretaria" : CFG_SECS.some(x => x[0] === s);
 
 function cfgAbrir(sec) {
   if (!cfgPode(sec)) sec = "geral"; CFG.sec = sec;
