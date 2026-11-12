@@ -3813,7 +3813,7 @@ function pDetalhe(p) {
   const msg = el("div", "msg"); msg.id = "pMsg"; msg.hidden = true; hd.appendChild(msg);
   // dados
   const g = el("div", "grid");
-  const iCli = el("input"); iCli.type = "text"; iCli.setAttribute("list", "dlClientes"); iCli.value = p.cliente; iCli.onchange = () => { p.cliente = iCli.value.trim(); p.polo = poloDoCliente(p) || p.polo; salvar(); pDetalhe(p); };
+  const iCli = el("input"); iCli.type = "text"; iCli.setAttribute("list", "dlClientes"); iCli.value = p.cliente; iCli.onchange = () => { p.cliente = iCli.value.trim(); p.polo = poloDoCliente(p) || p.polo; crmVincularPasta(p); salvar(); pDetalhe(p); };
   const sResp = el("select"); for (const r of RESPS) sResp.appendChild(Object.assign(el("option", "", r), { value: r })); sResp.value = p.resp; sResp.onchange = () => { p.resp = sResp.value; salvar(); };
   const sPolo = el("select"); for (const [v, n] of [["", "Não definido"], ["Passivo", "Passivo (réu, reclamada)"], ["Ativo", "Ativo (autor, reclamante)"]]) sPolo.appendChild(Object.assign(el("option", "", n), { value: v })); sPolo.value = p.polo || ""; sPolo.onchange = () => { p.polo = sPolo.value; salvar(); };
   const iVal = el("input"); iVal.type = "text"; iVal.inputMode = "decimal"; iVal.placeholder = "R$ 0,00"; const vm = tomarValoresManuais()[p.chave]; iVal.value = typeof vm === "number" ? vm.toLocaleString("pt-BR", { minimumFractionDigits: 2 }) : ""; iVal.onchange = () => { const v = lerValorBR(iVal.value), m = tomarValoresManuais(); if (v == null) delete m[p.chave]; else m[p.chave] = v; LS.set("valores", m); iVal.value = v == null ? "" : v.toLocaleString("pt-BR", { minimumFractionDigits: 2 }); };
@@ -3828,6 +3828,9 @@ function pDetalhe(p) {
   hd.appendChild(g);
   if (/^https?:\/\//.test(p.linkPasta)) { const a = el("a", "btn sec sm", "Abrir pasta de arquivos"); a.href = p.linkPasta; a.target = "_blank"; a.rel = "noopener noreferrer"; a.style.width = "fit-content"; hd.appendChild(a); }
   if (/^https?:\/\//.test(p.linkTribunal || "") && !souSecretaria()) { const a = el("a", "btn sec sm", "Abrir no tribunal"); a.href = p.linkTribunal; a.target = "_blank"; a.rel = "noopener noreferrer"; a.style.width = "fit-content"; hd.appendChild(a); }
+  const rc = el("div", "acts"); for (const c of crmContatosDaPasta(p)) rc.appendChild(btn("Cadastro do cliente: " + c.nome, () => crmAbrirContato(c.id), "sec"));
+  if (!rc.children.length && p.cliente) rc.appendChild(btn("Criar cadastro do cliente", () => { const c = crmNovoContato({ nome: p.cliente, status: "cliente", resp: p.resp || respPadrao() }); salvarContatos(); p.clienteIds = [c.id]; salvar(); pDetalhe(p); crmAbrirContato(c.id); }, "sec"));
+  if (rc.children.length) hd.appendChild(rc);
   const dr = el("div", "acts"); dr.appendChild(btn("Documentos no Drive", () => driveAbrir(driveAlvo("proc", p)), "")); if (!souSecretaria()) dr.appendChild(btn("Assistente de IA", () => iaProc(p), "")); hd.appendChild(dr);
   const nt = el("textarea"); nt.placeholder = "Observações do caso"; nt.value = p.nota; nt.onchange = () => { p.nota = nt.value; salvar(); }; if (!souSecretaria()) hd.appendChild(campo("Observações", nt));
   if (p._por) hd.appendChild(el("div", "hint", "Última alteração: " + p._por + (p._em ? " em " + new Date(p._em).toLocaleString("pt-BR") : "")));
@@ -4444,7 +4447,16 @@ function crmUltimoContato(id) { // data da última atividade concluída (ou do c
   let u = ""; for (const a of CRM_ATIV) if (a.contatoId === id && a.feita && a.tipo !== "tarefa") { const d = (a.feitaEm || a.data || ""); if (d > u) u = d; }
   const c = crmContato(id); return u || (c && c.criado) || "";
 }
-const crmPastasDoContato = c => PROCS.filter(p => p.cliente && norm(p.cliente) === norm(c.nome));
+// pastas do cliente: vínculo direto (p.clienteIds, criado na importação do Astrea ou pelo botão da pasta) ou, como reserva, o mesmo nome
+const crmPastasDoContato = c => PROCS.filter(p => (p.clienteIds || []).includes(c.id) || (p.cliente && norm(p.cliente) === norm(c.nome)));
+function crmContatosDaPasta(p) { // cadastros ligados a uma pasta
+  const ids = p.clienteIds || [], porId = CRM_CONTATOS.filter(c => ids.includes(c.id)); if (porId.length) return porId;
+  const c = p.cliente ? crmAchaContatoPorNome(p.cliente) : null; return c ? [c] : [];
+}
+function crmVincularPasta(p) { // refaz os vínculos a partir do campo "cliente" da pasta ("A / B" = dois clientes)
+  const ids = []; for (const n of String(p.cliente || "").split(" / ")) { const c = crmAchaContatoPorNome(n); if (c && !ids.includes(c.id)) ids.push(c.id); }
+  p.clienteIds = ids; return ids;
+}
 function crmAniversario(c, ref) { // próxima data de aniversário a partir de ref (iso) ou ""
   if (!c.nasc || !/^\d{4}-\d{2}-\d{2}$/.test(c.nasc)) return "";
   const y = +ref.slice(0, 4); let d = y + c.nasc.slice(4); if (d < ref) d = (y + 1) + c.nasc.slice(4); return d;
@@ -4698,7 +4710,7 @@ function crmContatos(box) {
   const p = el("div", "panel"); p.appendChild(el("h2", "", Tc("contatos") + " (" + l.length + (l.length !== CRM_CONTATOS.length ? " de " + CRM_CONTATOS.length : "") + ")"));
   if (!l.length) { p.appendChild(el("div", "empty", CRM_CONTATOS.length ? "Nenhum contato com estes filtros." : "Nenhum contato ainda. Use “Novo contato” ou “Importar CSV” (planilha do Excel salva como CSV).")); box.appendChild(p); return; }
   const w = el("div", "tblwrap"), t = el("table", "crmtbl"), cab = el("tr");
-  for (const h of ["Nome", "Contato", "Situação", "Origem", "Tags", "Resp.", "Último contato"].concat(crmVeValores() ? [Tc("negocios")] : [])) cab.appendChild(el("th", "", h));
+  for (const h of ["Nome", "Contato", "Situação", "Origem", "Tags", "Resp.", "Último contato", "Processos"].concat(crmVeValores() ? [Tc("negocios")] : [])) cab.appendChild(el("th", "", h));
   t.appendChild(el("thead")).appendChild(cab); const tb = el("tbody");
   for (const x of l.slice(0, c.lim)) {
     const tr = el("tr"); tr.tabIndex = 0; tr.onclick = () => crmAbrirContato(x.id); tr.onkeydown = e => { if (e.key === "Enter") crmAbrirContato(x.id); };
@@ -4710,6 +4722,7 @@ function crmContatos(box) {
     tr.appendChild(el("td", "", x.resp || ""));
     const uc = crmUltimoContato(x.id), dias = uc ? diasEntre(uc, hoje) : null, td = el("td");
     td.appendChild(el("span", "tag" + (x.status === "cliente" && dias != null && dias >= cfg.diasSemContato ? " warn" : ""), dias == null ? "—" : dias === 0 ? "hoje" : dias + " d")); tr.appendChild(td);
+    const np = crmPastasDoContato(x).length; tr.appendChild(el("td", "", np ? String(np) : ""));
     if (crmVeValores()) { const ab = crmNegociosDoContato(x.id).filter(y => y.status === "aberto").length; tr.appendChild(el("td", "", ab ? String(ab) : "")); }
     tb.appendChild(tr);
   }
@@ -5629,13 +5642,14 @@ function intDesenhar() {
 }
 
 
-/* ===== 44-astrea: importa para as pastas de Processos a planilha "Processos" exportada do Astrea =====
+/* ===== 44-astrea: importa do Astrea os processos, os cadastros de clientes e os casos, já vinculados entre si =====
    O arquivo é lido no próprio navegador (nada é enviado a terceiros). Cada linha com número CNJ vira (ou completa) uma pasta:
    cliente, polo, classe, vara, valor da causa e da condenação, distribuição, link do tribunal, chave de acesso (num_chave/hash
    do link do eproc, usada em segredo de justiça), pasta do Drive achada nas observações e responsável do Astrea.
-   Nunca sobrescreve o que já está preenchido numa pasta existente. "Casos" sem número e números fora do padrão não entram:
-   saem num relatório CSV para ajuste manual. */
-const AST = { linhas: null, plano: null, nome: "" };
+   Também cria o cadastro de cada cliente no CRM (dados extras vêm da planilha "Contatos", opcional), vincula cada pasta aos seus
+   clientes (p.clienteIds) e transforma os "Casos" sem número CNJ em casos do cliente no CRM. Nunca sobrescreve o que já está
+   preenchido numa pasta ou num cadastro existente; importar de novo não duplica nada. */
+const AST = { linhas: null, contatos: null, plano: null, nome: "" };
 const AST_ATIVO = /^(autor|autora|requerente|exequente|reclamante|impetrante|embargante|apelante|recorrente|agravante|credor|promovente|demandante|exeqüente)/i;
 const AST_PASSIVO = /^(r[eé]u|r[eé]|requerid[oa]|executad[oa]|reclamad[oa]|impetrad[oa]|embargad[oa]|apelad[oa]|recorrid[oa]|agravad[oa]|devedor|promovid[oa]|demandad[oa])/i;
 const astTxt = v => { if (v == null) return ""; if (typeof v === "object") { if (v.text != null) return String(v.text).trim(); if (v.richText) return v.richText.map(x => x.text).join("").trim(); if (v.result != null) return String(v.result).trim(); if (v instanceof Date) return v.toISOString(); } return String(v).trim(); };
@@ -5656,35 +5670,98 @@ function astPartes(txt, cliente, polo) { // "NOME (Autor)\nOUTRO (Réu)" -> [{no
   add(cliente, polo); return out.filter(x => x.polo);
 }
 
-async function astLer(arquivo) {
+async function astLerAba(arquivo, aba, exigidas, dica) {
   if (!(await carregarExcel())) throw new Error("Não consegui carregar o leitor de planilhas (internet). Tente de novo.");
   const wb = new ExcelJS.Workbook(); await wb.xlsx.load(await arquivo.arrayBuffer());
-  const ws = wb.getWorksheet("Processos") || wb.worksheets[0]; if (!ws) throw new Error("A planilha não tem nenhuma aba.");
+  const ws = wb.getWorksheet(aba) || wb.worksheets[0]; if (!ws) throw new Error("A planilha não tem nenhuma aba.");
   const cab = []; ws.getRow(1).eachCell({ includeEmpty: true }, (c, i) => { cab[i] = astTxt(c.value); });
-  if (!cab.includes("Título") || !cab.includes("Cliente")) throw new Error("Este não parece o arquivo exportado do Astrea (faltam as colunas “Título” e “Cliente”). No Astrea: Processos e casos › Exportar.");
+  if (!exigidas.every(x => cab.includes(x))) throw new Error("Este não parece o arquivo certo do Astrea (faltam as colunas " + exigidas.map(x => "“" + x + "”").join(" e ") + "). " + dica);
   const linhas = [];
   ws.eachRow({ includeEmpty: false }, (row, n) => { if (n === 1) return; const o = { _n: n }; row.eachCell({ includeEmpty: false }, (c, i) => { if (cab[i]) o[cab[i]] = c.value; }); linhas.push(o); });
   return linhas;
 }
+const astLer = arquivo => astLerAba(arquivo, "Processos", ["Título", "Cliente"], "No Astrea: Processos e casos › Exportar.");
+const astLerContatos = arquivo => astLerAba(arquivo, "Contatos", ["Nome/Empresa"], "No Astrea: Contatos › ⋮ › Exportar contatos.");
 
-// transforma as linhas em um plano: o que cria, o que completa e o que fica de fora
-function astPlano(linhas) {
-  const por = new Map(), fora = []; let casos = 0, dups = 0, dvRuim = 0;
+// ---------- clientes (cadastros) ----------
+const AST_PJ = /\b(ltda|s\/?a|eireli|epp|me|mei|cia|cooperativa|associa[cç][aã]o|munic[ií]pio|prefeitura|banco|sindicato|ind[uú]stria|com[eé]rcio|construtora|incorporadora|transportes?|holding|igreja|condom[ií]nio|distribuidora|empreendimentos|minist[eé]rio|inss)\b/i;
+const AST_MIN = new Set(["DE", "DA", "DO", "DAS", "DOS", "E"]), AST_SIGLAS = new Set(["LTDA", "S/A", "SA", "ME", "EPP", "EIRELI", "MEI", "CIA", "INSS", "CNPJ"]);
+function astNomeBonito(n) { // "ANA SOUZA LTDA" -> "Ana Souza LTDA"; nomes que já têm minúsculas ficam como estão
+  n = String(n || "").trim(); if (/[a-zà-ú]/.test(n)) return n;
+  return n.toLowerCase().split(/(\s+)/).map((w, i) => { const u = w.toUpperCase(); if (!w.trim()) return w; if (AST_SIGLAS.has(u)) return u; if (i > 0 && AST_MIN.has(u)) return w; return w.charAt(0).toUpperCase() + w.slice(1); }).join("");
+}
+function astClientes(r) { // nomes dos clientes de uma linha: coluna "Cliente" + "Outros clientes" marcados como (Cliente)
+  const out = [], add = n => { n = String(n || "").trim(); if (n && !out.some(x => norm(x) === norm(n))) out.push(n); };
+  add(astTxt(r["Cliente"]));
+  for (const parte of astTxt(r["Outros clientes"]).split(/\n|;/)) { const m = parte.match(/^(.*?)\s*\(([^()]*)\)\s*$/); if (m) { if (/cliente/i.test(m[2])) add(m[1]); } else add(parte); }
+  return out;
+}
+const astLista = v => astTxt(v).split(/","|\n/).map(x => x.replace(/^"+|"+$/g, "").trim()).filter(Boolean);
+const astSemRotulo = x => x.replace(/^[^:]{0,40}:\s*/, "");
+function astTelefone(x) { const v = astSemRotulo(x), d = soDigitos(v); return d.length >= 10 ? fmtTel(v) : v; }
+function astCidadeUf(end) { let r = null; for (const m of String(end || "").matchAll(/-\s*([^-,]+?)\s*-\s*([A-Z]{2})(?=\s*-|\s*$)/g)) r = m; return r ? { cidade: r[1].trim(), uf: r[2] } : { cidade: "", uf: "" }; }
+
+// junta os clientes das linhas de processos/casos com os cadastros da planilha "Contatos" (opcional)
+function astCadastros(linhas, contatos) {
+  const mapa = new Map();
+  const get = nome => { const k = norm(nome); if (!k) return null; let e = mapa.get(k); if (!e) { e = { nome: String(nome).trim(), ast: null, resps: {}, procs: 0 }; mapa.set(k, e); } return e; };
+  for (const r of linhas) { const rs = astResp(r["Responsável"]); for (const n of astClientes(r)) { const e = get(n); e.procs++; e.resps[rs] = (e.resps[rs] || 0) + 1; } }
+  let soContatos = 0;
+  for (const c of contatos || []) {
+    const nome = astTxt(c["Nome/Empresa"]); if (!nome || /^usu[aá]rio/i.test(astTxt(c["Tipo"]))) continue;
+    const fant = astTxt(c["Apelido/Nome fantasia"]);
+    let e = mapa.get(norm(nome)) || (fant && mapa.get(norm(fant)));
+    if (!e) { e = get(nome); soContatos++; }
+    e.ast = c;
+  }
+  return { mapa, soContatos };
+}
+function astDadosContato(e) {
+  const a = e.ast, g = k => a ? astTxt(a[k]) : "", nomeSite = e.nome;
+  const resp = (Object.entries(e.resps).sort((x, y) => y[1] - x[1])[0] || [])[0] || "Equipe";
+  const doc = fmtDoc(g("CPF/CNPJ")), nome = a ? astTxt(a["Nome/Empresa"]) : astNomeBonito(nomeSite);
+  const tipo = /jur/i.test(g("Pessoa")) || soDigitos(doc).length === 14 || /\b(ltda|eireli|s\/?a)\b/i.test(nome) || (!a && AST_PJ.test(nome)) ? "PJ" : "PF";
+  const tels = astLista(a && a["Telefone"]).map(astTelefone), emails = astLista(a && a["Email"]).map(astSemRotulo), end = astLista(a && a["Endereço"]).join("; "), cu = astCidadeUf(end);
+  const obs = [end && "Endereço: " + end, g("Site") && "Site: " + astSemRotulo(astLista(a["Site"])[0] || ""), g("Apelido/Nome fantasia") && "Nome fantasia/apelido: " + g("Apelido/Nome fantasia"), g("RG/IE") && "RG/IE: " + g("RG/IE"), g("Estado cívil") && "Estado civil: " + g("Estado cívil"), g("Nome do pai") && "Pai: " + g("Nome do pai"), g("Nome da mãe") && "Mãe: " + g("Nome da mãe"), g("Naturalidade") && "Naturalidade: " + g("Naturalidade"), g("Nacionalidade") && "Nacionalidade: " + g("Nacionalidade"), g("Comentários") && g("Comentários")].filter(Boolean).join("\n");
+  const status = e.procs > 0 || /^cliente/i.test(g("Tipo")) ? "cliente" : "outro";
+  return { nome, tipo, doc, tel: tels[0] || "", tel2: tels[1] || "", email: emails[0] || "", cidade: cu.cidade, uf: cu.uf, empresa: g("Empresa/Contato"), cargo: g("Profissão/Cargo"), nasc: a ? astIso(a["Nascimento"]) : "", status, origem: "Astrea", resp, criado: (a && astIso(a["Data de cadastro"])) || hojeIso(), obs: obs ? obs + "\nImportado do Astrea" : "Importado do Astrea" };
+}
+const astAcha = e => {
+  const d = e.ast ? soDigitos(astTxt(e.ast["CPF/CNPJ"])) : "", fant = e.ast ? astTxt(e.ast["Apelido/Nome fantasia"]) : "";
+  return crmAchaContatoPorNome(e.nome) || (e.ast && crmAchaContatoPorNome(astTxt(e.ast["Nome/Empresa"]))) || (fant && crmAchaContatoPorNome(fant)) || (d.length >= 11 ? CRM_CONTATOS.find(x => soDigitos(x.doc) === d) : null) || null;
+};
+// cria o cadastro (ou completa os campos vazios de um que já existe); devolve {c, criado, mudou}
+function astGarantirContato(e) {
+  const dados = astDadosContato(e); let c = astAcha(e);
+  if (!c) { c = crmNovoContato(dados); e.id = c.id; return { c, criado: true, mudou: 1 }; }
+  let mudou = 0; for (const k of Object.keys(dados)) { if (k === "nome" || k === "status" || k === "criado") continue; if (dados[k] && (c[k] == null || c[k] === "")) { c[k] = dados[k]; mudou++; } }
+  e.id = c.id; return { c, criado: false, mudou };
+}
+
+// ---------- plano ----------
+// transforma as linhas em um plano: o que cria, o que completa e quais viram casos do cliente
+function astPlano(linhas, contatos) {
+  const por = new Map(), casosL = []; let casos = 0, dups = 0, dvRuim = 0;
   for (const r of linhas) {
     const tipo = astTxt(r["Tipo"]), num = astNum(r["Número"]), titulo = astTxt(r["Título"]);
-    if (/^caso/i.test(tipo) && !num) { casos++; fora.push([r._n, "Caso sem número", titulo, astTxt(r["Cliente"]), ""]); continue; }
-    if (num.length !== 20) { fora.push([r._n, num ? "Número fora do padrão CNJ" : "Sem número", titulo, astTxt(r["Cliente"]), astTxt(r["Número"])]); continue; }
+    if (/^caso/i.test(tipo) && !num) { casos++; casosL.push([r, "Caso sem número"]); continue; }
+    if (num.length !== 20) { casosL.push([r, num ? "Número fora do padrão CNJ" : "Sem número"]); continue; }
     if (!dvCnjOk(num)) dvRuim++;
     if (por.has(num)) { dups++; por.get(num).rows.push(r); } else por.set(num, { chave: num, rows: [r] });
   }
   const itens = [...por.values()].map(it => Object.assign(it, { existe: !!procPorChave(it.chave) }));
-  return { itens, fora, casos, dups, dvRuim, novos: itens.filter(x => !x.existe).length, existentes: itens.filter(x => x.existe).length };
+  const cad = astCadastros(linhas, contatos);
+  let cadNovos = 0, cadExistem = 0; for (const e of cad.mapa.values()) { if (astAcha(e)) cadExistem++; else cadNovos++; }
+  let vinc = 0; for (const it of itens) { const ns = new Set(); for (const r of it.rows) for (const n of astClientes(r)) ns.add(norm(n)); vinc += ns.size; }
+  const fora = casosL.map(([r, motivo]) => [r._n, motivo, astTxt(r["Título"]), astTxt(r["Cliente"]), astTxt(r["Número"])]);
+  return { itens, casosL, fora, casos, semPadrao: casosL.length - casos, dups, dvRuim, cad, cadNovos, cadExistem, vinc, novos: itens.filter(x => !x.existe).length, existentes: itens.filter(x => x.existe).length };
 }
 
 // aplica uma ou mais linhas do Astrea a uma pasta; devolve o que mudou
-function astAplicar(p, rows, opc, hoje) {
+function astAplicar(p, rows, opc, hoje, ids) {
   let mudou = 0; const set = (campo, valor) => { if (valor && !p[campo]) { p[campo] = valor; mudou++; } };
   const notas = [];
+  if (ids && ids.length) { const atual = Array.isArray(p.clienteIds) ? p.clienteIds : []; const novos = ids.filter(i => !atual.includes(i)); if (novos.length || !Array.isArray(p.clienteIds)) { p.clienteIds = atual.concat(novos); if (novos.length) mudou++; } }
   for (const r of rows) {
     const cliente = astTxt(r["Cliente"]), polo = astPolo(r["Papel do cliente"]), url = astTxt(r["URL do Processo"]), obs = astTxt(r["Observações"]);
     if (cliente && !p.cliente) { p.cliente = cliente; mudou++; } else if (cliente && p.cliente && !norm(p.cliente).includes(norm(cliente)) && !norm(cliente).includes(norm(p.cliente))) { p.cliente += " / " + cliente; mudou++; }
@@ -5702,49 +5779,68 @@ function astAplicar(p, rows, opc, hoje) {
   return mudou;
 }
 
+// um "Caso" do Astrea (ou processo sem número CNJ) vira um caso do cliente no CRM
+function astNovoCaso(r, motivo, cad, hoje) {
+  const titulo = astTxt(r["Título"]), nomes = astClientes(r), e = nomes.length ? cad.mapa.get(norm(nomes[0])) : null, key = norm(titulo) + "|" + norm(nomes[0] || "");
+  if (CRM_NEGOCIOS.some(n => n.astreaKey === key)) return false;
+  const cr = astIso(r["Data de Criação"]) || hojeIso(), num = astTxt(r["Número"]), url = astTxt(r["URL do Processo"]);
+  const obs = [astTxt(r["Objeto"]), astTxt(r["Observações"]), num && "Número informado no Astrea: " + num, /^https?:\/\//.test(url) && "Link do processo: " + url, astTxt(r["Etiquetas"]) && "Etiquetas no Astrea: " + astTxt(r["Etiquetas"]), "Importado do Astrea em " + hoje + " (" + motivo.toLowerCase() + ")"].filter(Boolean).join("\n\n");
+  crmNovoNegocio({ titulo: titulo || "Caso de " + (nomes[0] || "cliente"), contatoId: e && e.id || "", resp: astResp(r["Responsável"]), origem: "Astrea", status: "ganho", criado: cr, etapaEm: cr, fechadoEm: cr, obs, astreaKey: key });
+  return true;
+}
+
 async function astImportar(plano, opc, prog) {
-  const hoje = new Date().toLocaleDateString("pt-BR"), vals = {}, valoresAtuais = LS.get("valores", {}); let novos = 0, completados = 0, iguais = 0, k = 0;
+  const hoje = new Date().toLocaleDateString("pt-BR"), vals = {}, valoresAtuais = LS.get("valores", {}); let novos = 0, completados = 0, iguais = 0, k = 0, cadNovos = 0, cadCompl = 0, casosNovos = 0, vinc = 0;
+  const total = plano.cad.mapa.size + plano.itens.length;
+  for (const e of plano.cad.mapa.values()) { const r = astGarantirContato(e); if (r.criado) cadNovos++; else if (r.mudou) cadCompl++; if (++k % 100 === 0) { prog("cadastros", k, total); await new Promise(r => setTimeout(r, 0)); } }
   for (const it of plano.itens) {
     let p = procPorChave(it.chave); const novo = !p;
     if (novo) { p = novaPasta(it.chave, { cliente: "", resp: astResp(it.rows[0]["Responsável"]) }); const cr = astIso(it.rows[0]["Data de Criação"]); if (cr) p.criado = Date.parse(cr + "T12:00:00") || p.criado; p.origem = "astrea"; PROCS.push(p); }
-    const m = astAplicar(p, it.rows, opc, hoje);
+    const nomes = []; for (const r of it.rows) for (const n of astClientes(r)) if (!nomes.some(x => norm(x) === norm(n))) nomes.push(n);
+    const ids = nomes.map(n => (plano.cad.mapa.get(norm(n)) || {}).id).filter(Boolean); vinc += ids.length;
+    const m = astAplicar(p, it.rows, opc, hoje, ids);
     if (novo) { novos++; if (!p.cliente) p.cliente = astTxt(it.rows[0]["Título"]).slice(0, 80); } else if (m) completados++; else iguais++;
     const v = Math.max(...it.rows.map(r => astValor(r["Valor da causa"])), 0); if (v && typeof valoresAtuais[it.chave] !== "number") vals[it.chave] = v;
-    if (++k % 100 === 0) { prog(k, plano.itens.length); await new Promise(r => setTimeout(r, 0)); }
+    if (++k % 100 === 0) { prog("processos", k, total); await new Promise(r => setTimeout(r, 0)); }
   }
+  for (const [r, motivo] of plano.casosL) if (astNovoCaso(r, motivo, plano.cad, hoje)) casosNovos++;
   if (Object.keys(vals).length) LS.set("valores", Object.assign({}, vals, valoresAtuais));
-  salvarProcs(); atualizarBadges(); if (typeof procDesenhar === "function") procDesenhar();
-  return { novos, completados, iguais, valores: Object.keys(vals).length };
+  salvarContatos(); salvarNegocios(); salvarProcs(); atualizarBadges(); if (typeof procDesenhar === "function") procDesenhar(); if (typeof crmDesenhar === "function") try { crmDesenhar(); } catch (e) {}
+  return { novos, completados, iguais, valores: Object.keys(vals).length, cadNovos, cadCompl, casosNovos, vinc };
 }
 
 function astCsv(fora) {
   const q = s => '"' + String(s == null ? "" : s).replace(/"/g, '""') + '"';
   const txt = "﻿" + [["Linha na planilha", "Motivo", "Título", "Cliente", "Número informado"], ...fora].map(r => r.map(q).join(";")).join("\r\n");
-  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([txt], { type: "text/csv;charset=utf-8" })); a.download = "astrea-nao-importados.csv"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([txt], { type: "text/csv;charset=utf-8" })); a.download = "astrea-casos-sem-numero.csv"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
 }
 
 function cfgAstrea(box) {
-  box.textContent = ""; const p = el("div", "panel"); p.appendChild(el("h2", "", "Importar processos do Astrea"));
-  p.appendChild(el("div", "hint", "No Astrea, abra Processos e casos, escolha “Todos” e clique em Exportar. Selecione aqui o arquivo Processo.xlsx baixado. A leitura é feita neste navegador; nada é enviado a terceiros. Pastas que já existem só são completadas (campos vazios), nunca sobrescritas. A consulta ao DJEN/CNJ de cada processo não roda na importação: ela acontece aos poucos depois, pelo monitor."));
-  const f = el("input"); f.type = "file"; f.accept = ".xlsx"; const res = el("div", "intpasso"), msg = el("div", "msg"); msg.hidden = true;
+  box.textContent = ""; const p = el("div", "panel"); p.appendChild(el("h2", "", "Importar do Astrea"));
+  p.appendChild(el("div", "hint", "Espelha o Astrea: cria o cadastro de cada cliente, cria/completa as pastas de processos, vincula cada processo ao(s) cliente(s) e transforma os “Casos” sem número em casos do cliente. A leitura é feita neste navegador; nada é enviado a terceiros. O que já está preenchido nunca é sobrescrito e importar de novo não duplica nada. A consulta ao DJEN/CNJ de cada processo acontece aos poucos depois, pelo monitor."));
+  const grupo = (rot, dica) => { const d = el("div", "campo"), l = el("label", "", rot), i = el("input"); i.type = "file"; i.accept = ".xlsx"; d.append(l, i, el("div", "hint", dica)); return [d, i]; };
+  const [d1, f1] = grupo("1) Processos e casos (obrigatório)", "No Astrea: Processos e casos › filtro Todos › Exportar (arquivo Processo.xlsx)."), [d2, f2] = grupo("2) Contatos (opcional, traz telefone, e-mail, CPF/CNPJ e endereço)", "No Astrea: Contatos › ⋮ › Exportar contatos (arquivo Contatos.xlsx).");
+  const res = el("div", "intpasso"), msg = el("div", "msg"); msg.hidden = true;
   const mostra = (t, erro) => { msg.hidden = !t; msg.textContent = t || ""; msg.className = "msg" + (erro ? " err" : ""); };
-  f.onchange = async () => {
-    res.textContent = ""; mostra(""); AST.plano = null; const a = f.files && f.files[0]; if (!a) return; mostra("Lendo “" + a.name + "”…");
-    try {
-      const linhas = await astLer(a), pl = astPlano(linhas); AST.plano = pl; AST.nome = a.name; mostra("");
-      const ul = el("ul", "mini");
-      for (const t of [pl.itens.length + " processo(s) com número CNJ válido na planilha (" + linhas.length + " linhas lidas)", pl.novos + " pasta(s) novas serão criadas", pl.existentes + " pasta(s) já existem e serão apenas completadas", pl.dups ? pl.dups + " linha(s) repetem o mesmo processo (clientes juntados na mesma pasta)" : "", pl.dvRuim ? pl.dvRuim + " número(s) com dígito verificador inválido (importados mesmo assim; confira)" : "", pl.fora.length ? pl.fora.length + " linha(s) ficam de fora (" + pl.casos + " casos sem número e " + (pl.fora.length - pl.casos) + " números fora do padrão): baixe a lista abaixo" : ""].filter(Boolean)) ul.appendChild(el("li", "", t));
-      res.appendChild(ul);
-      const lb = el("label", "ck"); const cb = el("input"); cb.type = "checkbox"; cb.checked = true; lb.append(cb, document.createTextNode(" Arquivar as pastas que o Astrea já marca como encerradas")); res.appendChild(lb);
-      const ac = el("div", "acts"); const bi = btn("Importar " + pl.itens.length + " processos", async () => {
-        if (!confirm("Importar " + pl.itens.length + " processos (" + pl.novos + " novos) para o escritório todo? A equipe passará a vê-los nas pastas.")) return;
-        bi.disabled = true; try { const r = await astImportar(pl, { encerrar: cb.checked }, (k, n) => mostra("Importando… " + k + " de " + n));
-          mostra("Pronto: " + r.novos + " pasta(s) criada(s), " + r.completados + " completada(s), " + r.iguais + " sem mudança" + (r.valores ? ", " + r.valores + " valor(es) de causa gravado(s)" : "") + ". Os dados estão sendo enviados à nuvem para a equipe."); }
-        catch (e) { mostra("Falhou: " + (e.message || e), true); } finally { bi.disabled = false; } }, "pri");
-      ac.appendChild(bi); if (pl.fora.length) ac.appendChild(btn("Baixar lista dos que ficaram de fora (CSV)", () => astCsv(pl.fora), "sec")); res.appendChild(ac);
-    } catch (e) { mostra(e.message || String(e), true); }
+  const refaz = () => {
+    res.textContent = ""; AST.plano = null; if (!AST.linhas) return;
+    const pl = astPlano(AST.linhas, AST.contatos); AST.plano = pl;
+    const ul = el("ul", "mini");
+    for (const t of [pl.itens.length + " processo(s) com número CNJ válido na planilha (" + AST.linhas.length + " linhas lidas)", pl.novos + " pasta(s) novas serão criadas", pl.existentes + " pasta(s) já existem e serão apenas completadas", pl.dups ? pl.dups + " linha(s) repetem o mesmo processo (clientes juntados na mesma pasta)" : "", pl.dvRuim ? pl.dvRuim + " número(s) com dígito verificador inválido (importados mesmo assim; confira)" : "",
+      pl.cad.mapa.size + " cliente(s)/contato(s): " + pl.cadNovos + " cadastro(s) novo(s) no CRM e " + pl.cadExistem + " já existem (serão apenas completados)" + (AST.contatos ? "; " + pl.cad.soContatos + " vêm só da planilha de Contatos" : " (sem a planilha de Contatos: só o nome do cliente)"), pl.vinc + " vínculo(s) processo ↔ cliente serão feitos",
+      pl.casosL.length ? pl.casosL.length + " linha(s) sem número CNJ válido (" + pl.casos + " casos e " + pl.semPadrao + " números fora do padrão) viram casos do cliente no CRM" : ""].filter(Boolean)) ul.appendChild(el("li", "", t));
+    res.appendChild(ul);
+    const lb = el("label", "ck"); const cb = el("input"); cb.type = "checkbox"; cb.checked = true; lb.append(cb, document.createTextNode(" Arquivar as pastas que o Astrea já marca como encerradas")); res.appendChild(lb);
+    const ac = el("div", "acts"); const bi = btn("Importar tudo", async () => {
+      if (!confirm("Importar " + pl.itens.length + " processos e " + pl.cad.mapa.size + " cadastros (" + pl.cadNovos + " novos) para o escritório todo? A equipe passará a vê-los.")) return;
+      bi.disabled = true; try { const r = await astImportar(pl, { encerrar: cb.checked }, (fase, k, n) => mostra("Importando " + fase + "… " + k + " de " + n));
+        mostra("Pronto: " + r.cadNovos + " cadastro(s) de cliente criado(s) e " + r.cadCompl + " completado(s); " + r.novos + " pasta(s) criada(s), " + r.completados + " completada(s), " + r.iguais + " sem mudança; " + r.vinc + " vínculo(s) processo ↔ cliente; " + r.casosNovos + " caso(s) criado(s) no CRM" + (r.valores ? "; " + r.valores + " valor(es) de causa gravado(s)" : "") + ". Os dados estão sendo enviados à nuvem para a equipe."); }
+      catch (e) { mostra("Falhou: " + (e.message || e), true); } finally { bi.disabled = false; } }, "pri");
+    ac.appendChild(bi); if (pl.fora.length) ac.appendChild(btn("Baixar lista dos casos sem número (CSV)", () => astCsv(pl.fora), "sec")); res.appendChild(ac);
   };
-  p.append(f, msg, res); box.appendChild(p);
+  f1.onchange = async () => { AST.linhas = null; res.textContent = ""; mostra(""); const a = f1.files && f1.files[0]; if (!a) return; mostra("Lendo “" + a.name + "”…"); try { AST.linhas = await astLer(a); AST.nome = a.name; mostra(""); refaz(); } catch (e) { mostra(e.message || String(e), true); } };
+  f2.onchange = async () => { AST.contatos = null; mostra(""); const a = f2.files && f2.files[0]; if (a) { mostra("Lendo “" + a.name + "”…"); try { AST.contatos = await astLerContatos(a); mostra(""); } catch (e) { mostra(e.message || String(e), true); return; } } refaz(); };
+  p.append(d1, d2, msg, res); box.appendChild(p);
 }
 
 
