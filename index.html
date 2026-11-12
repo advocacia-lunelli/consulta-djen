@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-KjFYuFNaLKsGl/oQg3YJHZWXGMXHykd1Rr2MuA1wjak=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-FsGIHdDiNH+hHfYYjM8zulXedcA6HYGaYuq8xT6zSiw=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#000065">
@@ -6716,7 +6716,7 @@ function clcTempo(texto, sexo) {
    Além disso, atalhos que abrem a pesquisa de jurisprudência do próprio tribunal (ou o Google restrito ao domínio oficial .jus.br).
    A IA é opcional e NUNCA é fonte: ela só (a) sugere termos de busca e (b) resume os textos que a busca oficial trouxe.
    Cada ponto do resumo vem com um trecho literal; o app confere o trecho contra o texto oficial e descarta o que não bater. */
-const JU = { q: "", trib: "", periodo: "12", soDec: true, busy: false, ctl: null, feito: false, prec: [], precParc: [], precTotal: 0, dec: [], decTotal: 0, decFora: 0, erroPrec: "", erroDec: "", status: "", verParc: false, ia: null, iaBusy: false, iaErro: "", sug: [], pergunta: "" };
+const JU = { q: "", trib: "", periodo: "12", soDec: true, busy: false, ctl: null, feito: false, prec: [], precParc: [], precTotal: 0, dec: [], decSem: [], decTotal: 0, decFora: 0, erroPrec: "", erroDec: "", status: "", verParc: false, ia: null, iaBusy: false, iaErro: "", sug: [], pergunta: "" };
 const JU_BNP = "https://pangeabnp.pdpj.jus.br/api/v1/precedentes", JU_BNP_SITE = "https://pangeabnp.pdpj.jus.br/";
 const JU_TIPOS = { SUM: "Súmula", SV: "Súmula Vinculante", RG: "Tema de Repercussão Geral", ADI: "ADI", ADC: "ADC", ADO: "ADO", ADPF: "ADPF", IAC: "Incidente de Assunção de Competência", SIRDR: "Suspensão em IRDR", RR: "Tema de Recurso Repetitivo", CT: "Controvérsia", IRDR: "IRDR", IRR: "Incidente de Recurso de Revista Repetitivo", PUIL: "Pedido de Uniformização (PUIL)", NT: "Nota Técnica", OJ: "Orientação Jurisprudencial" };
 const JU_UFS = ["AC", "AL", "AP", "AM", "BA", "CE", "DFT", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"];
@@ -6763,9 +6763,9 @@ function juRealce(texto, termos, janela) {
 }
 
 // ---------- fonte 1: Banco Nacional de Precedentes (CNJ)
-async function juBuscarPrec(termos, tribs, ctl) {
+async function juBuscarPrec(termos, tribs, ctl, semAspas) { // semAspas: 2ª tentativa, para trazer ao menos os resultados parciais
   const orgaos = (tribs.length ? tribs : JU_TRIBS).map(juBnpOrgao);
-  const r = await fetch(JU_BNP, { method: "POST", signal: ctl.signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ filtro: { buscaGeral: termos.map(t => t.frase ? '"' + t.txt + '"' : t.txt).join(" "), todasPalavras: "", quaisquerPalavras: "", semPalavras: "", trechoExato: "", atualizacaoDesde: "", atualizacaoAte: "", cancelados: false, ordenacao: "Text", nr: "", pagina: 1, tamanhoPagina: 30, orgaos, tipos: Object.keys(JU_TIPOS) } }) });
+  const r = await fetch(JU_BNP, { method: "POST", signal: ctl.signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ filtro: { buscaGeral: termos.map(t => t.frase && !semAspas ? '"' + t.txt + '"' : t.txt).join(" "), todasPalavras: "", quaisquerPalavras: "", semPalavras: "", trechoExato: "", atualizacaoDesde: "", atualizacaoAte: "", cancelados: false, ordenacao: "Text", nr: "", pagina: 1, tamanhoPagina: 30, orgaos, tipos: Object.keys(JU_TIPOS) } }) });
   if (!r.ok) throw new Error("HTTP " + r.status);
   const j = await r.json(), txt = s => { s = limpa(s); return /^(-|n[ãa]o informad[oa])$/i.test(s) ? "" : s; };
   const itens = (j.resultados || []).map(x => {
@@ -6775,13 +6775,16 @@ async function juBuscarPrec(termos, tribs, ctl) {
   return { itens, total: j.total || itens.length };
 }
 // ---------- fonte 2: DJEN (CNJ) — texto integral das decisões publicadas
+const JU_SEM_DJEN = new Set(["STF", "TNU"]); // não publicam no DJEN (têm diário próprio): para eles valem os precedentes do BNP e os atalhos
 const JU_RE_DEC = /ac[oó]rd|ementa|senten|decis|voto|julgamento/i;
 async function juBuscarDec(termos, tribs, ctl, aoStatus) {
   const base = { texto: termos.map(t => t.txt).join(" ") }; if (JU.periodo) { base.dataDisponibilizacaoInicio = somaDias(hojeIso(), -Math.round(+JU.periodo * 30.44)); base.dataDisponibilizacaoFim = hojeIso(); }
-  const alvo = tribs.length ? tribs.slice(0, 7) : [""], vistos = new Set(), itens = []; let total = 0, fora = 0;
+  const alvo = tribs.length ? tribs.slice(0, 7) : [""], vistos = new Set(), itens = [], sem = []; let total = 0, fora = 0, feitas = 0, ultErro = null;
   for (const s of alvo) {
+    if (JU_SEM_DJEN.has(s)) { sem.push(s); continue; }
     if (aoStatus) aoStatus("Consultando o DJEN" + (s ? " — " + s : "") + "…");
-    const j = await buscarPagina(Object.assign({ itensPorPagina: 100, pagina: 1 }, base, s ? { siglaTribunal: s } : {}), ctl, seg => aoStatus && aoStatus("Limite de consultas do CNJ atingido. Retomando em " + seg + " s…"));
+    let j; try { j = await buscarPagina(Object.assign({ itensPorPagina: 100, pagina: 1 }, base, s ? { siglaTribunal: s } : {}), ctl, seg => aoStatus && aoStatus("Limite de consultas do CNJ atingido. Retomando em " + seg + " s…")); feitas++; }
+    catch (e) { if ((e && e.parado) || alvo.length === 1) throw e; ultErro = e; sem.push(s); continue; } // um tribunal fora do ar (ou fora do DJEN) não derruba os demais
     total += (j && j.count) || 0;
     for (const i of (j && j.items) || []) {
       if (vistos.has(i.id)) continue; vistos.add(i.id); const texto = limpa(i.texto);
@@ -6791,7 +6794,8 @@ async function juBuscarDec(termos, tribs, ctl, aoStatus) {
     }
   }
   itens.sort((a, b) => (b.acordao - a.acordao) || (b.decisao - a.decisao) || b.data.localeCompare(a.data));
-  return { itens, total, fora };
+  if (!feitas && ultErro) throw ultErro;
+  return { itens, total, fora, sem };
 }
 function juCitacao(it) {
   if (it.fonte === "BNP") return it.orgao + ". " + (JU_TIPOS[it.tipo] || it.tipo) + (it.nr != null ? " nº " + it.nr : "") + "." + (it.tese ? " Tese: " + it.tese : it.questao ? " Questão: " + it.questao : "") + (it.situacao ? " Situação: " + it.situacao + "." : "") + " Fonte: Banco Nacional de Precedentes (CNJ), " + JU_BNP_SITE + (it.atual ? ", atualizado em " + it.atual : "") + ".";
@@ -6802,11 +6806,11 @@ function juCitacao(it) {
 async function juPesquisar(q) {
   if (q != null) JU.q = q; const termos = juTermos(JU.q); if (JU.busy) return;
   if (!termos.length) { JU.status = "Digite ao menos uma palavra com 3 letras ou mais (ou uma frase entre aspas)."; JU.feito = false; return juDesenhar(); }
-  const tribs = juTribsSel(); JU.busy = true; JU.feito = false; JU.ia = null; JU.iaErro = ""; JU.erroPrec = JU.erroDec = ""; JU.prec = []; JU.precParc = []; JU.dec = []; JU.verParc = false; JU.ctl = new AbortController(); JU.ctl.parar = false; JU.status = "Consultando o Banco Nacional de Precedentes (CNJ)…"; juDesenhar();
-  try { const p = await juBuscarPrec(termos, tribs, JU.ctl); JU.prec = p.itens.filter(x => x.completo); JU.precParc = p.itens.filter(x => !x.completo); JU.precTotal = p.total; }
+  const tribs = juTribsSel(); JU.busy = true; JU.feito = false; JU.ia = null; JU.iaErro = ""; JU.erroPrec = JU.erroDec = ""; JU.prec = []; JU.precParc = []; JU.dec = []; JU.decSem = []; JU.verParc = false; JU.ctl = new AbortController(); JU.ctl.parar = false; JU.status = "Consultando o Banco Nacional de Precedentes (CNJ)…"; juDesenhar();
+  try { let p = await juBuscarPrec(termos, tribs, JU.ctl); if (!p.itens.length && termos.some(t => t.frase)) p = await juBuscarPrec(termos, tribs, JU.ctl, true); JU.prec = p.itens.filter(x => x.completo); JU.precParc = p.itens.filter(x => !x.completo); JU.precTotal = p.total; }
   catch (e) { JU.erroPrec = "Não foi possível consultar o Banco Nacional de Precedentes agora (" + (e.message || "erro") + "). Tente de novo em instantes ou abra o Pangea pelo atalho abaixo."; }
   if (!JU.ctl.parar) {
-    try { const d = await juBuscarDec(termos, tribs, JU.ctl, s => { JU.status = s; const st = $("juStatus"); if (st) st.textContent = s; }); JU.dec = d.itens; JU.decTotal = d.total; JU.decFora = d.fora; }
+    try { const d = await juBuscarDec(termos, tribs, JU.ctl, s => { JU.status = s; const st = $("juStatus"); if (st) st.textContent = s; }); JU.dec = d.itens; JU.decTotal = d.total; JU.decFora = d.fora; JU.decSem = d.sem; }
     catch (e) { JU.erroDec = e && e.parado ? "Pesquisa interrompida." : erroAmigavel(e)[0]; }
   }
   JU.busy = false; JU.feito = true; JU.status = ""; const h = [JU.q].concat(LS.get("jurisHist", []).filter(x => x !== JU.q)).slice(0, 8); LS.setLocal("jurisHist", h); juDesenhar();
@@ -6937,6 +6941,7 @@ function juDesenhar() {
   if (JU.erroDec) p2.appendChild(el("div", "msg err", JU.erroDec));
   else {
     const outras = JU.dec.length - decs.length; p2.appendChild(el("p", "hint", "O DJEN informou " + nfmt(JU.decTotal) + " publicação(ões) para estes termos" + (JU.periodo ? " no período" : "") + "; foram lidas as " + nfmt(JU.dec.length + JU.decFora) + " mais recentes" + (juTribsSel().length > 1 ? " de cada tribunal" : "") + " e mantidas as " + nfmt(JU.dec.length) + " cujo texto contém todos os termos" + (outras > 0 ? " (" + outras + " são intimações/atos sem conteúdo decisório e estão ocultas pelo filtro acima)" : "") + ". Acórdãos aparecem primeiro; depois, as mais recentes."));
+    if ((JU.decSem || []).length) p2.appendChild(el("p", "hint", "Sem consulta no DJEN para: " + JU.decSem.join(", ") + " (STF e TNU têm diário próprio; os demais podem estar momentaneamente fora do ar). Para eles, use os precedentes acima e os atalhos abaixo."));
     if (!decs.length) p2.appendChild(el("div", "hint", "Nenhuma decisão encontrada com todos os termos. Amplie o período, troque o tribunal ou use menos palavras."));
   }
   for (const it of decs.slice(0, 60)) p2.appendChild(juCartao(it, termos, refs.get(it)));
