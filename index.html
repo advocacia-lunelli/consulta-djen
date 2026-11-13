@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-O+xqJADB+7SpLuQudKbay/ympWlcK1jsn+E/gRq8B4s=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-lfbDzCSu4cp2x9yDB7sqJsvCk2y1XO1Vfp12h0SChRM=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#202b47">
@@ -746,6 +746,10 @@ details.ajuda[open]>summary{margin-bottom:4px}
 .pzgrp{margin:16px 0 6px}
 .pzdesc{font-weight:600}
 .kpi-crit .v{color:#c0392b}
+details.pastaCli{margin:10px 0;border:1px solid var(--line);border-radius:10px;padding:6px 10px;background:var(--card,transparent)}
+details.pastaCli>summary{cursor:pointer;font-weight:700;padding:6px 0}
+details.pastaCli>summary .hint{font-weight:400}
+details.pastaCli>.card{margin:8px 0}
 
 </style>
 </head>
@@ -801,7 +805,7 @@ details.ajuda[open]>summary{margin-bottom:4px}
     <div class="panel"><h2>Minhas tarefas <button class="btn sm" id="meuNovaTarefa" type="button">Nova tarefa</button></h2><div id="meuTarefas"></div></div>
   </div>
   <div class="panel"><h2>Publicações novas para mim <a class="btn sec sm" href="#advogados">Abrir todas</a></h2><div class="list" id="meuPubs"></div></div>
-  <div class="panel"><h2>Minhas pastas <button class="btn sec sm" id="meuTodasPastas" type="button">Ver todas</button></h2><div id="meuPastas"></div></div>
+  <div class="panel"><h2>Meus processos <button class="btn sec sm" id="meuTodasPastas" type="button">Ver todas</button></h2><div id="meuPastas"></div></div>
 </section>
 
 <!-- ===================== SECRETARIA ===================== -->
@@ -816,7 +820,7 @@ details.ajuda[open]>summary{margin-bottom:4px}
     <div class="panel"><h2>Agenda dos próximos 14 dias</h2><div id="secAgenda"></div></div>
     <div class="panel"><h2>Tarefas da secretaria <button class="btn sm" id="secNovaTarefa" type="button">Nova tarefa</button></h2><div class="list" id="secTarefas"></div></div>
   </div>
-  <div class="panel"><h2>Publicações recentes dos advogados <a class="btn sec sm" href="#processos">Pastas</a></h2><div class="list" id="secPubs"></div></div>
+  <div class="panel"><h2>Publicações recentes dos advogados <a class="btn sec sm" href="#processos">Processos</a></h2><div class="list" id="secPubs"></div></div>
 </section>
 
 <!-- ===================== USUÁRIOS (administrador) ===================== -->
@@ -954,10 +958,10 @@ details.ajuda[open]>summary{margin-bottom:4px}
   <div id="pLista">
     <details class="panel" id="pCadastro">
       <summary><b>Cadastrar processos pelo número</b></summary>
-      <div class="hint">Cole um ou vários números no padrão CNJ (0000000-00.0000.0.00.0000), um por linha ou no meio de um texto. O site confere o dígito verificador, busca o histórico no DJEN e cria uma pasta para cada processo.</div>
+      <div class="hint">Cole um ou vários números no padrão CNJ (0000000-00.0000.0.00.0000), um por linha ou no meio de um texto. O site confere o dígito verificador, busca o histórico no DJEN e cadastra cada processo dentro da pasta do cliente.</div>
       <textarea id="pNums" placeholder="Ex.: 0001234-56.2026.8.24.0023"></textarea>
       <div class="grid">
-        <label>Cliente (pasta) <input type="text" id="pCli" list="dlClientes" autocomplete="off" placeholder="Opcional: se vazio, tenta reconhecer pelos nomes salvos"></label>
+        <label>Cliente (pasta onde o processo ficará) <input type="text" id="pCli" list="dlClientes" autocomplete="off" placeholder="Opcional: se vazio, tenta reconhecer pelos nomes salvos"></label>
         <label>Responsável <select id="pResp"><option>Davi</option><option>Fábio</option><option>Equipe</option><option>Secretaria</option></select></label>
       </div>
       <div class="acts"><button class="btn" id="pBuscar" type="button">Buscar no DJEN e cadastrar</button><button class="btn danger" id="pParar" type="button" hidden>Parar</button><span class="hint" id="pStatus"></span></div>
@@ -965,8 +969,8 @@ details.ajuda[open]>summary{margin-bottom:4px}
       <datalist id="dlClientes"></datalist>
     </details>
     <div class="panel">
-      <div class="hd"><h2>Pastas de processos <span class="hint" id="pContagem"></span></h2>
-        <div class="acts"><input type="text" id="pBusca" placeholder="Buscar nº, cliente, parte…" aria-label="Buscar nas pastas"><select id="pRespF" aria-label="Responsável"><option value="">Todos os responsáveis</option><option>Fábio</option><option>Davi</option><option>Equipe</option><option>Secretaria</option></select><select id="pStatusF" aria-label="Situação"><option value="todos">Todos</option><option value="ativo">Ativos</option><option value="arquivado">Arquivados</option></select><button class="btn sec sm" id="pAtualizarTodas" type="button">Atualizar andamentos</button></div></div>
+      <div class="hd"><h2>Processos por pasta de cliente <span class="hint" id="pContagem"></span></h2>
+        <div class="acts"><input type="text" id="pBusca" placeholder="Buscar nº, cliente, parte…" aria-label="Buscar nos processos"><select id="pRespF" aria-label="Responsável"><option value="">Todos os responsáveis</option><option>Fábio</option><option>Davi</option><option>Equipe</option><option>Secretaria</option></select><select id="pStatusF" aria-label="Situação"><option value="todos">Todos</option><option value="ativo">Ativos</option><option value="arquivado">Arquivados</option></select><button class="btn sec sm" id="pAtualizarTodas" type="button">Atualizar andamentos</button></div></div>
       <div class="acts" id="pPastas"></div>
       <div class="list" id="pTabela"></div>
     </div>
@@ -3307,7 +3311,7 @@ function desenhar() {
     const c = el("article", "card" + (g.passivo ? " passivo" : "")), top = el("div", "top");
     const num = el("span", "num", g.processo); top.appendChild(num);
     const cp = el("button", "copy", "copiar"); cp.type = "button"; cp.onclick = () => copiar(g.processo, cp);
-    const bp = el("button", "copy", PROCS.some(x => x.chave === g.chave) ? "abrir pasta" : "criar pasta"); bp.type = "button"; bp.onclick = () => { const ex = PROCS.find(x => x.chave === g.chave); if (ex) abrirPasta(ex.id); else cadastrarRapido(g.processo, { cliente: E.busca && E.busca.nomes && E.termos.length === 1 ? E.busca.nomes : "" }); };
+    const bp = el("button", "copy", PROCS.some(x => x.chave === g.chave) ? "abrir processo" : "cadastrar processo"); bp.type = "button"; bp.onclick = () => { const ex = PROCS.find(x => x.chave === g.chave); if (ex) abrirPasta(ex.id); else cadastrarRapido(g.processo, { cliente: E.busca && E.busca.nomes && E.termos.length === 1 ? E.busca.nomes : "" }); };
     top.append(cp, bp, el("span", "tag", g.tribunal));
     if (g.dist) top.appendChild(el("span", "tag dist", "Distribuição"));
     if (g.polo) top.appendChild(el("span", "tag" + (g.passivo ? " crit" : ""), "Polo " + g.polo));
@@ -3731,7 +3735,7 @@ function advCard(p) {
   const pz = prazoNoTexto(p.texto); if (pz) top.appendChild(Object.assign(el("span", "tag warn", "texto cita prazo de " + pz), { title: "Detectado no texto da publicação. Confira o prazo e a contagem no processo." }));
   c.appendChild(top);
   const l2 = el("div", "top"), num = el("span", "num", p.processo), cp = el("button", "copy", "copiar"); cp.type = "button"; cp.onclick = () => copiar(p.processo, cp);
-  const bp = el("button", "copy", PROCS.some(x => x.chave === p.chave) ? "abrir pasta" : "criar pasta"); bp.type = "button"; bp.onclick = () => { const ex = PROCS.find(x => x.chave === p.chave); if (ex) abrirPasta(ex.id); else cadastrarRapido(p.processo, {}); };
+  const bp = el("button", "copy", PROCS.some(x => x.chave === p.chave) ? "abrir processo" : "cadastrar processo"); bp.type = "button"; bp.onclick = () => { const ex = PROCS.find(x => x.chave === p.chave); if (ex) abrirPasta(ex.id); else cadastrarRapido(p.processo, {}); };
   l2.append(num, cp, bp); c.appendChild(l2);
   c.appendChild(Object.assign(el("div", "row"), {})); c.lastChild.append(el("span", "", titulo(p.classe)), el("span", "", p.orgao));
   if (p.dest.length) { const pt = el("div", "partes"); pt.appendChild(el("b", "", "Partes: ")); pt.appendChild(document.createTextNode(p.dest.slice(0, 6).map(d => d.nome + (d.polo === "P" ? " (passivo)" : d.polo === "A" ? " (ativo)" : "")).join("; ") + (p.dest.length > 6 ? " e outros" : ""))); c.appendChild(pt); }
@@ -3990,7 +3994,7 @@ function agendaLi(e) {
   const li = el("li"), atr = agendaAtrasada(e);
   li.append(el("b", "", br(e.data) + (e.hora ? " " + e.hora : "")), el("span", "tag" + (atr ? " crit" : e.tipo === "Audiência" ? " dist" : e.tipo === "Prazo" ? " prazo" : " tarefa"), atr ? "Atrasado · " + e.tipo : (e.tipo === "Prazo" ? "PRAZO" : e.tipo) + " · " + e.resp), document.createTextNode(e.titulo));
   const pp = e.procId ? PROCS.find(x => x.id === e.procId) : e.proc ? PROCS.find(x => x.chave === chaveDe(e.proc)) : null;
-  if (pp && /^https?:\/\//.test(pp.linkPasta || "")) { const a = el("a", "", "📁 pasta"); a.href = pp.linkPasta; a.target = "_blank"; a.rel = "noopener noreferrer"; a.style.marginLeft = "8px"; a.onclick = ev => ev.stopPropagation(); li.appendChild(a); }
+  if (pp && /^https?:\/\//.test(pp.linkPasta || "")) { const a = el("a", "", "📁 arquivos"); a.href = pp.linkPasta; a.target = "_blank"; a.rel = "noopener noreferrer"; a.style.marginLeft = "8px"; a.onclick = ev => ev.stopPropagation(); li.appendChild(a); }
   li.style.cursor = "pointer"; li.onclick = () => e.procId ? abrirPasta(e.procId) : abrirTarefa(null, e.tarefaId); return li;
 }
 
@@ -4015,21 +4019,27 @@ function pLista() {
   const clientes = [...new Set(PROCS.map(x => x.cliente || ""))].sort((a, b) => a.localeCompare(b, "pt"));
   const ch = $("pPastas"); ch.textContent = "";
   const bt = (rot, val, n) => { const b = el("button", "btn sm" + (P.pasta === val ? "" : " sec"), rot + " (" + n + ")"); b.type = "button"; b.onclick = () => { P.pasta = val; pLista(); }; ch.appendChild(b); };
-  bt("Todas as pastas", "", PROCS.length);
+  bt("Todos os clientes", "", PROCS.length);
   for (const c of clientes) bt(c || "Sem cliente", c || "§sem", PROCS.filter(x => (x.cliente || "") === c).length);
   const filtro = x => (!P.respF || x.resp === P.respF) && (!P.pasta || (P.pasta === "§sem" ? !x.cliente : x.cliente === P.pasta)) && (P.filtroStatus === "todos" || (x.status || "ativo") === P.filtroStatus) && (!q || norm(x.numero + " " + x.cliente + " " + x.classe + " " + x.partes.map(d => d.nome).join(" ")).includes(q));
   const lista = PROCS.filter(filtro).sort((a, b) => { const ea = procEventoProximo(a), eb = procEventoProximo(b); return (ea ? ea.data : "9999").localeCompare(eb ? eb.data : "9999") || (b.pubs[0] ? b.pubs[0].data : "").localeCompare(a.pubs[0] ? a.pubs[0].data : ""); });
   $("pContagem").textContent = lista.length + " processo(s)";
   if (!lista.length) { box.appendChild(el("div", "empty", PROCS.length ? "Nenhum processo com estes filtros." : "Nenhum processo cadastrado. Cole os números acima e clique em “Buscar no DJEN e cadastrar”.")); return; }
-  for (const p of lista) {
+  const grupos = new Map(); for (const p of lista) { const k = p.cliente || ""; if (!grupos.has(k)) grupos.set(k, []); grupos.get(k).push(p); }
+  const ordem = [...grupos.keys()].sort((a, b) => !a ? 1 : !b ? -1 : a.localeCompare(b, "pt"));
+  for (const k of ordem) {
+    const det = el("details", "pastaCli"); det.open = true; const sm = el("summary", "", "📁 Pasta do cliente: " + (k || "Sem cliente definido")); sm.appendChild(el("span", "hint", " · " + grupos.get(k).length + " processo(s)")); det.appendChild(sm);
+    for (const p of grupos.get(k)) {
     const c = el("article", "card" + (p.polo === "Passivo" ? " passivo" : "")), top = el("div", "top"), num = el("a", "num", p.numero); num.href = "#processos"; num.onclick = e => { e.preventDefault(); abrirPasta(p.id); };
     const cp = el("button", "copy", "copiar"); cp.type = "button"; cp.onclick = () => copiar(p.numero, cp);
     top.append(num, cp, el("span", "tag", p.tribunal)); if (p.polo) top.appendChild(el("span", "tag" + (p.polo === "Passivo" ? " crit" : ""), "Cliente no polo " + p.polo.toLowerCase())); if (p.semDjen) top.appendChild(el("span", "tag warn", "sem publicação no DJEN")); if (p.status === "arquivado") top.appendChild(el("span", "tag", "arquivado"));
     const sg = sugestoes(p), ns = sg.aud.length + sg.prazos.length; if (ns) top.appendChild(el("span", "tag dist", ns + " sugestão(ões)"));
     c.appendChild(top);
-    const r = el("div", "row"); r.append(el("span", "", p.classe || "classe não informada"), el("span", "", p.orgao || ""), el("span", "", "Cliente: " + (p.cliente || "—")), el("span", "", "Resp.: " + p.resp), el("span", "", p.pubs.length ? "Última publicação: " + br(p.pubs[0].data) : "Sem publicações")); c.appendChild(r);
+    const r = el("div", "row"); r.append(el("span", "", p.classe || "classe não informada"), el("span", "", p.orgao || ""), el("span", "", "Resp.: " + p.resp), el("span", "", p.pubs.length ? "Última publicação: " + br(p.pubs[0].data) : "Sem publicações")); c.appendChild(r);
     const ev = procEventoProximo(p); if (ev) { const e = el("div", "partes"); e.append(el("b", "", "Próximo: "), document.createTextNode(ev.tipo + " em " + br(ev.data) + (ev.hora ? " às " + ev.hora : "") + (agendaAtrasada(ev) ? " (atrasado)" : ""))); c.appendChild(e); }
-    box.appendChild(c);
+    det.appendChild(c);
+    }
+    box.appendChild(det);
   }
 }
 
@@ -4043,7 +4053,7 @@ function pDetalhe(p) {
   const ac = el("div", "acts"); const bc = el("button", "btn sec sm", "copiar nº"); bc.type = "button"; bc.onclick = () => copiar(p.numero, bc);
   const bu = el("button", "btn sm", "Atualizar andamento"); bu.type = "button"; bu.onclick = async () => { if (P.rodando) return; bu.disabled = true; P.rodando = true; let m = "", er = false; try { const n = await atualizarPasta(p, { parar: false }); m = n ? n + " publicação(ões) nova(s) no DJEN." : "Sem publicações novas no DJEN."; } catch (e) { [m, er] = erroAmigavel(e); } P.rodando = false; pDetalhe(p); aviso("pMsg", m, er); };
   const ba = el("button", "btn sec sm", p.status === "arquivado" ? "Reativar" : "Arquivar"); ba.type = "button"; ba.onclick = () => { p.status = p.status === "arquivado" ? "ativo" : "arquivado"; salvar(); pDetalhe(p); };
-  const bd = el("button", "btn danger sm", "Excluir pasta"); bd.type = "button"; bd.onclick = () => { if (!confirm("Excluir a pasta deste processo (audiências e prazos cadastrados também)? As tarefas do quadro são mantidas.")) return; PROCS = PROCS.filter(x => x.id !== p.id); salvarProcs(); P.sel = null; procDesenhar(); atualizarBadges(); };
+  const bd = el("button", "btn danger sm", "Excluir processo"); bd.type = "button"; bd.onclick = () => { if (!confirm("Excluir a pasta deste processo (audiências e prazos cadastrados também)? As tarefas do quadro são mantidas.")) return; PROCS = PROCS.filter(x => x.id !== p.id); salvarProcs(); P.sel = null; procDesenhar(); atualizarBadges(); };
   if (souSecretaria()) ac.append(bc, bu); else ac.append(bc, bu, ba, bd);
   t1.append(tl, ac); hd.append(vb, t1);
   const msg = el("div", "msg"); msg.id = "pMsg"; msg.hidden = true; hd.appendChild(msg);
@@ -4062,7 +4072,7 @@ function pDetalhe(p) {
   if (souSecretaria()) g.append(campo("Cliente (pasta)", iCli), campo("Responsável", sResp), campo("Classe", iCls), lk);
   else g.append(campo("Cliente (pasta)", iCli), campo("Responsável", sResp), campo("Polo do cliente", sPolo), campo("Valor da causa (R$)", iVal), campo("Classe", iCls), lk, lt, ch);
   hd.appendChild(g);
-  if (/^https?:\/\//.test(p.linkPasta)) { const a = el("a", "btn sec sm", "Abrir pasta de arquivos"); a.href = p.linkPasta; a.target = "_blank"; a.rel = "noopener noreferrer"; a.style.width = "fit-content"; hd.appendChild(a); }
+  if (/^https?:\/\//.test(p.linkPasta)) { const a = el("a", "btn sec sm", "Abrir pasta de arquivos do processo"); a.href = p.linkPasta; a.target = "_blank"; a.rel = "noopener noreferrer"; a.style.width = "fit-content"; hd.appendChild(a); }
   if (/^https?:\/\//.test(p.linkTribunal || "") && !souSecretaria()) { const a = el("a", "btn sec sm", "Abrir no tribunal"); a.href = p.linkTribunal; a.target = "_blank"; a.rel = "noopener noreferrer"; a.style.width = "fit-content"; hd.appendChild(a); }
   const rc = el("div", "acts"); for (const c of crmContatosDaPasta(p)) rc.appendChild(btn("Cadastro do cliente: " + c.nome, () => crmAbrirContato(c.id), "sec"));
   if (!rc.children.length && p.cliente) rc.appendChild(btn("Criar cadastro do cliente", () => { const c = crmNovoContato({ nome: p.cliente, status: "cliente", resp: p.resp || respPadrao() }); salvarContatos(); p.clienteIds = [c.id]; salvar(); pDetalhe(p); crmAbrirContato(c.id); }, "sec"));
@@ -5602,7 +5612,7 @@ function tkCard(t) {
   if (t.prazo) m.appendChild(el("span", atrasada(t) ? "tag crit" : "tag", (atrasada(t) ? "Atrasada · " : "Prazo ") + br(t.prazo)));
   if (t.cli) m.appendChild(el("span", "", t.cli));
   c.appendChild(m);
-  if (t.proc) { const dm = el("div", "m", t.proc + " "), pp = PROCS.find(x => x.chave === chaveDe(t.proc)); if (pp) { const a = el("a", "", "abrir pasta"); a.href = "#processos"; a.onclick = e => { e.preventDefault(); abrirPasta(pp.id); }; dm.appendChild(a); if (/^https?:\/\//.test(pp.linkPasta || "")) { const d = el("a", "", "pasta no Drive"); d.href = pp.linkPasta; d.target = "_blank"; d.rel = "noopener noreferrer"; dm.append(" · ", d); } } c.appendChild(dm); }
+  if (t.proc) { const dm = el("div", "m", t.proc + " "), pp = PROCS.find(x => x.chave === chaveDe(t.proc)); if (pp) { const a = el("a", "", "abrir processo"); a.href = "#processos"; a.onclick = e => { e.preventDefault(); abrirPasta(pp.id); }; dm.appendChild(a); if (/^https?:\/\//.test(pp.linkPasta || "")) { const d = el("a", "", "pasta do cliente no Drive"); d.href = pp.linkPasta; d.target = "_blank"; d.rel = "noopener noreferrer"; dm.append(" · ", d); } } c.appendChild(dm); }
   const mv = el("div", "mv"), i = COLS.findIndex(x => x[0] === t.status);
   const bt = (txt, d, tit) => { const b = el("button", "btn sec sm", txt); b.type = "button"; b.title = tit; b.onclick = () => { t.status = COLS[i + d][0]; if (t.status === "concluida") t.concluidaEm = Date.now(); salvarTarefas(); atualizarTudo(); }; return b; };
   if (i > 0) mv.appendChild(bt("←", -1, "Mover para " + COLS[i - 1][1])); if (i < COLS.length - 1) mv.appendChild(bt("→", 1, "Mover para " + COLS[i + 1][1]));
@@ -6973,7 +6983,7 @@ function meuDesenhar() {
   if (!pubs.length) bp.appendChild(el("div", "hint", AD.meta.ultima ? "Nenhuma publicação nova para você. Tudo tratado." : "As publicações são carregadas ao abrir o site."));
   for (const p of pubs.slice(0, 5)) bp.appendChild(advCard(p)); if (pubs.length > 5) bp.appendChild(el("div", "hint", "e mais " + (pubs.length - 5) + " na tela Advogados."));
   const bs = $("meuPastas"); bs.textContent = "";
-  if (!pastas.length) bs.appendChild(el("div", "hint", "Nenhuma pasta em seu nome. Cadastre processos na tela Processos.")); else { const ul = el("ul", "mini"); for (const p of pastas.sort((x, y) => (procEventoProximo(x) ? procEventoProximo(x).data : "9999").localeCompare(procEventoProximo(y) ? procEventoProximo(y).data : "9999")).slice(0, 8)) ul.appendChild(liPasta(p)); bs.appendChild(ul); }
+  if (!pastas.length) bs.appendChild(el("div", "hint", "Nenhum processo em seu nome. Cadastre processos na tela Processos.")); else { const ul = el("ul", "mini"); for (const p of pastas.sort((x, y) => (procEventoProximo(x) ? procEventoProximo(x).data : "9999").localeCompare(procEventoProximo(y) ? procEventoProximo(y).data : "9999")).slice(0, 8)) ul.appendChild(liPasta(p)); bs.appendChild(ul); }
   badgesPapel();
 }
 function secPubCard(p) {
@@ -6983,7 +6993,7 @@ function secPubCard(p) {
   const r = el("div", "row"); r.append(el("span", "", titulo(p.classe)), el("span", "", p.orgao)); c.appendChild(r);
   const pz = prazoNoTexto(p.texto); if (pz) c.appendChild(el("div", "partes", "O texto cita prazo de " + pz + ". Confira no processo."));
   const ac = el("div", "pubact");
-  ac.appendChild(btn(pasta ? "Abrir pasta" : "Criar pasta", () => pasta ? abrirPasta(pasta.id) : cadastrarRapido(p.processo, {}), ""));
+  ac.appendChild(btn(pasta ? "Abrir processo" : "Cadastrar processo", () => pasta ? abrirPasta(pasta.id) : cadastrarRapido(p.processo, {}), ""));
   ac.appendChild(btn("Tarefa para o advogado", () => abrirTarefa({ titulo: (p.docTipo || p.tipo) + " · " + p.processo, proc: p.processo, cli: pasta ? pasta.cliente : "", resp: p.quem.length === 1 ? (advPor(p.quem[0]) || {}).curto || "Equipe" : "Equipe", nota: "Origem: publicação de " + br(p.data) + " (" + p.tribunal + ").\n" + (p.link || "") })));
   if (/^https:\/\//.test(p.link)) { const a = el("a", "btn sec sm", "Abrir documento"); a.href = p.link; a.target = "_blank"; a.rel = "noopener noreferrer"; ac.appendChild(a); }
   c.appendChild(ac); return c;
@@ -8422,7 +8432,7 @@ function inicioDesenhar() {
   const k = $("kpisInicio"); k.textContent = "";
   const K = (v, l, s) => { const d = el("div", "kpi"); d.append(el("div", "v", v), el("div", "l", l)); if (s) d.appendChild(el("div", "s", s)); return d; };
   const proc = E.itens.length ? new Set(E.itens.filter(i => i.exato || !E.termos.length).map(i => i.chave)).size : 0;
-  k.append(K(novas.length, "Publicações novas", "dos dois advogados, ainda não tratadas"), K(abertas.length, "Tarefas em aberto"), K(PROCS.filter(x => x.status !== "arquivado").length, "Pastas de processos", "ativas"), K(atr, "Prazos/tarefas atrasados", atr ? "exigem atenção" : "nenhum"), K(proc, "Processos na última consulta", E.busca ? E.busca.nomes || "consulta avulsa" : "faça uma consulta"));
+  k.append(K(novas.length, "Publicações novas", "dos dois advogados, ainda não tratadas"), K(abertas.length, "Tarefas em aberto"), K(PROCS.filter(x => x.status !== "arquivado").length, "Processos", "ativas"), K(atr, "Prazos/tarefas atrasados", atr ? "exigem atenção" : "nenhum"), K(proc, "Processos na última consulta", E.busca ? E.busca.nomes || "consulta avulsa" : "faça uma consulta"));
   const a = $("inAdv"); a.textContent = ""; const ul = el("ul", "mini");
   for (const ad of ADVS) {
     const mine = Object.values(AD.pubs).filter(p => p.quem.includes(ad.id)), n = mine.filter(ehNova).length, ult = mine.reduce((m, p) => p.data > m ? p.data : m, "");
@@ -8500,7 +8510,7 @@ function pzLinha(x, compacto) {
   const li = el("li", "pzli" + (atr ? " atr" : hj ? " hoje" : z.cumprido ? " ok" : ""));
   const dias = Math.round((new Date(z.data + "T12:00:00") - new Date(hoje + "T12:00:00")) / 864e5);
   li.append(el("b", "", br(z.data)), el("span", "tag prazo", "PRAZO"), el("span", "pzdesc", z.desc), el("span", "hint", [p.numero, p.cliente].filter(Boolean).join(" · ")), el("span", "tag" + (atr ? " crit" : hj ? " warn" : ""), z.cumprido ? "Cumprido" : atr ? "Atrasado " + Math.abs(dias) + " d" : hj ? "Vence hoje" : "em " + dias + " d"), el("span", "hint", z.resp || p.resp));
-  if (!compacto) { const ac = el("span", "acts"); ac.style.marginLeft = "auto"; ac.append(btn(z.cumprido ? "Reabrir" : "Cumprido", () => { z.cumprido = !z.cumprido; salvarProcs(); atualizarTudo(); }), btn("Editar", () => abrirPrazo(p, z, z.id)), btn("Abrir pasta", () => abrirPasta(p.id, "prazos"))); li.appendChild(ac); }
+  if (!compacto) { const ac = el("span", "acts"); ac.style.marginLeft = "auto"; ac.append(btn(z.cumprido ? "Reabrir" : "Cumprido", () => { z.cumprido = !z.cumprido; salvarProcs(); atualizarTudo(); }), btn("Editar", () => abrirPrazo(p, z, z.id)), btn("Abrir processo", () => abrirPasta(p.id, "prazos"))); li.appendChild(ac); }
   else { li.style.cursor = "pointer"; li.onclick = () => abrirPasta(p.id, "prazos"); }
   return li;
 }
