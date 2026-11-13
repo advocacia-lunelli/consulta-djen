@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-lfbDzCSu4cp2x9yDB7sqJsvCk2y1XO1Vfp12h0SChRM=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-SOEky94rMqMlq/Uzb1Q8Rn/zLCpdWHNwWs97PygDKdk=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#202b47">
@@ -6150,20 +6150,22 @@ function intDesenhar() {
   // ---------------- IA
   const pi = el("div", "panel"), h2 = el("div", "hd"), ia = iaCfg(); h2.append(el("h2", "", "Assistentes de IA (Claude, Gemini e JusIA)"), el("span", "tag" + (iaPronta() ? " ok" : " warn"), iaPronta() ? "chave neste navegador" : "sem chave")); pi.appendChild(h2);
   pi.appendChild(el("div", "hint", "Resumir andamentos, sugerir tarefas e prazos a conferir a partir das publicações, redigir mensagens ao cliente e minutas. Cada pessoa cola a própria chave de API: ela fica guardada só neste navegador (não vai para a nuvem do app nem para os backups). Tudo é rascunho para revisão do advogado."));
-  const sP = el("select"); optsSel(sP, [["claude", "Claude (Anthropic)"], ["gemini", "Gemini (Google)"], ["claudeai", "Claude.ai — minha assinatura (modo assistido)"], ["jusia", "JusIA (Jusbrasil) — modo assistido"]]); sP.value = ia.prov;
+  const sP = el("select"); optsSel(sP, [["claude", "Claude (Anthropic)"], ["gemini", "Gemini (Google)"], ["chrome", "IA do Chrome (Gemini Nano) — neste computador, grátis"], ["claudeai", "Claude.ai / Claude no Chrome — minha assinatura (1 clique)"], ["jusia", "JusIA (Jusbrasil) — modo assistido"]]); sP.value = ia.prov;
   const kC = intTexto(ia.chaveClaude, "sk-ant-…", "password"), kG = intTexto(ia.chaveGemini, "AIza…", "password"), mC = intTexto(ia.modeloClaude), mG = intTexto(ia.modeloGemini);
   const [lMa, cMa] = intCheck("Mascarar CPF, CNPJ, telefones e e-mails antes de enviar à IA (recomendado)", ia.mascara);
   const g2 = el("div", "intgrid"); g2.append(intCampo("Provedor usado", sP, "Modo assistido (Claude.ai com sua assinatura, ou JusIA): sem chave; o app copia o pedido e você cola a resposta de volta. Nem a assinatura do claude.ai nem o Jus IA liberam conexão automática."), intCampo("Chave do Claude (console.anthropic.com)", kC), intCampo("Modelo do Claude", mC), intCampo("Chave do Gemini (aistudio.google.com)", kG), intCampo("Modelo do Gemini", mG, "Se o Google renomear o modelo, edite aqui."));
   const m2 = el("div", "msg"), ac2 = el("div", "acts"); m2.hidden = true;
   const sv = () => iaSalvarCfg({ prov: sP.value, chaveClaude: kC.value.trim(), chaveGemini: kG.value.trim(), modeloClaude: mC.value.trim() || IA_PADRAO.modeloClaude, modeloGemini: mG.value.trim() || IA_PADRAO.modeloGemini, mascara: cMa.checked });
-  ac2.append(btn("Salvar neste navegador", () => { sv(); intMsg(m2, "Salvo. Esta chave fica só neste navegador."); setTimeout(intDesenhar, 1200); }, ""), btn("Testar a IA", async () => { sv(); if (IA_ASSIST[sP.value]) { intMsg(m2, "No modo assistido não há conexão automática para testar. Abra o assistente em um processo: o pedido é copiado, você cola em " + IA_ASSIST[sP.value].nome + " e traz a resposta de volta."); return; } intMsg(m2, "Testando…"); try { const r = await iaPerguntar("Responda em uma frase curta.", [{ role: "user", content: "Diga apenas: IA conectada ao Lunelli Office." }], 60); intMsg(m2, "Resposta: " + r.trim().slice(0, 200)); } catch (e) { intMsg(m2, e.message, true); } }));
+  ac2.append(btn("Salvar neste navegador", () => { sv(); intMsg(m2, "Salvo. Esta chave fica só neste navegador."); setTimeout(intDesenhar, 1200); }, ""), btn("Testar a IA", async () => { sv(); if (sP.value === "chrome") { const e = await iaChromeEstado(); intMsg(m2, e === "available" ? "IA do Chrome pronta neste computador." : e === "downloadable" || e === "downloading" ? "Disponível: o modelo será baixado no primeiro uso (alguns minutos)." : "Indisponível aqui. Precisa de Chrome atualizado no computador e do recurso “Prompt API for Gemini Nano” ativado em chrome://flags."); return; } if (IA_ASSIST[sP.value]) { intMsg(m2, "No modo assistido não há conexão automática para testar. Abra o assistente em um processo: o pedido é copiado, você cola em " + IA_ASSIST[sP.value].nome + " e traz a resposta de volta."); return; } intMsg(m2, "Testando…"); try { const r = await iaPerguntar("Responda em uma frase curta.", [{ role: "user", content: "Diga apenas: IA conectada ao Lunelli Office." }], 60); intMsg(m2, "Resposta: " + r.trim().slice(0, 200)); } catch (e) { intMsg(m2, e.message, true); } }));
   pi.append(g2, lMa, ac2, m2);
   const dv = el("details"); dv.appendChild(el("summary", "", "Privacidade e custos (leia antes de usar com dados de clientes)"));
+  /* chrome */
   const ul = el("ul", "intpasso"); for (const t of [
     "O texto enviado (andamentos, dados do cliente, proposta) sai do seu navegador direto para a Anthropic ou para o Google. Sigilo profissional: use com critério e evite segredo de justiça.",
     "Claude: a API da Anthropic é paga por uso (cartão no console) e, pelos termos comerciais, não usa os dados da API para treinar modelos. Gemini: o plano gratuito do Google AI Studio pode usar os dados para melhorar os produtos; prefira o plano pago ou o Claude para dados de clientes.",
     "A IA pode errar e inventar. Prazos, datas, fundamentos legais e jurisprudência devem ser sempre conferidos. As tarefas sugeridas entram marcadas como “Sugerida pela IA”.",
     "Claude.ai (assinatura): a assinatura do claude.ai não vale como chave de API; no modo assistido o pedido (com dados mascarados) é colado por você na sua conta, sob as configurações de privacidade do seu plano. JusIA (Jusbrasil): não há API pública do Jus IA; no modo assistido o app apenas copia o pedido para a área de transferência e recebe de volta o texto que você colar. Nada é enviado automaticamente ao Jusbrasil e a assinatura do JusIA é a sua. Confira sempre cada precedente na fonte.",
+    "IA do Chrome: o Gemini Nano roda dentro do seu computador; nada sai dele (bom para sigilo), mas o modelo é pequeno: serve para resumos e rascunhos curtos, não para peças. Precisa de Chrome recente no computador, ~22 GB livres e do recurso ativado em chrome://flags. Claude.ai / Claude no Chrome: o botão abre o Claude.ai já com o pedido preenchido na sua conta.",
     "A chave é pessoal: não a compartilhe nem a cole em mensagens. Se vazar, revogue no console do provedor."
   ]) ul.appendChild(el("li", "", t)); dv.appendChild(ul); pi.appendChild(dv);
   SEC.ia = [pi];
@@ -6389,10 +6391,10 @@ const IA_PADRAO = { prov: "claude", chaveClaude: "", chaveGemini: "", modeloClau
 const IA_GEMINI_RESERVA = ["gemini-flash-latest", "gemini-flash-lite-latest"]; // apelidos mantidos pelo Google: sempre apontam para um modelo ativo
 const iaCfg = () => Object.assign({}, IA_PADRAO, LS.get("ia", {}));
 const iaSalvarCfg = p => LS.setLocal("ia", Object.assign(iaCfg(), p));
-const IA_ASSIST = { jusia: { nome: "JusIA", url: "https://ia.jusbrasil.com.br", rot: "JusIA (Jusbrasil) · modo assistido" }, claudeai: { nome: "Claude.ai", url: "https://claude.ai/new", rot: "Claude.ai (minha assinatura) · modo assistido" } };
+const IA_ASSIST = { jusia: { nome: "JusIA", url: "https://ia.jusbrasil.com.br", rot: "JusIA (Jusbrasil) · modo assistido" }, claudeai: { nome: "Claude.ai", url: "https://claude.ai/new", rot: "Claude.ai (minha assinatura / Claude no Chrome) · 1 clique" } };
 const iaAssist = () => IA_ASSIST[iaCfg().prov] || null;
-const iaPronta = () => { const c = iaCfg(); return !!IA_ASSIST[c.prov] || !!(c.prov === "gemini" ? c.chaveGemini : c.chaveClaude); };
-const iaProvRot = () => { const c = iaCfg(); return IA_ASSIST[c.prov] ? IA_ASSIST[c.prov].rot : c.prov === "gemini" ? "Gemini · " + c.modeloGemini : "Claude · " + c.modeloClaude; };
+const iaPronta = () => { const c = iaCfg(); return !!IA_ASSIST[c.prov] || c.prov === "chrome" || !!(c.prov === "gemini" ? c.chaveGemini : c.chaveClaude); };
+const iaProvRot = () => { const c = iaCfg(); return c.prov === "chrome" ? "IA do Chrome (neste computador, sem envio)" : IA_ASSIST[c.prov] ? IA_ASSIST[c.prov].rot : c.prov === "gemini" ? "Gemini · " + c.modeloGemini : "Claude · " + c.modeloClaude; };
 const iaDisponivel = () => !souSecretaria();
 const IA_SISTEMA = "Você é um assistente de um escritório de advocacia brasileiro (Advocacia Lunelli), usado por advogados. Responda em português do Brasil, de forma objetiva e prática. Tudo o que você produz é rascunho para revisão de um advogado: não invente fatos, números de processo, dispositivos legais nem jurisprudência; quando não tiver certeza, diga e indique o que conferir. Prazos processuais devem sempre ser conferidos no processo (contagem em dias úteis, CPC e CLT). Dados pessoais podem aparecer mascarados ([CPF], [TELEFONE]); mantenha os marcadores.";
 
@@ -6403,8 +6405,22 @@ function iaMascara(t) {
     .replace(/(?:\(\d{2}\)\s?|\b\d{2}\s)?\b9?\d{4}-\d{4}\b/g, "[TELEFONE]").replace(/\(\d{2}\)\s?9?\d{8,9}\b/g, "[TELEFONE]").replace(/[\w.+-]+@[\w-]+\.[\w.-]+/g, "[E-MAIL]");
   return t.replace(/\u0001(\d+)\u0002/g, (m, i) => guarda[+i]);
 }
+// IA embutida no Chrome (Gemini Nano, Prompt API): roda no computador, sem chave, sem custo e sem enviar nada para fora.
+const iaChromeApi = () => (typeof LanguageModel !== "undefined" ? LanguageModel : (window.ai && window.ai.languageModel) || null);
+async function iaChromeEstado() {
+  const A = iaChromeApi(); if (!A) return "ausente";
+  try { const a = A.availability ? await A.availability() : (await A.capabilities()).available; return a === "readily" ? "available" : a === "after-download" ? "downloadable" : a; } catch (e) { return "ausente"; }
+}
+async function iaChrome(sistema, mensagens, aoBaixar) {
+  const A = iaChromeApi(), est = await iaChromeEstado();
+  if (!A || est === "ausente" || est === "unavailable" || est === "no") throw new Error("A IA do Chrome não está disponível neste computador. Use o Chrome atualizado para computador (Windows, Mac ou Linux), com ~22 GB livres, e ative em chrome://flags → “Prompt API for Gemini Nano”. Ou escolha outro provedor em Integrações.");
+  const hist = mensagens.slice(0, -1).map(m => ({ role: m.role === "assistant" ? "assistant" : "user", content: m.content })), monitor = m => m.addEventListener("downloadprogress", e => { if (aoBaixar) aoBaixar(Math.round((e.loaded || 0) * 100)); });
+  let ses; const base = { initialPrompts: [{ role: "system", content: sistema }].concat(hist), monitor };
+  try { ses = await A.create(Object.assign({ expectedInputs: [{ type: "text", languages: ["en"] }], expectedOutputs: [{ type: "text", languages: ["en"] }] }, base)); } catch (e) { ses = await A.create(base); }
+  try { const r = await ses.prompt(mensagens[mensagens.length - 1].content); if (!r) throw new Error("A IA do Chrome não devolveu texto."); return r; } finally { try { ses.destroy(); } catch (e) {} }
+}
 async function iaPerguntar(sistema, mensagens, max) {
-  const c = iaCfg(); if (!iaPronta()) throw new Error("Cole a chave do Claude ou do Gemini em Integrações.");
+  const c = iaCfg(); if (c.prov === "chrome") return iaChrome(sistema, mensagens, p => iaStatus("Baixando o modelo do Chrome (só na 1ª vez): " + p + "%")); if (!iaPronta()) throw new Error("Cole a chave do Claude ou do Gemini em Integrações.");
   const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 170000); let r, j;
   try {
     if (c.prov === "gemini") {
@@ -6437,8 +6453,8 @@ function iaManual(sistema, msgs) {
   return new Promise((ok, no) => {
     const ult = msgs[msgs.length - 1].content, prompt = msgs.length === 1 ? sistema + "\n\n" + ult : ult;
     const as = iaAssist() || IA_ASSIST.jusia; $("iaManualTit").textContent = as.nome + " — modo assistido"; $("iaManualAbrir").href = as.url; $("iaManualAbrir").textContent = "Abrir o " + as.nome; $("iaManualRespRot").textContent = "Cole aqui a resposta do " + as.nome; $("iaManualPedRot").textContent = "Pedido a colar no " + as.nome;
-    $("iaManualPrompt").value = prompt; $("iaManualResp").value = ""; $("iaManualMsg").textContent = ""; $("iaManual").hidden = false; IA.manual = { ok, no };
-    crmCopiar(prompt).then(c => { $("iaManualMsg").textContent = c ? "Pedido copiado. Abra o " + as.nome + ", cole (Ctrl+V), espere a resposta e cole-a abaixo." : "Não consegui copiar sozinho: selecione o texto do pedido abaixo, copie e cole no JusIA."; });
+    $("iaManualPrompt").value = prompt; { const q = encodeURIComponent(prompt); $("iaManualAbrir").href = as.url + (iaCfg().prov === "claudeai" && q.length < 6500 ? "?q=" + q : ""); } $("iaManualResp").value = ""; $("iaManualMsg").textContent = ""; $("iaManual").hidden = false; IA.manual = { ok, no };
+    crmCopiar(prompt).then(c => { $("iaManualMsg").textContent = c ? (iaCfg().prov === "claudeai" && !/\?q=$/.test($("iaManualAbrir").href) && $("iaManualAbrir").href.includes("?q=") ? "Clique em “Abrir o Claude.ai”: o pedido já vai preenchido (e também está copiado). Quando ele responder, cole a resposta abaixo." : "Pedido copiado. Abra o " + as.nome + ", cole (Ctrl+V), espere a resposta e cole-a abaixo.") : "Não consegui copiar sozinho: selecione o texto do pedido abaixo, copie e cole no JusIA."; });
   });
 }
 function iaManualFim(resp, erro) { const m = IA.manual; IA.manual = null; $("iaManual").hidden = true; if (!m) return; if (erro) { const e = new Error(erro); e.cancelado = true; m.no(e); } else m.ok(resp); }
