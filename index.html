@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-QAWh+Lfg5cPFdU++em5j0/w+n7SOrJdMGqI7Yf3J0DE=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-THBI/A4KBAXgvSS0AbDfxu9Dk3bsCBS4tfLWfNyrZUc=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#202b47">
@@ -7307,6 +7307,9 @@ function juCitacao(it) {
   return it.tribunal + ". " + (it.orgao ? it.orgao + ". " : "") + (it.classe ? it.classe + " " : "Processo ") + (it.processo ? "nº " + it.processo : "") + ". " + (it.docTipo || "Publicação") + " disponibilizado(a) no DJEN em " + br(it.data) + "." + (it.link ? " Disponível em: " + it.link : "") + " Fonte: Diário de Justiça Eletrônico Nacional (CNJ).";
 }
 
+// citação + texto publicado, prontos para colar na peça (BNP já traz tese/questão na própria citação)
+function juCitacaoComTexto(it) { const c = juCitacao(it), t = String(it.texto || "").replace(/\s+\n/g, "\n").trim(); return t && it.fonte !== "BNP" ? c + "\n\nTexto publicado:\n“" + t + "”" : c; }
+
 // ---------- pesquisa
 async function juPesquisar(q) {
   if (q != null) JU.q = q; const termos = juTermos(JU.q); if (JU.busy) return;
@@ -7399,7 +7402,7 @@ function juCartao(it, termos, ref) {
     c.appendChild(el("div", "hint", [it.classe, it.processo, it.orgao].filter(Boolean).join(" · ")));
     const p = el("p", "jutxt"); p.appendChild(juRealce(it.texto, termos, 700)); c.appendChild(p);
     if (it.texto.length > 700) { const d = el("details", "juint"), s = el("summary", "", "Ver o texto integral publicado (" + nfmt(it.texto.length) + " caracteres)"); d.appendChild(s); d.addEventListener("toggle", () => { if (d.open && d.children.length < 2) { const pp = el("p", "jutxt"); pp.appendChild(juRealce(it.texto, termos)); d.appendChild(pp); } }); c.appendChild(d); }
-    const a = el("div", "acts"); const bc = btn("Copiar citação", () => juCopiar(juCitacao(it), bc)), bt = btn("Copiar texto", () => juCopiar(it.texto, bt)); a.append(bc, bt); if (it.link) a.appendChild(juLink(it.fonte === "STF" ? "Abrir o inteiro teor no STF" : "Abrir no tribunal (documento oficial)", it.link)); if (it.dje) a.appendChild(juLink("Publicação no DJe do STF", it.dje)); c.appendChild(a);
+    const a = el("div", "acts"); const bc = btn("Copiar citação com o texto", () => juCopiar(juCitacaoComTexto(it), bc)); a.appendChild(bc); if (it.link) a.appendChild(juLink(it.fonte === "STF" ? "Abrir o inteiro teor no STF" : "Abrir no tribunal (documento oficial)", it.link)); if (it.dje) a.appendChild(juLink("Publicação no DJe do STF", it.dje)); c.appendChild(a);
   }
   return c;
 }
