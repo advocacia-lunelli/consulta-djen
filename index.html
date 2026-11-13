@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-oy6USNrBmkDTW3T37DeaesA8YeHw8zEsp1IKovidaSI=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-PeyR7l+6x7FUBuyOkJcXg1/962vkOy+9u/FGZlMYlbs=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#202b47">
@@ -704,6 +704,8 @@ footer.rod .direitos{display:block;margin-top:6px;font-weight:600}
 @media print{.advbloco,.pubcb{display:none!important}}
 .cltab td .acts .btn{white-space:nowrap}
 
+.ajlista{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}.ajlista li{display:flex;justify-content:space-between;gap:8px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:6px 10px}#ajBusca{min-width:260px;flex:1}#ajEmail,#ajWhats{min-width:200px;flex:1}
+
 </style>
 </head>
 <body>
@@ -724,6 +726,7 @@ footer.rod .direitos{display:block;margin-top:6px;font-weight:600}
     <a href="#relatorios" data-v="relatorios"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Relatórios</a>
     <a href="#advogados" data-v="advogados"><svg viewBox="0 0 24 24"><path d="M12 3v18M5 7h14M5 7l-3 7a3 3 0 006 0zM19 7l-3 7a3 3 0 006 0z"/></svg>Advogados<span class="bd" id="bdAdv" hidden></span></a>
     <a href="#organizacao" data-v="organizacao"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="10" rx="1"/><rect x="17" y="4" width="4" height="6" rx="1"/></svg>Organização<span class="bd red" id="bdOrg" hidden></span></a>
+    <a href="#ajuizamentos" data-v="ajuizamentos" hidden><svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M12 8v5M12 16v.01"/></svg>Ajuizamentos</a>
     <a href="#jurisprudencia" data-v="jurisprudencia" hidden><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 012-2h12v16H6a2 2 0 00-2 2z"/><path d="M4 21a2 2 0 012-2h12v2z"/><path d="M9 8h6M9 12h4"/></svg>Jurisprudência</a>
     <a href="#calculos" data-v="calculos" hidden><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h2M12 12h2M16 12h0M8 16h2M12 16h2M16 16h0"/></svg>Cálculos</a>
     <a href="#configuracoes" data-v="configuracoes"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 01-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 010-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 014 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 010 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg>Configurações<span class="bd red" id="bdUsr" hidden></span></a>
@@ -800,6 +803,11 @@ footer.rod .direitos{display:block;margin-top:6px;font-weight:600}
 <!-- ===================== JURISPRUDÊNCIA (fontes oficiais) ===================== -->
 <section class="view" id="v-jurisprudencia" hidden>
   <div id="juCorpo"></div>
+</section>
+
+<!-- ===================== AJUIZAMENTOS (novos processos contra clientes) ===================== -->
+<section class="view" id="v-ajuizamentos" hidden>
+  <div id="ajCorpo"></div>
 </section>
 
 <!-- ===================== CÁLCULOS JUDICIAIS ===================== -->
@@ -4276,13 +4284,90 @@ function djScript(token) {
     "  const j = JSON.parse(r.getContentText());",
     "  return { total: j.totalRegistros || 0, itens: (j.registros || []).map(function (x) { const g = x.registro || {}; let og = g.orgaoJudicante; if (typeof og === 'string') { try { og = JSON.parse(og); } catch (e) {} } og = (og && og.descricao) || og; return { numero: limpa(g.numFormatado), relator: limpa(g.nomRelatorSemTratamento), orgao: limpa(og), julgamento: limpa(g.dtaJulgamento), publicacao: limpa(g.dtaPublicacao), ementa: limpa(g.ementa), dispositivo: limpa(g.dispositivo) }; }) };",
     "}",
+    "const AJ_TZ = 'America/Sao_Paulo';",
+    "function ajLer(k, d) { try { return JSON.parse(PropertiesService.getScriptProperties().getProperty(k)) || d; } catch (e) { return d; } }",
+    "function ajNorm(s) { return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\\s+/g, ' ').trim().toUpperCase(); }",
+    "function ajEsc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }",
+    "function ajDia(d) { return Utilities.formatDate(d, AJ_TZ, 'yyyy-MM-dd'); }",
+    "function ajBr(iso) { const m = String(iso || '').match(/^(\\d{4})-(\\d{2})-(\\d{2})/); return m ? m[3] + '/' + m[2] + '/' + m[1] : String(iso || ''); }",
+    "function ajPasta() { const it = DriveApp.getFoldersByName('Lunelli Office - Ajuizamentos'); return it.hasNext() ? it.next() : DriveApp.createFolder('Lunelli Office - Ajuizamentos'); }",
+    "function ajEstado() {",
+    "  const f = ajPasta().getFilesByName('estado.json');",
+    "  if (f.hasNext()) { try { const s = JSON.parse(f.next().getBlob().getDataAsString()); s.seen = s.seen || []; s.procs = s.procs || {}; s.itens = s.itens || []; s.init = s.init || {}; return s; } catch (e) {} }",
+    "  return { seen: [], procs: {}, itens: [], init: {}, ultima: '' };",
+    "}",
+    "function ajSalva(s) { const p = ajPasta(), f = p.getFilesByName('estado.json'), t = JSON.stringify(s); if (f.hasNext()) f.next().setContent(t); else p.createFile('estado.json', t, 'application/json'); }",
+    "function ajCfg(b) {",
+    "  const c = { email: String(b.email || '').trim().slice(0, 120), whats: String(b.whats || '').replace(/\\D/g, '').slice(0, 15), clientes: (b.clientes || []).slice(0, 60).map(function (x) { return { id: String(x.id || '').slice(0, 40), nome: String(x.nome || '').trim().slice(0, 120), doc: String(x.doc || '').replace(/\\D/g, '').slice(0, 14) }; }).filter(function (x) { return x.nome.length >= 5; }) };",
+    "  PropertiesService.getScriptProperties().setProperty('AJ_CFG', JSON.stringify(c));",
+    "  return { ok: true, clientes: c.clientes.length };",
+    "}",
+    "function ajCfgGet() {",
+    "  const c = ajLer('AJ_CFG', { email: '', whats: '', clientes: [] }), s = ajEstado();",
+    "  return { email: c.email, whats: c.whats, ultima: s.ultima || '', clientes: c.clientes.map(function (x) { return { id: x.id, nome: x.nome, primeira: !s.init[x.id] }; }) };",
+    "}",
+    "function ajStatus() {",
+    "  const c = ajLer('AJ_CFG', { email: '', whats: '', clientes: [] }), s = ajEstado();",
+    "  return { email: c.email, whats: c.whats, clientes: c.clientes.length, ultima: s.ultima || '', itens: s.itens.slice(0, 80) };",
+    "}",
+    "function ajPdf(novos, cfg, rotulo) {",
+    "  const linhas = novos.map(function (x) { return '<tr><td>' + ajEsc(x.cliente) + '</td><td>' + ajEsc(x.proc) + '<br>' + ajEsc(x.classe) + '</td><td>' + ajEsc(x.trib) + '<br>' + ajEsc(x.orgao) + '</td><td>' + ajBr(x.data) + '<br>' + ajEsc(x.motivo) + '</td><td>' + ajEsc(x.polo) + '</td></tr>'; }).join('');",
+    "  const html = '<html><body style=\"font-family:Arial,sans-serif;font-size:11px\"><h2>Novos ajuizamentos contra clientes monitorados</h2><p>' + ajEsc(rotulo) + ' · Lunelli Advocacia · ' + novos.length + ' ocorrência(s)</p><table border=\"1\" cellpadding=\"5\" style=\"border-collapse:collapse;width:100%\"><tr style=\"background:#e8e8e8\"><th>Cliente</th><th>Processo / classe</th><th>Tribunal / órgão</th><th>Data / motivo</th><th>Polo do cliente</th></tr>' + linhas + '</table><p style=\"color:#555\">Fonte: Diário de Justiça Eletrônico Nacional (CNJ). Confira homônimos antes de agir: a busca é por nome da parte.</p></body></html>';",
+    "  const nome = 'Ajuizamentos-' + Utilities.formatDate(new Date(), AJ_TZ, 'yyyy-MM-dd-HHmm') + '.pdf';",
+    "  return ajPasta().createFile(Utilities.newBlob(html, 'text/html', 'x.html').getAs('application/pdf').setName(nome));",
+    "}",
+    "function ajProcessar(b) {",
+    "  const cfg = ajLer('AJ_CFG', null);",
+    "  if (!cfg || !cfg.clientes.length) return { erro: 'nenhum cliente cadastrado para monitorar' };",
+    "  const st = ajEstado(), seen = {}; st.seen.forEach(function (i) { seen[i] = 1; });",
+    "  const o = { enviar: b.enviar !== false }, hoje = new Date(), fim = ajDia(hoje), anoAt = +fim.slice(0, 4);",
+    "  const novos = [], erros = (b.erros || []).slice(0, 20).map(function (e) { return String(e).slice(0, 200); });",
+    "  (b.lotes || []).slice(0, 60).forEach(function (lote) {",
+    "    const c = cfg.clientes.filter(function (x) { return x.id === String(lote.clienteId); })[0]; if (!c) return;",
+    "    const primeira = !st.init[c.id], alvo = ajNorm(c.nome);",
+    "    (lote.items || []).slice(0, 100).forEach(function (i) {",
+    "      const dest = (i.destinatarios || []).filter(function (d) { return ajNorm(d.nome).indexOf(alvo) >= 0; });",
+    "      if (!dest.length) return;",
+    "      const id = String(i.id); if (seen[id]) return; seen[id] = 1;",
+    "      const proc = i.numeroprocessocommascara || i.numero_processo || '', ano = +((proc.match(/\\.(\\d{4})\\./) || [])[1] || 0), chave = c.id + '|' + proc, jaVisto = !!st.procs[chave];",
+    "      st.procs[chave] = 1;",
+    "      const dist = /istribui/i.test(i.tipoComunicacao || ''), primeiroContato = !jaVisto && !primeira && ano >= anoAt - 1;",
+    "      if (dist || primeiroContato) novos.push({ id: id, cliente: c.nome, clienteId: c.id, data: i.data_disponibilizacao || fim, trib: i.siglaTribunal || '', orgao: i.nomeOrgao || '', proc: proc, classe: i.nomeClasse || '', tipo: i.tipoComunicacao || '', motivo: dist ? 'Lista de distribui\\u00e7\\u00e3o' : 'Primeira publica\\u00e7\\u00e3o do processo', polo: dest[0].polo || '', link: /^https:\\/\\//.test(i.link || '') ? i.link : '', texto: String(i.texto || '').replace(/<[^>]+>/g, ' ').replace(/\\s+/g, ' ').trim().slice(0, 400) });",
+    "    });",
+    "    st.init[c.id] = 1;",
+    "  });",
+    "  let pdf = null, enviado = false;",
+    "  if (novos.length) {",
+    "    const rotulo = 'Verificação de ' + Utilities.formatDate(hoje, AJ_TZ, 'dd/MM/yyyy HH:mm');",
+    "    pdf = ajPdf(novos, cfg, rotulo);",
+    "    novos.forEach(function (x) { x.pdf = pdf.getUrl(); });",
+    "    st.itens = novos.concat(st.itens).slice(0, 200);",
+    "    if (o.enviar !== false && cfg.email) {",
+    "      const msg = 'Novos ajuizamentos contra clientes (' + novos.length + '). Relatório em PDF: ' + pdf.getUrl();",
+    "      const wa = cfg.whats ? 'https://wa.me/' + (cfg.whats.length <= 11 ? '55' + cfg.whats : cfg.whats) + '?text=' + encodeURIComponent(msg) : '';",
+    "      const lista = novos.slice(0, 15).map(function (x) { return '<li><b>' + ajEsc(x.cliente) + '</b> — ' + ajEsc(x.proc) + ' (' + ajEsc(x.trib) + ', ' + ajEsc(x.classe) + ') — ' + ajEsc(x.motivo) + ' em ' + ajBr(x.data) + '</li>'; }).join('');",
+    "      MailApp.sendEmail({ to: cfg.email, subject: 'Novos ajuizamentos contra clientes: ' + novos.length + ' (' + Utilities.formatDate(hoje, AJ_TZ, 'dd/MM HH:mm') + ')', htmlBody: '<p>Foram encontradas ' + novos.length + ' ocorrência(s) nova(s) para os clientes monitorados. O PDF segue em anexo.</p><ul>' + lista + '</ul>' + (wa ? '<p><a href=\"' + wa + '\">Enviar este aviso pelo WhatsApp</a></p>' : '') + '<p style=\"color:#777\">Lunelli Office · fonte: DJEN (CNJ). Confira homônimos.</p>', attachments: [pdf.getBlob()] });",
+    "      enviado = true;",
+    "    }",
+    "  }",
+    "  st.seen = Object.keys(seen).slice(-3000);",
+    "  const ks = Object.keys(st.procs); if (ks.length > 6000) { const n = {}; ks.slice(-5000).forEach(function (k) { n[k] = 1; }); st.procs = n; }",
+    "  st.ultima = Utilities.formatDate(hoje, AJ_TZ, \"yyyy-MM-dd'T'HH:mm\") + (erros.length ? ' (com erros)' : '');",
+    "  ajSalva(st);",
+    "  return { novos: novos.length, itens: novos, erros: erros, pdf: pdf ? pdf.getUrl() : '', enviado: enviado, ultima: st.ultima };",
+    "}",
+    "function autorizar() { MailApp.getRemainingDailyQuota(); DriveApp.getRootFolder(); ScriptApp.getProjectTriggers(); Logger.log('autorizado'); }",
     "function doPost(e) {",
     "  try {",
     "    const b = JSON.parse(e.postData.contents);",
     "    if (b.t !== TOKEN) return resp({ erro: 'token' });",
-    "    if (b.f === 'ping') return resp({ ok: true, fontes: ['datajud', 'stf', 'tst'] });",
+    "    if (b.f === 'ping') return resp({ ok: true, fontes: ['datajud', 'stf', 'tst', 'aj'] });",
     "    if (b.f === 'stf') return resp(stf(b));",
     "    if (b.f === 'tst') return resp(tst(b));",
+    "    if (b.f === 'aj_cfg') return resp(ajCfg(b));",
+    "    if (b.f === 'aj_cfg_get') return resp(ajCfgGet());",
+    "    if (b.f === 'aj_status') return resp(ajStatus());",
+    "    if (b.f === 'aj_processar') return resp(ajProcessar(b));",
     "    if (!/^(tj[a-z]{2,4}|trt\\d{1,2}|trf\\d|tre-[a-z]{2}|stj|tst|tse|stm)$/.test(b.a)) return resp({ erro: 'tribunal inválido' });",
     "    const r = UrlFetchApp.fetch('" + DJ_BASE + "' + b.a + '/_search', { method: 'post', contentType: 'application/json', headers: { Authorization: 'APIKey ' + CHAVE }, payload: JSON.stringify(b.q), muteHttpExceptions: true });",
     "    return ContentService.createTextOutput(r.getContentText()).setMimeType(ContentService.MimeType.JSON);",
@@ -6416,9 +6501,9 @@ async function iaResumirPub(p, x) {
 const NUVEM_SRI_OFF = false; // só os testes automáticos desligam (usam um Firebase simulado)
 const NV = { ativo: !!NUVEM_CFG, user: null, perfil: null, papel: "local", advId: null, db: null, auth: null, unsubs: [], mapas: {}, sessao: false, cadastrando: false, users: [] };
 const ACESSO = {
-  local: ["inicio", "clientes", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "organizacao", "jurisprudencia", "calculos", "configuracoes"],
-  admin: ["meu", "inicio", "secretaria", "clientes", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "organizacao", "jurisprudencia", "calculos", "configuracoes"],
-  advogado: ["meu", "inicio", "clientes", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "organizacao", "jurisprudencia", "calculos", "configuracoes"],
+  local: ["inicio", "clientes", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "organizacao", "ajuizamentos", "jurisprudencia", "calculos", "configuracoes"],
+  admin: ["meu", "inicio", "secretaria", "clientes", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "organizacao", "ajuizamentos", "jurisprudencia", "calculos", "configuracoes"],
+  advogado: ["meu", "inicio", "clientes", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "organizacao", "ajuizamentos", "jurisprudencia", "calculos", "configuracoes"],
   secretaria: ["secretaria", "clientes", "audiencias", "processos", "crm", "configuracoes"]
 };
 const PAPEL_ROT = { admin: "Administrador", advogado: "Advogado(a)", secretaria: "Secretaria", local: "" };
@@ -6680,6 +6765,123 @@ function locaisDesenhar() {
 
 // ---------- ponto de entrada
 if (NV.ativo) { ligarLogin(); nuvemIniciar(); }
+
+
+/* ===== 46-ajuiz: aba "Ajuizamentos" — novos processos contra clientes escolhidos (cadastro manual) =====
+   • O escritório escolhe, um a um, os clientes que quer acompanhar de perto. A busca é por nome da parte no DJEN (CNJ):
+     vale "Lista de distribuição" e a primeira publicação de um processo novo para aquele nome.
+   • O DJEN bloqueia consultas feitas pelos servidores do Google; por isso a busca roda no navegador (ou numa rotina fora do Google)
+     e o proxy gratuito do Google só guarda a lista, evita repetições, gera o PDF (Drive) e envia o e-mail com o PDF anexo.
+   • WhatsApp: não há envio automático gratuito; o e-mail traz um link que abre o WhatsApp com a mensagem pronta e o link do PDF.
+   • Lista e destinos ficam em crm_config.ajuiz (compartilhada com a equipe). O histórico fica no proxy (Drive do escritório). */
+const AJ = { busy: false, st: null, erro: "", msg: "", res: null, sel: "", ctl: null };
+const ajCfg = () => Object.assign({ ids: [], email: "", whats: "" }, crmCfg().ajuiz || {});
+const ajSalvar = p => crmSalvarCfg({ ajuiz: Object.assign(ajCfg(), p) });
+const ajClientes = () => ajCfg().ids.map(i => CRM_CONTATOS.find(c => c.id === i)).filter(Boolean);
+const ajNomeOk = c => String(c.nome || "").trim().length >= 5;
+const ajWhatsLink = (num, texto) => { const d = soDigitos(num); if (d.length < 10) return ""; return "https://wa.me/" + (d.length <= 11 ? "55" + d : d) + "?text=" + encodeURIComponent(texto); };
+async function ajSincronizar() {
+  const c = ajCfg(), cl = ajClientes().filter(ajNomeOk);
+  AJ.ctl = AJ.ctl || { signal: undefined };
+  return juProxy({ f: "aj_cfg", email: c.email, whats: c.whats, clientes: cl.map(x => ({ id: x.id, nome: x.nome, doc: x.doc || "" })) }, AJ.ctl);
+}
+async function ajStatus() {
+  try { AJ.st = await juProxy({ f: "aj_status" }, AJ.ctl || { signal: undefined }); AJ.erro = ""; }
+  catch (e) { AJ.st = null; AJ.erro = e && e.semProxy ? "Ative o proxy gratuito em Configurações › Integrações › Andamentos (a mesma ativação serve aqui)." : "Não foi possível falar com o proxy: " + (e.message || "erro"); }
+  ajDesenhar();
+}
+async function ajVerificar(enviar) {
+  if (AJ.busy) return; AJ.busy = true; AJ.msg = ""; AJ.erro = ""; AJ.res = null; ajDesenhar();
+  const ctl = { signal: undefined, parar: false }; AJ.ctl = ctl;
+  try {
+    await ajSincronizar();
+    const cfg = await juProxy({ f: "aj_cfg_get" }, ctl), lotes = [], erros = [], fim = hojeIso();
+    if (!cfg.clientes.length) throw new Error("nenhum cliente com nome completo (mínimo 5 letras) na lista");
+    let k = 0;
+    for (const c of cfg.clientes) {
+      k++; AJ.msg = "Consultando o DJEN: " + c.nome + " (" + k + " de " + cfg.clientes.length + ")…"; ajDesenhar();
+      try {
+        const j = await buscarPagina({ nomeParte: c.nome, dataDisponibilizacaoInicio: somaDias(fim, c.primeira ? -7 : -3), dataDisponibilizacaoFim: fim, itensPorPagina: 100, pagina: 1 }, ctl, s => { AJ.msg = "Limite de consultas do CNJ atingido. Retomando em " + s + " s…"; ajDesenhar(); });
+        lotes.push({ clienteId: c.id, items: (j.items || []).map(i => ({ id: i.id, data_disponibilizacao: i.data_disponibilizacao, siglaTribunal: i.siglaTribunal, tipoComunicacao: i.tipoComunicacao, nomeOrgao: i.nomeOrgao, numeroprocessocommascara: i.numeroprocessocommascara, numero_processo: i.numero_processo, nomeClasse: i.nomeClasse, link: i.link, texto: String(i.texto || "").slice(0, 600), destinatarios: (i.destinatarios || []).map(d => ({ nome: d.nome, polo: d.polo })) })) });
+      } catch (e) { erros.push(c.nome + ": " + (e && e.http ? "DJEN respondeu " + e.http : "falha de rede")); }
+    }
+    AJ.msg = "Gerando o relatório…"; ajDesenhar();
+    AJ.res = await juProxy({ f: "aj_processar", lotes, erros, enviar: !!enviar }, ctl);
+    AJ.msg = "";
+    await ajStatus();
+  } catch (e) { AJ.erro = e && e.semProxy ? "Ative o proxy gratuito em Configurações › Integrações › Andamentos." : "Não foi possível verificar: " + ((e && e.message) || "erro"); AJ.msg = ""; }
+  AJ.busy = false; ajDesenhar();
+}
+function ajCartao(x) {
+  const c = el("div", "jucard"), top = el("div", "jutop");
+  top.append(el("b", "", x.cliente), el("span", "tag", x.motivo || "Novo"), el("span", "hint", ((x.data || "").length >= 10 ? br(x.data.slice(0, 10)) : "")));
+  c.appendChild(top);
+  c.appendChild(el("div", "", [x.proc, x.classe && titulo(x.classe), x.trib, x.orgao].filter(Boolean).join(" · ")));
+  if (x.polo) c.appendChild(el("div", "hint", "Polo do cliente: " + x.polo + " · confira se não é homônimo"));
+  if (x.texto) c.appendChild(el("p", "hint", x.texto.slice(0, 260) + (x.texto.length > 260 ? "…" : "")));
+  const a = el("div", "acts");
+  if (x.proc) a.appendChild(btn("Copiar nº do processo", () => navigator.clipboard && navigator.clipboard.writeText(x.proc)));
+  if (/^https:\/\//.test(x.link || "")) { const l = el("a", "btn sec sm", "Abrir no tribunal"); l.href = x.link; l.target = "_blank"; l.rel = "noopener noreferrer"; a.appendChild(l); }
+  if (/^https:\/\//.test(x.pdf || "")) { const l = el("a", "btn sec sm", "PDF do relatório"); l.href = x.pdf; l.target = "_blank"; l.rel = "noopener noreferrer"; a.appendChild(l); }
+  const novoCli = CRM_CONTATOS.find(k => k.id === x.clienteId);
+  if (novoCli) a.appendChild(btn("Abrir o cliente", () => clAbrir(novoCli.id, x.proc)));
+  c.appendChild(a); return c;
+}
+function ajDesenhar() {
+  const box = $("ajCorpo"); if (!box) return; const foco = document.activeElement && document.activeElement.id; box.textContent = "";
+  const cfg = ajCfg(), cls = ajClientes();
+  const intro = el("div", "panel"); intro.appendChild(el("p", "", "Escolha os clientes que você quer acompanhar de perto. O sistema procura no DJEN, pelo nome da parte, processos novos contra eles (lista de distribuição e primeira publicação) e gera um relatório em PDF."));
+  intro.appendChild(el("p", "hint", "O PDF é enviado ao e-mail do escritório; o e-mail traz um botão que abre o WhatsApp com a mensagem pronta. A busca é por nome: confira homônimos antes de agir."));
+  box.appendChild(intro);
+
+  const pc = el("div", "panel"); pc.appendChild(el("h2", "", "Clientes monitorados (" + cls.length + ")"));
+  const add = el("div", "acts"), dl = el("datalist"); dl.id = "ajLista";
+  for (const c of CRM_CONTATOS.slice().sort((a, b) => norm(a.nome).localeCompare(norm(b.nome))).slice(0, 2000)) { const o = el("option"); o.value = c.nome; dl.appendChild(o); }
+  const inp = el("input"); inp.id = "ajBusca"; inp.setAttribute("list", "ajLista"); inp.placeholder = "Digite o nome do cliente cadastrado…"; inp.value = AJ.sel || ""; inp.oninput = () => { AJ.sel = inp.value; };
+  const bAdd = btn("Adicionar à lista", async () => {
+    const q = norm(AJ.sel || "").trim(), c = CRM_CONTATOS.find(x => norm(x.nome) === q);
+    if (!c) { AJ.erro = "Escolha um cliente que já esteja cadastrado (aba Clientes/CRM)."; return ajDesenhar(); }
+    if (!ajNomeOk(c)) { AJ.erro = "O nome precisa ter ao menos 5 letras para a busca ser confiável."; return ajDesenhar(); }
+    if (cfg.ids.includes(c.id)) { AJ.erro = "Este cliente já está na lista."; return ajDesenhar(); }
+    AJ.sel = ""; AJ.erro = ""; ajSalvar({ ids: cfg.ids.concat(c.id) }); ajDesenhar();
+  }, "pri");
+  add.append(inp, dl, bAdd); pc.appendChild(add);
+  if (!cls.length) pc.appendChild(el("div", "hint", "Nenhum cliente na lista ainda."));
+  const ul = el("ul", "ajlista");
+  for (const c of cls) { const li = el("li"); li.append(el("span", "", c.nome + (ajNomeOk(c) ? "" : " (nome curto demais)")), btn("Remover", () => { ajSalvar({ ids: cfg.ids.filter(i => i !== c.id) }); ajDesenhar(); })); ul.appendChild(li); }
+  pc.appendChild(ul); box.appendChild(pc);
+
+  const pd = el("div", "panel"); pd.appendChild(el("h2", "", "Para onde enviar o relatório"));
+  const g = el("div", "acts"), em = el("input"), wa = el("input"); em.id = "ajEmail"; em.type = "email"; em.placeholder = "E-mail do escritório"; em.value = cfg.email; wa.id = "ajWhats"; wa.placeholder = "WhatsApp (DDD + número)"; wa.value = cfg.whats;
+  g.append(em, wa, btn("Salvar destinos", async () => { ajSalvar({ email: em.value.trim(), whats: wa.value.trim() }); AJ.erro = ""; AJ.msg = "Destinos salvos."; ajDesenhar(); try { await ajSincronizar(); } catch (e) { AJ.erro = "Salvo no app, mas o proxy não respondeu: " + ((e && e.message) || "erro"); } ajDesenhar(); })); pd.appendChild(g);
+  pd.appendChild(el("p", "hint", "O e-mail sai do Gmail do escritório (gratuito, até cerca de 100 por dia). O WhatsApp abre com um clique: o envio automático com PDF só existe na API paga da Meta."));
+  box.appendChild(pd);
+
+  const pv = el("div", "panel"); pv.appendChild(el("h2", "", "Verificar"));
+  const av = el("div", "acts");
+  const b1 = btn("Verificar agora e enviar o PDF por e-mail", () => ajVerificar(true), "pri"), b2 = btn("Só verificar (sem e-mail)", () => ajVerificar(false));
+  b1.disabled = b2.disabled = AJ.busy || !cls.length; b1.id = "ajGo"; av.append(b1, b2); pv.appendChild(av);
+  if (AJ.msg) pv.appendChild(el("div", "msg", AJ.msg)); if (AJ.erro) pv.appendChild(el("div", "msg err", AJ.erro));
+  if (AJ.st) pv.appendChild(el("p", "hint", "Última verificação: " + (AJ.st.ultima ? br(AJ.st.ultima.slice(0, 10)) + " " + AJ.st.ultima.slice(11, 16) : "nunca") + " · " + AJ.st.clientes + " cliente(s) no proxy."));
+  pv.appendChild(el("p", "hint", "O DJEN não aceita consultas dos servidores do Google; a verificação roda aqui no navegador, com o app aberto. A primeira verificação de cada cliente olha os últimos 7 dias; as seguintes, os últimos 3 (sem repetir o que já foi avisado)."));
+  box.appendChild(pv);
+
+  if (AJ.res) {
+    const pr = el("div", "panel"); pr.id = "ajRes"; pr.appendChild(el("h2", "", "Resultado desta verificação"));
+    if (AJ.res.erro) pr.appendChild(el("div", "msg err", AJ.res.erro));
+    else {
+      pr.appendChild(el("div", "msg", AJ.res.novos ? AJ.res.novos + " ocorrência(s) nova(s)." + (AJ.res.enviado ? " PDF enviado por e-mail." : " (e-mail não enviado)") : "Nenhum ajuizamento novo desde a última verificação."));
+      for (const e of AJ.res.erros || []) pr.appendChild(el("div", "msg warn", e));
+      if (AJ.res.pdf) { const a = el("div", "acts"), l = el("a", "btn pri sm", "Abrir o PDF"); l.href = AJ.res.pdf; l.target = "_blank"; l.rel = "noopener noreferrer"; a.appendChild(l); const w = ajWhatsLink(cfg.whats, "Novos ajuizamentos contra clientes (" + AJ.res.novos + "). Relatório em PDF: " + AJ.res.pdf); if (w) { const lw = el("a", "btn sec sm", "Avisar pelo WhatsApp"); lw.href = w; lw.target = "_blank"; lw.rel = "noopener noreferrer"; a.appendChild(lw); } pr.appendChild(a); }
+      for (const x of AJ.res.itens || []) pr.appendChild(ajCartao(x));
+    }
+    box.appendChild(pr);
+  }
+  if (AJ.st && (AJ.st.itens || []).length) { const ph = el("div", "panel"); ph.appendChild(el("h2", "", "Histórico recente")); for (const x of AJ.st.itens.slice(0, 30)) ph.appendChild(ajCartao(x)); box.appendChild(ph); }
+  if (foco) { const f = $(foco); if (f && f.focus) f.focus(); }
+}
+let ajIniciado = false;
+function ajAbrir() { ajDesenhar(); if (!ajIniciado) { ajIniciado = true; ajStatus(); } }
 
 
 /* ===== 46-telas: "Meu painel" (uma tela por advogado) e "Secretaria" ===== */
@@ -8037,6 +8239,7 @@ const VIEWS = {
   relatorios: ["Relatórios", "Indicadores e gráficos do cliente pesquisado, prontos para imprimir ou apresentar"],
   advogados: ["Advogados", "Publicações do DJEN em nome de Fábio (OAB/SC 15.044) e Davi (OAB/SC 39.336)"],
   organizacao: ["Organização", "Tarefas, prazos e rotina do escritório"],
+  ajuizamentos: ["Ajuizamentos", "Novos processos contra clientes escolhidos: relatório em PDF por e-mail, com aviso pronto para WhatsApp"],
   jurisprudencia: ["Jurisprudência", "Pesquisa em fontes oficiais: Banco Nacional de Precedentes e Diário de Justiça Eletrônico Nacional (CNJ), com atalhos para os tribunais"],
   calculos: ["Cálculos", "Atualização de débitos, verbas trabalhistas, atrasados e RMI previdenciários, tributos e índices oficiais"],
   configuracoes: ["Configurações", "Conta, backup, alertas, integrações (Google, CNJ, IA), aplicativo e usuários"]
@@ -8060,6 +8263,7 @@ function desenharVista(v) {
   if (v === "calculos") cuDesenhar();
   if (v === "clientes") clDesenhar();
   if (v === "jurisprudencia") juDesenhar();
+  if (v === "ajuizamentos") ajAbrir();
 }
 function atualizarTudo() { desenharVista(vistaAtual()); atualizarBadges(); }
 function irPara() {
