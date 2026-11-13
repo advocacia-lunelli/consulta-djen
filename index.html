@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-AWHRPwbo4gWJLtb7PlRwBoNKzrXQ7uaYBVgViZ37CRE=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-wCe7WjYp8e161aPpMeid9EYzbcZeImCRHmW9d706Ny0=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#202b47">
@@ -935,8 +935,8 @@ details.ajuda[open]>summary{margin-bottom:4px}
 <!-- ===================== PROCESSOS ===================== -->
 <section class="view" id="v-processos" hidden>
   <div id="pLista">
-    <div class="panel">
-      <h2>Cadastrar processos pelo número</h2>
+    <details class="panel" id="pCadastro">
+      <summary><b>Cadastrar processos pelo número</b></summary>
       <div class="hint">Cole um ou vários números no padrão CNJ (0000000-00.0000.0.00.0000), um por linha ou no meio de um texto. O site confere o dígito verificador, busca o histórico no DJEN e cria uma pasta para cada processo.</div>
       <textarea id="pNums" placeholder="Ex.: 0001234-56.2026.8.24.0023"></textarea>
       <div class="grid">
@@ -946,10 +946,10 @@ details.ajuda[open]>summary{margin-bottom:4px}
       <div class="acts"><button class="btn" id="pBuscar" type="button">Buscar no DJEN e cadastrar</button><button class="btn danger" id="pParar" type="button" hidden>Parar</button><span class="hint" id="pStatus"></span></div>
       <ul class="mini" id="pRelat"></ul>
       <datalist id="dlClientes"></datalist>
-    </div>
+    </details>
     <div class="panel">
       <div class="hd"><h2>Pastas de processos <span class="hint" id="pContagem"></span></h2>
-        <div class="acts"><input type="text" id="pBusca" placeholder="Buscar nº, cliente, parte…" aria-label="Buscar nas pastas"><select id="pRespF" aria-label="Responsável"><option value="">Todos os responsáveis</option><option>Fábio</option><option>Davi</option><option>Equipe</option><option>Secretaria</option></select><select id="pStatusF" aria-label="Situação"><option value="ativo">Ativos</option><option value="arquivado">Arquivados</option><option value="todos">Todos</option></select><button class="btn sec sm" id="pAtualizarTodas" type="button">Atualizar andamentos</button></div></div>
+        <div class="acts"><input type="text" id="pBusca" placeholder="Buscar nº, cliente, parte…" aria-label="Buscar nas pastas"><select id="pRespF" aria-label="Responsável"><option value="">Todos os responsáveis</option><option>Fábio</option><option>Davi</option><option>Equipe</option><option>Secretaria</option></select><select id="pStatusF" aria-label="Situação"><option value="todos">Todos</option><option value="ativo">Ativos</option><option value="arquivado">Arquivados</option></select><button class="btn sec sm" id="pAtualizarTodas" type="button">Atualizar andamentos</button></div></div>
       <div class="acts" id="pPastas"></div>
       <div class="list" id="pTabela"></div>
     </div>
@@ -3788,7 +3788,7 @@ function advBarra() {
 
 /* ===== 35-processos: pastas de processos com cadastro automático pelo número (DJEN), audiências, prazos e tarefas ===== */
 let PROCS = LS.get("procs", []);
-const P = { sel: null, aba: "andamento", rodando: false, ctl: { parar: false }, pasta: "", filtroStatus: "ativo", respF: "" };
+const P = { sel: null, aba: "andamento", rodando: false, ctl: { parar: false }, pasta: "", filtroStatus: "todos", respF: "" };
 const salvarProcs = () => LS.set("procs", PROCS);
 const chaveDe = s => String(s || "").replace(/\D/g, "");
 const procPorChave = c => PROCS.find(p => p.chave === c);
@@ -3974,6 +3974,7 @@ function procEventoProximo(p) {
   const ev = agendaItens().filter(e => e.procId === p.id)[0]; return ev ? ev : null;
 }
 function procDesenhar() {
+  { const cd = $("pCadastro"); if (cd && (!PROCS.length || P.rodando)) cd.open = true; }
   const p = P.sel && PROCS.find(x => x.id === P.sel); if (P.sel && !p) P.sel = null;
   $("pLista").hidden = !!p; $("pDetalhe").hidden = !p;
   const dl = $("dlClientes"); dl.textContent = ""; for (const c of new Set([...lerLista().map(n => n.nome), ...PROCS.map(x => x.cliente).filter(Boolean)])) { const o = el("option"); o.value = c; dl.appendChild(o); }
