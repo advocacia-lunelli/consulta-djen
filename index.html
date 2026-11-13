@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-DMOJFSfBggoahMxSV6WpOQKdeSmdA1Kf26YbdOzRxm8=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-jp33Pbx0BQWMT/hYhoYw7hNJKEQazK1wf8St4hyvp2E=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#202b47">
@@ -4113,7 +4113,7 @@ function procIniciar() {
    • Configuração em crm_config.datajud (compartilhada com a equipe); o resultado fica em cada processo (p.mov). */
 const DJ_CHAVE = "cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw==";
 const DJ_BASE = "https://api-publica.datajud.cnj.jus.br/api_publica_";
-const DJ_PAD = { proxy: "", token: "", auto: true, horas: 6 };
+const DJ_PAD = { proxy: "", token: "", jproxy: "", jtoken: "", auto: true, horas: 6 };
 const DJ_MAX = 40;
 const djCfg = () => Object.assign({}, DJ_PAD, crmCfg().datajud || {});
 const djSalvarCfg = p => crmSalvarCfg({ datajud: Object.assign(djCfg(), p) });
@@ -4287,9 +4287,10 @@ function djPainel() {
   p.appendChild(el("div", "hint", "Consulta gratuita à base nacional do CNJ para os processos cadastrados (TJs, TRFs, TRTs, STJ, TST e outros) e aviso no sino quando surge movimentação nova. Não é tempo real: os tribunais enviam os dados ao CNJ com atraso (horas a dias) e processos em segredo de justiça não aparecem. Intimações e prazos continuam chegando mais cedo pelo DJEN. A configuração é compartilhada com a equipe."));
   const msg = el("div", "msg"); msg.hidden = true;
   const iUrl = intTexto(c.proxy, "https://script.google.com/macros/s/…/exec"), iTok = intTexto(c.token, "token do proxy (clique em Gerar)");
+  const iJu = intTexto(c.jproxy, "(opcional) outro proxy, só para a Jurisprudência"), iJt = intTexto(c.jtoken, "token desse proxy");
   const [lAu, cAu] = intCheck("Monitorar automaticamente os processos ativos (com o app aberto)", c.auto), sH = optsSel(el("select"), [[3, "3 horas"], [6, "6 horas"], [12, "12 horas"], [24, "1 dia"]]); sH.value = c.horas;
-  const g = el("div", "intgrid"); g.append(intCampo("Endereço do proxy (Google Apps Script)", iUrl), intCampo("Token do proxy", iTok, "Evita que terceiros usem o proxy do escritório."), intCampo("Consultar cada processo a cada", sH));
-  const salva = () => { const u = iUrl.value.trim(); if (u && !/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(u)) throw new Error("O endereço do proxy deve ser o link “Aplicativo da Web” (termina em /exec)."); djSalvarCfg({ proxy: u, token: iTok.value.trim(), auto: cAu.checked, horas: +sH.value }); tag.className = "tag " + (u ? "ok" : "warn"); tag.textContent = u ? (cAu.checked ? "monitor ativo" : "configurado") : "falta o proxy"; };
+  const g = el("div", "intgrid"); g.append(intCampo("Endereço do proxy (Google Apps Script)", iUrl), intCampo("Token do proxy", iTok, "Evita que terceiros usem o proxy do escritório."), intCampo("Consultar cada processo a cada", sH), intCampo("Proxy da Jurisprudência (opcional)", iJu, "Se ficar vazio, a aba Jurisprudência usa o proxy acima."), intCampo("Token do proxy da Jurisprudência", iJt));
+  const salva = () => { const u = iUrl.value.trim(); if (u && !/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(u)) throw new Error("O endereço do proxy deve ser o link “Aplicativo da Web” (termina em /exec)."); const ju = iJu.value.trim(); if (ju && !/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(ju)) throw new Error("O endereço do proxy da jurisprudência deve terminar em /exec."); djSalvarCfg({ proxy: u, token: iTok.value.trim(), jproxy: ju, jtoken: iJt.value.trim(), auto: cAu.checked, horas: +sH.value }); tag.className = "tag " + (u ? "ok" : "warn"); tag.textContent = u ? (cAu.checked ? "monitor ativo" : "configurado") : "falta o proxy"; };
   const exec = fn => async () => { try { const t = await fn(); if (t) intMsg(msg, t); } catch (e) { intMsg(msg, e.message || String(e), true); } };
   const ac = el("div", "acts");
   ac.append(btn("Salvar", exec(async () => { salva(); return "Configuração salva e compartilhada com a equipe."; }), ""),
@@ -7057,7 +7058,7 @@ async function juBuscarDec(termos, tribs, ctl, aoStatus, aoItens) {
 // ---------- fonte 3: acervo de acórdãos do STF, consultado pelo proxy gratuito (Google Apps Script) — o navegador não pode falar direto com o STF
 const juUsaStf = () => { const t = juTribsSel(); return !t.length || t.includes("STF"); };
 async function juBuscarTrib(termos, ctl) {
-  const c = djCfg(); if (!c.proxy) { const e = new Error("sem proxy"); e.semProxy = true; throw e; }
+  const c0 = djCfg(), c = { proxy: c0.jproxy || c0.proxy, token: c0.jproxy ? c0.jtoken : c0.token }; if (!c.proxy) { const e = new Error("sem proxy"); e.semProxy = true; throw e; }
   let r; try { r = await fetch(c.proxy, { method: "POST", signal: ctl.signal, headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ t: c.token, f: "stf", base: "acordaos", n: 15, q: termos.map(t => t.frase ? '"' + t.txt + '"' : t.txt).join(" ") }) }); } catch (e) { if (ctl.parar) throw e; throw new Error("não foi possível falar com o proxy (confira o endereço em Integrações › Andamentos)"); }
   let j; try { j = await r.json(); } catch (e) { throw new Error("resposta inválida do proxy"); }
   if (j.erro) throw new Error(j.erro === "token" ? "token do proxy incorreto (Integrações › Andamentos)" : j.erro);
