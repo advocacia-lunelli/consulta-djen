@@ -1,0 +1,1 @@
+{"name":"teste-djen","on":"workflow_dispatch","jobs":{"t":{"runs-on":"ubuntu-latest","steps":[{"run":"curl -s -o /dev/null -w 'HTTP=%{http_code}' 'https://comunicaapi.pje.jus.br/api/v1/comunicacao?nomeParte=MARIA%20DA%20SILVA&dataDisponibilizacaoInicio=2026-11-10&dataDisponibilizacaoFim=2026-11-13&itensPorPagina=5&pagina=1'"}]}}}
