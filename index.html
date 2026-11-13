@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-4W7lwDpsr4oYJSIoew2x/CXUor9R+g38QbQlw0dFP28=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-DxmC3SapAfABRYhGXPTaWNLY7+P6p+y3Y/5XMtPIVXU=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#202b47">
@@ -7024,7 +7024,7 @@ const ordDec = (a, b) => (b.acordao - a.acordao) || (b.decisao - a.decisao) || b
 const JU_RE_DEC = /ac[oó]rd|ementa|senten|decis|voto|julgamento/i;
 async function juBuscarDec(termos, tribs, ctl, aoStatus, aoItens) {
   const base = { texto: termos.map(t => t.txt).join(" ") }; if (JU.periodo) { base.dataDisponibilizacaoInicio = somaDias(hojeIso(), -Math.round(+JU.periodo * 30.44)); base.dataDisponibilizacaoFim = hojeIso(); }
-  const alvo = tribs.length ? tribs.slice(0, 7) : [""], vistos = new Set(), itens = [], sem = []; let total = 0, fora = 0, feitas = 0, ultErro = null;
+  const alvo = tribs.length ? tribs.slice(0, 7) : ["", "STJ", "TST"], vistos = new Set(), itens = [], sem = []; let total = 0, fora = 0, feitas = 0, ultErro = null;
   for (const s of alvo) {
     if (JU_SEM_DJEN.has(s)) { sem.push(s); continue; }
     if (aoStatus) aoStatus("Consultando o DJEN" + (s ? " — " + s : "") + "…");
@@ -7197,6 +7197,11 @@ function juDesenhar() {
   const tabs = el("div", "tabs jutabs"); tabs.setAttribute("role", "tablist");
   for (const [k, rot, n, car] of [["prec", "Súmulas e teses", JU.prec.length, JU.ldPrec], ["dec", "Decisões publicadas", decs.length, JU.ldDec], ["sites", "Sites dos tribunais", null, false]]) { const b = el("button", "", rot); b.type = "button"; b.id = "juTab-" + k; b.setAttribute("role", "tab"); b.setAttribute("aria-selected", String(aba === k)); if (n != null) b.appendChild(el("span", "n", car ? "…" : String(n))); b.onclick = () => { JU.aba = k; juDesenhar(); }; tabs.appendChild(b); }
   box.appendChild(tabs);
+  const ts = juTribsSel(); if (!ts.length || ts.includes("STF") || ts.includes("STJ")) { // o acervo de acórdãos do STF e do STJ está nos sites deles, não no DJEN
+    const av = el("div", "msg"); av.id = "juSup"; av.appendChild(el("b", "", "STF e STJ: ")); av.appendChild(document.createTextNode("os acórdãos desses tribunais ficam no diário e no site próprios; o DJEN traz deles só despachos e decisões. Abra a pesquisa oficial já com os seus termos: "));
+    for (const k of ["STF", "STJ"]) { const site = JU_SITES[k]; if (site) av.appendChild(juLink("Jurisprudência do " + k, site.q ? site.q(JU.q.trim()) : site.url, "")); av.appendChild(document.createTextNode(" ")); }
+    box.appendChild(av);
+  }
   const p1 = el("div", "panel"); p1.id = "juPrec"; p1.hidden = aba !== "prec";
   p1.appendChild(el("p", "hint", "Banco Nacional de Precedentes (CNJ): súmulas, temas de repercussão geral, recursos repetitivos, IRDR, IAC. Vinculam ou orientam os demais julgados."));
   if (JU.ldPrec) p1.appendChild(el("div", "msg", "Buscando precedentes…"));
