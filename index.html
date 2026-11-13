@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-THBI/A4KBAXgvSS0AbDfxu9Dk3bsCBS4tfLWfNyrZUc=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-nWZEBaduYkZRaUUJIWigYP8CZyRxpxOohTVm9tVAa+I=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#202b47">
@@ -7183,7 +7183,7 @@ function clcTempo(texto, sexo) {
    Além disso, atalhos que abrem a pesquisa de jurisprudência do próprio tribunal (ou o Google restrito ao domínio oficial .jus.br).
    A IA é opcional e NUNCA é fonte: ela só (a) sugere termos de busca e (b) resume os textos que a busca oficial trouxe.
    Cada ponto do resumo vem com um trecho literal; o app confere o trecho contra o texto oficial e descarta o que não bater. */
-const JU = { q: "", trib: "", periodo: "12", soDec: true, busy: false, ctl: null, feito: false, prec: [], precParc: [], precTotal: 0, dec: [], decSem: [], decTotal: 0, decFora: 0, erroPrec: "", erroDec: "", status: "", verParc: false, aba: "", tri: [], triTotal: 0, erroTri: "", avisoTri: "", ldTri: false, semProxy: false, ldPrec: false, ldDec: false, iaAberto: false, ia: null, iaBusy: false, iaErro: "", sug: [], pergunta: "" };
+const JU = { q: "", trib: "", periodo: "12", soDec: true, busy: false, ctl: null, feito: false, prec: [], precParc: [], precTotal: 0, dec: [], decSem: [], decTotal: 0, decFora: 0, erroPrec: "", erroDec: "", status: "", verParc: false, aba: "", tri: [], triTotal: 0, erroTri: "", avisoTri: "", ldTri: false, semProxy: false, ldPrec: false, ldDec: false, iaAberto: false, ia: null, iaBusy: false, iaErro: "", sug: [], pergunta: "", fCam: "", fTur: "", fRel: "", soRG: false };
 const JU_BNP = "https://pangeabnp.pdpj.jus.br/api/v1/precedentes", JU_BNP_SITE = "https://pangeabnp.pdpj.jus.br/";
 const JU_TIPOS = { SUM: "Súmula", SV: "Súmula Vinculante", RG: "Tema de Repercussão Geral", ADI: "ADI", ADC: "ADC", ADO: "ADO", ADPF: "ADPF", IAC: "Incidente de Assunção de Competência", SIRDR: "Suspensão em IRDR", RR: "Tema de Recurso Repetitivo", CT: "Controvérsia", IRDR: "IRDR", IRR: "Incidente de Recurso de Revista Repetitivo", PUIL: "Pedido de Uniformização (PUIL)", NT: "Nota Técnica", OJ: "Orientação Jurisprudencial" };
 const JU_UFS = ["AC", "AL", "AP", "AM", "BA", "CE", "DFT", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"];
@@ -7258,7 +7258,7 @@ async function juBuscarDec(termos, tribs, ctl, aoStatus, aoItens) {
       if (vistos.has(i.id)) continue; vistos.add(i.id); const texto = limpa(i.texto);
       if (!juTemTodos(norm(texto), termos)) { fora++; continue; } // conferência nossa: o texto oficial precisa conter todos os termos
       const it = { fonte: "DJEN", id: String(i.id), tribunal: i.siglaTribunal || "", orgao: i.nomeOrgao || "", processo: i.numeroprocessocommascara || i.numero_processo || "", classe: titulo(i.nomeClasse || ""), docTipo: i.tipoDocumento || i.tipoComunicacao || "", data: i.data_disponibilizacao || "", link: /^https:\/\//.test(i.link || "") ? i.link : "", texto };
-      it.decisao = JU_RE_DEC.test(it.docTipo); it.acordao = /ac[oó]rd|ementa/i.test(it.docTipo); it.rot = it.tribunal + " — " + (it.docTipo || "Publicação") + (it.processo ? " no processo " + it.processo : ""); itens.push(it);
+      it.relator = juRelator(texto); it.decisao = JU_RE_DEC.test(it.docTipo); it.acordao = /ac[oó]rd|ementa/i.test(it.docTipo); it.rot = it.tribunal + " — " + (it.docTipo || "Publicação") + (it.processo ? " no processo " + it.processo : ""); itens.push(it);
     }
     if (aoItens && s !== alvo[alvo.length - 1]) aoItens({ itens: itens.slice().sort(ordDec), total, fora, sem: sem.slice() }); // mostra o que já chegou enquanto os outros tribunais respondem
   }
@@ -7280,13 +7280,13 @@ async function juProxy(corpo, ctl) {
 }
 async function juBuscarStf(q, ctl) {
   const j = await juProxy({ f: "stf", base: "acordaos", n: 15, q }, ctl);
-  const itens = (j.itens || []).map(x => { const it = { fonte: "STF", id: String(x.id), tribunal: "STF", docTipo: "Acórdão", data: /^\d{4}-\d{2}-\d{2}/.test(x.julgamento) ? x.julgamento.slice(0, 10) : "", classe: titulo(x.classe || ""), processo: x.titulo || "", orgao: [x.orgao, x.relator ? "Rel. " + titulo(x.relator) : "", x.rg ? "Repercussão geral" : ""].filter(Boolean).join(" · "), texto: x.ementa || x.ata || x.decisao || "", link: /^https:\/\//.test(x.inteiroTeor || "") ? x.inteiroTeor : "", dje: /^https:\/\//.test(x.dje || "") ? x.dje : "", acordao: true, decisao: true };
+  const itens = (j.itens || []).map(x => { const it = { fonte: "STF", id: String(x.id), tribunal: "STF", docTipo: "Acórdão", data: /^\d{4}-\d{2}-\d{2}/.test(x.julgamento) ? x.julgamento.slice(0, 10) : "", classe: titulo(x.classe || ""), processo: x.titulo || "", orgao: [x.orgao, x.relator ? "Rel. " + titulo(x.relator) : "", x.rg ? "Repercussão geral" : ""].filter(Boolean).join(" · "), relator: x.relator ? titulo(x.relator) : "", orgaoJ: x.orgao || "", rg: !!x.rg, texto: x.ementa || x.ata || x.decisao || "", link: /^https:\/\//.test(x.inteiroTeor || "") ? x.inteiroTeor : "", dje: /^https:\/\//.test(x.dje || "") ? x.dje : "", acordao: true, decisao: true };
     it.rot = "STF — Acórdão " + (x.titulo || ""); return it; }).filter(it => it.texto);
   return { itens, total: j.total || itens.length };
 }
 async function juBuscarTst(q, ctl) {
   const j = await juProxy({ f: "tst", n: 15, q }, ctl);
-  const itens = (j.itens || []).map((x, i) => { const it = { fonte: "TST", id: "tst" + i + "-" + (x.numero || ""), tribunal: "TST", docTipo: "Acórdão", data: /^\d{4}-\d{2}-\d{2}/.test(x.julgamento) ? x.julgamento.slice(0, 10) : "", classe: "", processo: x.numero || "", orgao: [x.orgao, x.relator ? "Rel. " + titulo(x.relator) : ""].filter(Boolean).join(" · "), texto: x.ementa || x.dispositivo || "", link: "", acordao: true, decisao: true };
+  const itens = (j.itens || []).map((x, i) => { const it = { fonte: "TST", id: "tst" + i + "-" + (x.numero || ""), tribunal: "TST", docTipo: "Acórdão", data: /^\d{4}-\d{2}-\d{2}/.test(x.julgamento) ? x.julgamento.slice(0, 10) : "", classe: "", processo: x.numero || "", orgao: [x.orgao, x.relator ? "Rel. " + titulo(x.relator) : ""].filter(Boolean).join(" · "), relator: x.relator ? titulo(x.relator) : "", orgaoJ: x.orgao || "", texto: x.ementa || x.dispositivo || "", link: "", acordao: true, decisao: true };
     it.rot = "TST — Acórdão " + (x.numero || ""); return it; }).filter(it => it.texto);
   return { itens, total: j.total || itens.length };
 }
@@ -7301,7 +7301,7 @@ async function juBuscarTrib(termos, ctl) {
   return { itens, total: ok.reduce((n, x) => n + x.r.total, 0), falhas: falhas.map(x => x.nome + ": " + (x.e.message || "erro")) };
 }
 function juCitacao(it) {
-  if (it.fonte === "STF") return "BRASIL. Supremo Tribunal Federal. " + (it.processo || "Acórdão") + (it.orgao ? ". " + it.orgao : "") + (it.data ? ". Julgado em " + br(it.data) : "") + "." + (it.link ? " Inteiro teor: " + it.link : "") + " Fonte: Jurisprudência do STF (jurisprudencia.stf.jus.br).";
+  if (it.fonte === "STF") return "BRASIL. Supremo Tribunal Federal. " + (it.processo || "Acórdão") + (it.orgao ? ". " + it.orgao : "") + (it.data ? ". Julgado em " + br(it.data) : "") + "." + (it.rg ? " Repercussão geral." : "") + (it.link ? " Inteiro teor: " + it.link : "") + " Fonte: Jurisprudência do STF (jurisprudencia.stf.jus.br).";
   if (it.fonte === "TST") return "BRASIL. Tribunal Superior do Trabalho. " + (it.processo || "Acórdão") + (it.orgao ? ". " + it.orgao : "") + (it.data ? ". Julgado em " + br(it.data) : "") + ". Fonte: Jurisprudência do TST (jurisprudencia.tst.jus.br).";
   if (it.fonte === "BNP") return it.orgao + ". " + (JU_TIPOS[it.tipo] || it.tipo) + (it.nr != null ? " nº " + it.nr : "") + "." + (it.tese ? " Tese: " + it.tese : it.questao ? " Questão: " + it.questao : "") + (it.situacao ? " Situação: " + it.situacao + "." : "") + " Fonte: Banco Nacional de Precedentes (CNJ), " + JU_BNP_SITE + (it.atual ? ", atualizado em " + it.atual : "") + ".";
   return it.tribunal + ". " + (it.orgao ? it.orgao + ". " : "") + (it.classe ? it.classe + " " : "Processo ") + (it.processo ? "nº " + it.processo : "") + ". " + (it.docTipo || "Publicação") + " disponibilizado(a) no DJEN em " + br(it.data) + "." + (it.link ? " Disponível em: " + it.link : "") + " Fonte: Diário de Justiça Eletrônico Nacional (CNJ).";
@@ -7314,7 +7314,7 @@ function juCitacaoComTexto(it) { const c = juCitacao(it), t = String(it.texto ||
 async function juPesquisar(q) {
   if (q != null) JU.q = q; const termos = juTermos(JU.q); if (JU.busy) return;
   if (!termos.length) { JU.status = "Digite ao menos uma palavra com 3 letras ou mais (ou uma frase entre aspas)."; JU.feito = false; return juDesenhar(); }
-  const tribs = juTribsSel(); JU.busy = true; JU.feito = true; JU.aba = ""; JU.ia = null; JU.iaErro = ""; JU.erroPrec = JU.erroDec = ""; JU.prec = []; JU.precParc = []; JU.dec = []; JU.decSem = []; JU.decTotal = 0; JU.decFora = 0; JU.verParc = false; JU.tri = []; JU.erroTri = ""; JU.avisoTri = ""; JU.semProxy = false; JU.triTotal = 0; JU.ldPrec = JU.ldDec = true; JU.ldTri = juUsaTri(); JU.ctl = new AbortController(); JU.ctl.parar = false; JU.status = ""; juDesenhar();
+  const tribs = juTribsSel(); JU.busy = true; JU.feito = true; JU.aba = ""; JU.fCam = JU.fTur = JU.fRel = ""; JU.ia = null; JU.iaErro = ""; JU.erroPrec = JU.erroDec = ""; JU.prec = []; JU.precParc = []; JU.dec = []; JU.decSem = []; JU.decTotal = 0; JU.decFora = 0; JU.verParc = false; JU.tri = []; JU.erroTri = ""; JU.avisoTri = ""; JU.semProxy = false; JU.triTotal = 0; JU.ldPrec = JU.ldDec = true; JU.ldTri = juUsaTri(); JU.ctl = new AbortController(); JU.ctl.parar = false; JU.status = ""; juDesenhar();
   // as duas bases são consultadas ao mesmo tempo e cada uma aparece assim que responde
   const aPrec = (async () => {
     try { let p = await juBuscarPrec(termos, tribs, JU.ctl); if (!p.itens.length && termos.some(t => t.frase)) p = await juBuscarPrec(termos, tribs, JU.ctl, true); JU.prec = p.itens.filter(x => x.completo); JU.precParc = p.itens.filter(x => !x.completo); JU.precTotal = p.total; }
@@ -7336,7 +7336,23 @@ async function juPesquisar(q) {
   JU.busy = false; JU.status = ""; const h = [JU.q].concat(LS.get("jurisHist", []).filter(x => x !== JU.q)).slice(0, 8); LS.setLocal("jurisHist", h); juDesenhar();
 }
 function juParar() { if (JU.ctl) { JU.ctl.parar = true; try { JU.ctl.abort(); } catch (e) {} } }
-const juDecVisiveis = () => JU.soDec ? JU.dec.filter(x => x.decisao) : JU.dec;
+const juPrecVisiveis = () => JU.soRG ? JU.prec.filter(x => ["RG", "RR", "IRR", "SV"].includes(x.tipo)) : JU.prec;
+const juDecVisiveis = () => (JU.soDec ? JU.dec.filter(x => x.decisao) : JU.dec).filter(juPasseFiltro);
+// ---------- filtros por câmara, turma e relator (sobre o que já foi encontrado)
+const JU_PARA = /^(apelante|apelado|apelada|processo|recorrente|recorrido|recorrida|julgado|data|[oó]rg[aã]o|ementa|ac[oó]rd[aã]o|revisor|revisora|impetrante|impetrado|agravante|agravado|agravada|embargante|embargado|embargada|autor|autora|r[eé]u|r[eé]|vistos|relat[oó]rio|decis[aã]o|classe|assunto|origem|comarca|vara)$/i, JU_TIT = /^(des|des\.|desa|desa\.|desembargador|desembargadora|juiz|ju[ií]za|min|min\.|ministro|ministra|dr|dr\.|dra|dra\.|relator|relatora|\(a\)|substituto|substituta|convocado|convocada)$/i, JU_LIG = /^(de|da|do|das|dos|e)$/i;
+function juRelator(texto) {
+  const m = /relator(?:a)?(?:\(a\))?\s*[:\-–]?\s*((?:\S+\s+){1,9})/i.exec(String(texto || "")); if (!m) return "";
+  const tk = m[1].trim().split(/\s+/), nome = []; let i = 0; while (i < tk.length && JU_TIT.test(tk[i].replace(/[:,;]$/, ""))) i++;
+  for (; i < tk.length; i++) { const w = tk[i].replace(/[,;:]+$/, ""), fim = /[,;:.]$/.test(tk[i]) && !/^[A-ZÁ-Ú]\.$/.test(tk[i]); if (JU_PARA.test(w) || !/^[A-Za-zÀ-ÿ'’.-]+$/.test(w)) break; if (!(JU_LIG.test(w) || /^[A-ZÁ-Ú]/.test(w))) break; nome.push(w); if (fim) break; }
+  while (nome.length && JU_LIG.test(nome[nome.length - 1])) nome.pop();
+  return nome.length >= 2 && nome.join(" ").length <= 60 ? titulo(nome.join(" ").toLowerCase()) : "";
+}
+const juOrgaoDe = it => String(it.orgaoJ || it.orgao || "").split(" · ")[0];
+const juEhCam = it => /c[aâ]mara/i.test(juOrgaoDe(it)), juEhTur = it => /turma/i.test(juOrgaoDe(it));
+function juPasseFiltro(it) { return (!JU.fCam || (juEhCam(it) && juOrgaoDe(it) === JU.fCam)) && (!JU.fTur || (juEhTur(it) && juOrgaoDe(it) === JU.fTur)) && (!JU.fRel || it.relator === JU.fRel); }
+const juTriVisiveis = () => JU.tri.filter(juPasseFiltro);
+function juOpcoesFiltro() { const pool = (JU.soDec ? JU.dec.filter(x => x.decisao) : JU.dec).concat(JU.tri), c = new Set(), t = new Set(), r = new Set(); for (const it of pool) { if (juEhCam(it)) c.add(juOrgaoDe(it)); if (juEhTur(it)) t.add(juOrgaoDe(it)); if (it.relator) r.add(it.relator); } const o = a => [...a].sort((x, y) => x.localeCompare(y, "pt-BR", { numeric: true })); return { cam: o(c), tur: o(t), rel: o(r) }; }
+
 const juRefaz = () => { if (!JU.busy && JU.feito && juTermos(JU.q).length) juPesquisar(); else juDesenhar(); }; // mudou um filtro: pesquisa de novo sozinho
 
 // ---------- IA (opcional): nunca é fonte; só resume o que a busca oficial trouxe, com trecho literal conferido
@@ -7387,18 +7403,29 @@ async function juIaTermos() {
 // ---------- tela
 function juCopiar(t, b) { crmCopiar(t).then(ok => { const a = b.textContent; b.textContent = ok ? "Copiado ✓" : "Não foi possível copiar"; setTimeout(() => { b.textContent = a; }, 1800); }); }
 function juLink(txt, url, cls) { const a = el("a", "btn sm " + (cls || "sec"), txt); a.href = url; a.target = "_blank"; a.rel = "noopener noreferrer"; return a; }
+
+// indicação de uso em recursos de estrito direito: repercussão geral → RE (CF 102 §3º; CPC 1.035); repetitivo do STJ → REsp (CPC 1.036 e ss.)
+function juIndicaRecurso(it) {
+  if (it.fonte === "BNP" && it.tipo === "RG") return { tag: "Repercussão geral", txt: "Serve para recurso extraordinário: indique o tema como preliminar de repercussão geral (CPC, art. 1.035, § 2º)." };
+  if (it.fonte === "BNP" && (it.tipo === "RR" || it.tipo === "IRR")) return { tag: "Recurso repetitivo", txt: "Serve para recurso especial (STJ) e para aplicar a tese na origem (CPC, arts. 1.036 e seguintes e 1.040)." };
+  if (it.fonte === "BNP" && it.tipo === "SV") return { tag: "Súmula vinculante", txt: "Vincula o Judiciário e a administração; cabível reclamação ao STF em caso de descumprimento." };
+  if (it.fonte === "STF" && it.rg) return { tag: "Repercussão geral", txt: "O STF marcou este acórdão como de repercussão geral: confira o tema no inteiro teor antes de usá-lo em recurso extraordinário." };
+  return null;
+}
 function juCartao(it, termos, ref) {
   const c = el("div", "card jucard"); c.id = "ju-" + it.fonte + "-" + it.id; const top = el("div", "jutop");
   if (ref) top.appendChild(el("span", "tag dist", ref));
   if (it.fonte === "BNP") {
-    top.append(el("b", "", (JU_TIPOS[it.tipo] || it.tipo) + (it.nr != null ? " nº " + it.nr : "")), el("span", "tag", it.orgao)); if (it.suspenso) top.appendChild(el("span", "tag warn", "Suspensão ativa")); if (it.atual) top.appendChild(el("span", "hint", "atualizado em " + it.atual)); c.appendChild(top);
+    top.append(el("b", "", (JU_TIPOS[it.tipo] || it.tipo) + (it.nr != null ? " nº " + it.nr : "")), el("span", "tag", it.orgao)); const ind1 = juIndicaRecurso(it); if (ind1) top.appendChild(el("span", "tag ok jurg", ind1.tag)); if (it.suspenso) top.appendChild(el("span", "tag warn", "Suspensão ativa")); if (it.atual) top.appendChild(el("span", "hint", "atualizado em " + it.atual)); c.appendChild(top);
     if (it.questao) { const p = el("p", "jutxt"); p.append(el("b", "", "Questão: "), juRealce(it.questao, termos)); c.appendChild(p); }
     if (it.tese) { const p = el("p", "jutxt"); p.append(el("b", "", "Tese: "), juRealce(it.tese, termos)); c.appendChild(p); }
     if (it.situacao) { const p = el("p", "hint"); p.append(el("b", "", "Situação: "), document.createTextNode(it.situacao)); c.appendChild(p); }
+    if (ind1) c.appendChild(el("p", "hint jurg", ind1.txt));
     const a = el("div", "acts"); const bc = btn("Copiar citação", () => juCopiar(juCitacao(it), bc)); a.appendChild(bc);
     for (const p of it.paradigmas.slice(0, 3)) a.appendChild(juLink("Processo paradigma " + p.numero, p.link)); a.appendChild(juLink("Conferir no Pangea (CNJ)", JU_BNP_SITE)); c.appendChild(a);
   } else {
-    top.append(el("b", "", it.tribunal), el("span", "tag" + (it.acordao ? " ok" : ""), it.docTipo || "Publicação"), el("span", "hint", (it.fonte === "STF" || it.fonte === "TST") ? "julgado em " + br(it.data) : "DJEN de " + br(it.data))); c.appendChild(top);
+    top.append(el("b", "", it.tribunal), el("span", "tag" + (it.acordao ? " ok" : ""), it.docTipo || "Publicação"), el("span", "hint", (it.fonte === "STF" || it.fonte === "TST") ? "julgado em " + br(it.data) : "DJEN de " + br(it.data))); const ind2 = juIndicaRecurso(it); if (ind2) top.appendChild(el("span", "tag ok jurg", ind2.tag)); c.appendChild(top);
+    if (ind2) c.appendChild(el("p", "hint jurg", ind2.txt));
     c.appendChild(el("div", "hint", [it.classe, it.processo, it.orgao].filter(Boolean).join(" · ")));
     const p = el("p", "jutxt"); p.appendChild(juRealce(it.texto, termos, 700)); c.appendChild(p);
     if (it.texto.length > 700) { const d = el("details", "juint"), s = el("summary", "", "Ver o texto integral publicado (" + nfmt(it.texto.length) + " caracteres)"); d.appendChild(s); d.addEventListener("toggle", () => { if (d.open && d.children.length < 2) { const pp = el("p", "jutxt"); pp.appendChild(juRealce(it.texto, termos)); d.appendChild(pp); } }); c.appendChild(d); }
@@ -7430,7 +7457,8 @@ function juDesenhar() {
   fil.appendChild(pil);
   const sp = optsSel(el("select"), JU_PERIODOS); sp.id = "juPeriodo"; sp.value = JU.periodo; sp.disabled = JU.busy; sp.title = "Período das decisões publicadas (DJEN)"; sp.onchange = () => { JU.periodo = sp.value; juRefaz(); };
   const [lc, ck] = intCheck("Só acórdãos e decisões", JU.soDec); ck.id = "juSoDec"; ck.onchange = () => { JU.soDec = ck.checked; juDesenhar(); };
-  fil.append(sp, lc); f.appendChild(fil);
+  const [lg, ckg] = intCheck("Só repercussão geral e repetitivos", JU.soRG); ckg.id = "juSoRG"; ckg.onchange = () => { JU.soRG = ckg.checked; juDesenhar(); };
+  fil.append(sp, lc, lg); f.appendChild(fil);
   if (!JU.feito) {
     f.appendChild(el("p", "hint", "Pesquisa ao vivo nas bases oficiais do CNJ — nada é inventado, tudo vem de lá: súmulas, teses e recursos repetitivos, e o texto de decisões publicadas por todos os tribunais. Palavras soltas: o texto precisa conter todas. Frase entre aspas: exatamente assim."));
     const ex = el("div", "chips"); ex.appendChild(el("span", "hint", "Experimente:")); for (const x of JU_EXEMPLOS) { const b = el("button", "btn sec sm", x); b.type = "button"; b.onclick = () => juPesquisar(x); ex.appendChild(b); } f.appendChild(ex);
@@ -7460,10 +7488,18 @@ function juDesenhar() {
   }
   if (!JU.feito) return;
   // --- resultados em abas: o usuário vê de cara quantos achados há em cada base
-  const refs = new Map(); JU.prec.slice(0, 8).forEach((it, i) => refs.set(it, "P" + (i + 1))); const decs = juDecVisiveis(); decs.slice(0, 6).forEach((it, i) => refs.set(it, "D" + (i + 1)));
-  const aba = JU.aba || (JU.prec.length ? "prec" : decs.length ? "dec" : JU.tri.length ? "tri" : JU.ldPrec ? "prec" : "dec");
+  const precs = juPrecVisiveis(), tris = juTriVisiveis(), refs = new Map(); precs.slice(0, 8).forEach((it, i) => refs.set(it, "P" + (i + 1))); const decs = juDecVisiveis(); decs.slice(0, 6).forEach((it, i) => refs.set(it, "D" + (i + 1)));
+  const aba = JU.aba || (precs.length ? "prec" : decs.length ? "dec" : tris.length ? "tri" : JU.ldPrec ? "prec" : "dec");
+  const op = juOpcoesFiltro(), temF = op.cam.length || op.tur.length || op.rel.length || JU.fCam || JU.fTur || JU.fRel;
+  if (temF && !JU.busy) {
+    const ff = el("div", "panel jufil jufil2"); ff.appendChild(el("span", "hint", "Filtrar o que foi encontrado:"));
+    for (const [id, rot, lista, chave] of [["juFCam", "Câmara", op.cam, "fCam"], ["juFTur", "Turma", op.tur, "fTur"], ["juFRel", "Relator", op.rel, "fRel"]]) { if (!lista.length && !JU[chave]) continue; const sl = el("select"); sl.id = id; sl.title = rot; const o0 = el("option", "", rot + ": todos"); o0.value = ""; sl.appendChild(o0); for (const v of lista.concat(JU[chave] && !lista.includes(JU[chave]) ? [JU[chave]] : [])) { const o = el("option", "", v); o.value = v; sl.appendChild(o); } sl.value = JU[chave]; sl.onchange = () => { JU[chave] = sl.value; juDesenhar(); }; ff.appendChild(sl); }
+    if (JU.fCam || JU.fTur || JU.fRel) ff.appendChild(btn("Limpar filtros", () => { JU.fCam = JU.fTur = JU.fRel = ""; juDesenhar(); }, "sec"));
+    ff.appendChild(el("span", "hint", "Câmara/turma vêm do órgão julgador publicado; o relator, quando o tribunal o informa no texto."));
+    box.appendChild(ff);
+  }
   const tabs = el("div", "tabs jutabs"); tabs.setAttribute("role", "tablist");
-  for (const [k, rot, n, car] of [["prec", "Súmulas e teses", JU.prec.length, JU.ldPrec], ["dec", "Decisões publicadas", decs.length, JU.ldDec]].concat(juUsaTri() ? [["tri", "Acervo do " + juNomeTri(), JU.tri.length, JU.ldTri]] : []).concat([["sites", "Sites dos tribunais", null, false]])) { const b = el("button", "", rot); b.type = "button"; b.id = "juTab-" + k; b.setAttribute("role", "tab"); b.setAttribute("aria-selected", String(aba === k)); if (n != null) b.appendChild(el("span", "n", car ? "…" : String(n))); b.onclick = () => { JU.aba = k; juDesenhar(); }; tabs.appendChild(b); }
+  for (const [k, rot, n, car] of [["prec", "Súmulas e teses", precs.length, JU.ldPrec], ["dec", "Decisões publicadas", decs.length, JU.ldDec]].concat(juUsaTri() ? [["tri", "Acervo do " + juNomeTri(), tris.length, JU.ldTri]] : []).concat([["sites", "Sites dos tribunais", null, false]])) { const b = el("button", "", rot); b.type = "button"; b.id = "juTab-" + k; b.setAttribute("role", "tab"); b.setAttribute("aria-selected", String(aba === k)); if (n != null) b.appendChild(el("span", "n", car ? "…" : String(n))); b.onclick = () => { JU.aba = k; juDesenhar(); }; tabs.appendChild(b); }
   box.appendChild(tabs);
   const ts = juTribsSel(), stfOk = !JU.semProxy; if (!ts.length || ts.includes("STJ") || (ts.includes("STF") && !stfOk)) { // o acervo de acórdãos do STF e do STJ está nos sites deles, não no DJEN
     const av = el("div", "msg"); av.id = "juSup"; av.appendChild(el("b", "", stfOk ? "STJ: " : "STF e STJ: ")); av.appendChild(document.createTextNode(stfOk ? "os acórdãos do STJ ficam no site dele; o DJEN traz só despachos e decisões. Abra a pesquisa oficial já com os seus termos: " : "os acórdãos desses tribunais ficam no site próprio; o DJEN traz só despachos e decisões. Abra a pesquisa oficial já com os seus termos (ou ative o proxy gratuito em Integrações › Andamentos para ver o acervo do STF aqui): "));
@@ -7474,10 +7510,10 @@ function juDesenhar() {
   p1.appendChild(el("p", "hint", "Banco Nacional de Precedentes (CNJ): súmulas, temas de repercussão geral, recursos repetitivos, IRDR, IAC. Vinculam ou orientam os demais julgados."));
   if (JU.ldPrec) p1.appendChild(el("div", "msg", "Buscando precedentes…"));
   if (JU.erroPrec) p1.appendChild(el("div", "msg err", JU.erroPrec));
-  else if (!JU.prec.length && !JU.ldPrec) p1.appendChild(el("div", "hint", "Nenhuma súmula, tema ou incidente contém todos os termos pesquisados." + (JU.precParc.length ? " Há resultados parciais abaixo." : "")));
-  for (const it of JU.prec) p1.appendChild(juCartao(it, termos, refs.get(it)));
+  else if (!precs.length && !JU.ldPrec) p1.appendChild(el("div", "hint", "Nenhuma súmula, tema ou incidente contém todos os termos pesquisados." + (JU.precParc.length ? " Há resultados parciais abaixo." : "")));
+  for (const it of precs) p1.appendChild(juCartao(it, termos, refs.get(it)));
   if (JU.precParc.length) { if (JU.verParc) { p1.appendChild(el("h3", "", "Resultados parciais (contêm só parte dos termos)")); for (const it of JU.precParc) p1.appendChild(juCartao(it, termos)); } else { const b = btn("Mostrar também " + JU.precParc.length + " resultado(s) parcial(is), que contêm só parte dos termos", () => { JU.verParc = true; juDesenhar(); }); b.id = "juVerParc"; p1.appendChild(b); } }
-  if (!JU.prec.length && !JU.precParc.length && !JU.ldPrec && !JU.erroPrec) juMenos(p1, termos);
+  if (!precs.length && !JU.precParc.length && !JU.ldPrec && !JU.erroPrec) juMenos(p1, termos);
   box.appendChild(p1);
   const p2 = el("div", "panel"); p2.id = "juDec"; p2.hidden = aba !== "dec";
   p2.appendChild(el("p", "hint", "Diário de Justiça Eletrônico Nacional (CNJ): texto integral de acórdãos, sentenças e decisões publicados. Acórdãos primeiro; depois, as mais recentes."));
@@ -7499,9 +7535,9 @@ function juDesenhar() {
     if (JU.ldTri) pt.appendChild(el("div", "msg", "Buscando no " + juNomeTri() + "…"));
     if (JU.semProxy) pt.appendChild(el("div", "msg warn", "Para ver o acervo do STF e do TST aqui é preciso ativar o proxy gratuito uma única vez (um advogado faz isso em Integrações › Andamentos). Enquanto isso, use o botão “Jurisprudência do STF” acima."));
     if (JU.erroTri) pt.appendChild(el("div", "msg err", JU.erroTri));
-    if (!JU.ldTri && !JU.semProxy && !JU.erroTri) { pt.appendChild(el("p", "hint", nfmt(JU.triTotal) + " acórdão(s) do " + juNomeTri() + " para estes termos; mostrando os " + JU.tri.length + " mais relevantes." )); if (!JU.tri.length) { pt.appendChild(el("div", "hint", "Nenhum acórdão do " + juNomeTri() + " encontrado para estes termos.")); juMenos(pt, termos); } }
+    if (!JU.ldTri && !JU.semProxy && !JU.erroTri) { pt.appendChild(el("p", "hint", nfmt(JU.triTotal) + " acórdão(s) do " + juNomeTri() + " para estes termos; mostrando os " + tris.length + " mais relevantes." )); if (!tris.length) { pt.appendChild(el("div", "hint", "Nenhum acórdão do " + juNomeTri() + " encontrado para estes termos.")); juMenos(pt, termos); } }
     if (JU.avisoTri && !JU.ldTri) pt.appendChild(el("div", "msg warn", "Parte do acervo não respondeu: " + JU.avisoTri));
-    for (const it of JU.tri) pt.appendChild(juCartao(it, termos));
+    for (const it of tris) pt.appendChild(juCartao(it, termos));
     box.appendChild(pt);
   }
   const p3 = el("div", "panel"); p3.id = "juSites"; p3.hidden = aba !== "sites"; p3.appendChild(el("p", "hint", "Para aprofundar no acervo completo de cada tribunal.")); juAtalhos(p3); box.appendChild(p3);
