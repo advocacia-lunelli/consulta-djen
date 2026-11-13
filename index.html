@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-jp33Pbx0BQWMT/hYhoYw7hNJKEQazK1wf8St4hyvp2E=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-oy6USNrBmkDTW3T37DeaesA8YeHw8zEsp1IKovidaSI=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#202b47">
@@ -4255,7 +4255,7 @@ function pMovimentos(p, c) {
 // ---------- painel em Integrações
 function djScript(token) {
   return [
-    "// Proxy gratuito do Lunelli Office — Advocacia Lunelli: DataJud (andamentos) e acervo de jurisprudência do STF",
+    "// Proxy gratuito do Lunelli Office — Advocacia Lunelli: DataJud (andamentos) e acervos de jurisprudência do STF e do TST",
     "const CHAVE = '" + DJ_CHAVE + "'; // chave pública do CNJ",
     "const TOKEN = '" + (token || "COLE-O-TOKEN-AQUI") + "'; // o mesmo token informado no app",
     "const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';",
@@ -4268,12 +4268,21 @@ function djScript(token) {
     "  const j = JSON.parse(r.getContentText()), h = (j.result && j.result.hits) || { hits: [], total: { value: 0 } };",
     "  return { total: h.total.value, itens: h.hits.map(function (x) { const s = x._source || {}; return { id: s.id || x._id, base: base, titulo: limpa(s.titulo), classe: limpa(s.processo_classe_processual_unificada_extenso), numero: limpa(s.processo_numero), relator: limpa(s.relator_processo_nome), orgao: limpa(s.orgao_julgador), julgamento: limpa(s.julgamento_data), publicacao: limpa(s.publicacao_data), ementa: limpa(s.ementa_texto), ata: limpa(s.acordao_ata), decisao: limpa(s.decisao_texto), partes: limpa(s.partes_lista_texto), inteiroTeor: s.inteiro_teor_url || '', dje: s.dje_url || '', rg: s.is_repercussao_geral === 'true' }; }) };",
     "}",
+    "function tst(b) {",
+    "  const q = String(b.q || '').slice(0, 300), n = Math.min(Math.max(+b.n || 10, 1), 20);",
+    "  const corpo = { ou: null, e: q, termoExato: '', naoContem: null, ementa: null, dispositivo: null, numeracaoUnica: { numero: null, digito: null, ano: null, orgao: '5', tribunal: null, vara: null }, orgaosJudicantes: [], ministros: [], convocados: [], classesProcessuais: [], codigosClassesPrecedentes: [], indicadores: [], assuntos: [], tipos: ['ACORDAO'], orgao: 'TST', tiposPaginacao: ['ACORDAO'] };",
+    "  const r = UrlFetchApp.fetch('https://jurisprudencia-backend.tst.jus.br/rest/pesquisa-textual/1/' + n, { method: 'post', contentType: 'application/json', muteHttpExceptions: true, headers: { 'User-Agent': UA, Origin: 'https://jurisprudencia.tst.jus.br', Referer: 'https://jurisprudencia.tst.jus.br/' }, payload: JSON.stringify(corpo) });",
+    "  if (r.getResponseCode() !== 200) return { erro: 'TST respondeu HTTP ' + r.getResponseCode() };",
+    "  const j = JSON.parse(r.getContentText());",
+    "  return { total: j.totalRegistros || 0, itens: (j.registros || []).map(function (x) { const g = x.registro || {}; let og = g.orgaoJudicante; if (typeof og === 'string') { try { og = JSON.parse(og); } catch (e) {} } og = (og && og.descricao) || og; return { numero: limpa(g.numFormatado), relator: limpa(g.nomRelatorSemTratamento), orgao: limpa(og), julgamento: limpa(g.dtaJulgamento), publicacao: limpa(g.dtaPublicacao), ementa: limpa(g.ementa), dispositivo: limpa(g.dispositivo) }; }) };",
+    "}",
     "function doPost(e) {",
     "  try {",
     "    const b = JSON.parse(e.postData.contents);",
     "    if (b.t !== TOKEN) return resp({ erro: 'token' });",
-    "    if (b.f === 'ping') return resp({ ok: true, fontes: ['datajud', 'stf'] });",
+    "    if (b.f === 'ping') return resp({ ok: true, fontes: ['datajud', 'stf', 'tst'] });",
     "    if (b.f === 'stf') return resp(stf(b));",
+    "    if (b.f === 'tst') return resp(tst(b));",
     "    if (!/^(tj[a-z]{2,4}|trt\\d{1,2}|trf\\d|tre-[a-z]{2}|stj|tst|tse|stm)$/.test(b.a)) return resp({ erro: 'tribunal inválido' });",
     "    const r = UrlFetchApp.fetch('" + DJ_BASE + "' + b.a + '/_search', { method: 'post', contentType: 'application/json', headers: { Authorization: 'APIKey ' + CHAVE }, payload: JSON.stringify(b.q), muteHttpExceptions: true });",
     "    return ContentService.createTextOutput(r.getContentText()).setMimeType(ContentService.MimeType.JSON);",
@@ -4306,7 +4315,7 @@ function djPainel() {
     "Clique em “Implantar › Nova implantação”, tipo “App da Web”. Em “Executar como” deixe “Eu” e em “Quem pode acessar” escolha “Qualquer pessoa”. Autorize quando o Google pedir (aviso de app não verificado: “Avançado › continuar”).",
     "Copie o URL do “App da Web” (termina em /exec), cole no campo “Endereço do proxy” acima, clique em Salvar e em “Testar com um processo”."
   ]) ol.appendChild(el("li", "", t));
-  d.append(ol, cod, btn("Copiar código", () => copiar(cod.value, d.lastChild)), el("div", "hint", "O proxy só repassa consultas públicas (DataJud e acervo de jurisprudência do STF), com o token do escritório. Custo zero (cota gratuita do Google).")); det.appendChild(d);
+  d.append(ol, cod, btn("Copiar código", () => copiar(cod.value, d.lastChild)), el("div", "hint", "O proxy só repassa consultas públicas (DataJud e acervos de jurisprudência do STF e do TST), com o token do escritório. Custo zero (cota gratuita do Google).")); det.appendChild(d);
   p.append(g, lAu, ac, msg, det);
   return p;
 }
@@ -6972,7 +6981,7 @@ function clcTempo(texto, sexo) {
    Além disso, atalhos que abrem a pesquisa de jurisprudência do próprio tribunal (ou o Google restrito ao domínio oficial .jus.br).
    A IA é opcional e NUNCA é fonte: ela só (a) sugere termos de busca e (b) resume os textos que a busca oficial trouxe.
    Cada ponto do resumo vem com um trecho literal; o app confere o trecho contra o texto oficial e descarta o que não bater. */
-const JU = { q: "", trib: "", periodo: "12", soDec: true, busy: false, ctl: null, feito: false, prec: [], precParc: [], precTotal: 0, dec: [], decSem: [], decTotal: 0, decFora: 0, erroPrec: "", erroDec: "", status: "", verParc: false, aba: "", tri: [], triTotal: 0, erroTri: "", ldTri: false, semProxy: false, ldPrec: false, ldDec: false, iaAberto: false, ia: null, iaBusy: false, iaErro: "", sug: [], pergunta: "" };
+const JU = { q: "", trib: "", periodo: "12", soDec: true, busy: false, ctl: null, feito: false, prec: [], precParc: [], precTotal: 0, dec: [], decSem: [], decTotal: 0, decFora: 0, erroPrec: "", erroDec: "", status: "", verParc: false, aba: "", tri: [], triTotal: 0, erroTri: "", avisoTri: "", ldTri: false, semProxy: false, ldPrec: false, ldDec: false, iaAberto: false, ia: null, iaBusy: false, iaErro: "", sug: [], pergunta: "" };
 const JU_BNP = "https://pangeabnp.pdpj.jus.br/api/v1/precedentes", JU_BNP_SITE = "https://pangeabnp.pdpj.jus.br/";
 const JU_TIPOS = { SUM: "Súmula", SV: "Súmula Vinculante", RG: "Tema de Repercussão Geral", ADI: "ADI", ADC: "ADC", ADO: "ADO", ADPF: "ADPF", IAC: "Incidente de Assunção de Competência", SIRDR: "Suspensão em IRDR", RR: "Tema de Recurso Repetitivo", CT: "Controvérsia", IRDR: "IRDR", IRR: "Incidente de Recurso de Revista Repetitivo", PUIL: "Pedido de Uniformização (PUIL)", NT: "Nota Técnica", OJ: "Orientação Jurisprudencial" };
 const JU_UFS = ["AC", "AL", "AP", "AM", "BA", "CE", "DFT", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"];
@@ -7057,17 +7066,41 @@ async function juBuscarDec(termos, tribs, ctl, aoStatus, aoItens) {
 }
 // ---------- fonte 3: acervo de acórdãos do STF, consultado pelo proxy gratuito (Google Apps Script) — o navegador não pode falar direto com o STF
 const juUsaStf = () => { const t = juTribsSel(); return !t.length || t.includes("STF"); };
-async function juBuscarTrib(termos, ctl) {
+const juUsaTst = () => { const t = juTribsSel(); return !t.length || t.includes("TST"); };
+const juUsaTri = () => juUsaStf() || juUsaTst();
+const juNomeTri = () => juUsaStf() && juUsaTst() ? "STF e TST" : juUsaTst() ? "TST" : "STF";
+async function juProxy(corpo, ctl) {
   const c0 = djCfg(), c = { proxy: c0.jproxy || c0.proxy, token: c0.jproxy ? c0.jtoken : c0.token }; if (!c.proxy) { const e = new Error("sem proxy"); e.semProxy = true; throw e; }
-  let r; try { r = await fetch(c.proxy, { method: "POST", signal: ctl.signal, headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ t: c.token, f: "stf", base: "acordaos", n: 15, q: termos.map(t => t.frase ? '"' + t.txt + '"' : t.txt).join(" ") }) }); } catch (e) { if (ctl.parar) throw e; throw new Error("não foi possível falar com o proxy (confira o endereço em Integrações › Andamentos)"); }
+  let r; try { r = await fetch(c.proxy, { method: "POST", signal: ctl.signal, headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(Object.assign({ t: c.token }, corpo)) }); } catch (e) { if (ctl.parar) throw e; throw new Error("não foi possível falar com o proxy (confira o endereço em Integrações › Andamentos)"); }
   let j; try { j = await r.json(); } catch (e) { throw new Error("resposta inválida do proxy"); }
   if (j.erro) throw new Error(j.erro === "token" ? "token do proxy incorreto (Integrações › Andamentos)" : j.erro);
+  return j;
+}
+async function juBuscarStf(q, ctl) {
+  const j = await juProxy({ f: "stf", base: "acordaos", n: 15, q }, ctl);
   const itens = (j.itens || []).map(x => { const it = { fonte: "STF", id: String(x.id), tribunal: "STF", docTipo: "Acórdão", data: /^\d{4}-\d{2}-\d{2}/.test(x.julgamento) ? x.julgamento.slice(0, 10) : "", classe: titulo(x.classe || ""), processo: x.titulo || "", orgao: [x.orgao, x.relator ? "Rel. " + titulo(x.relator) : "", x.rg ? "Repercussão geral" : ""].filter(Boolean).join(" · "), texto: x.ementa || x.ata || x.decisao || "", link: /^https:\/\//.test(x.inteiroTeor || "") ? x.inteiroTeor : "", dje: /^https:\/\//.test(x.dje || "") ? x.dje : "", acordao: true, decisao: true };
     it.rot = "STF — Acórdão " + (x.titulo || ""); return it; }).filter(it => it.texto);
   return { itens, total: j.total || itens.length };
 }
+async function juBuscarTst(q, ctl) {
+  const j = await juProxy({ f: "tst", n: 15, q }, ctl);
+  const itens = (j.itens || []).map((x, i) => { const it = { fonte: "TST", id: "tst" + i + "-" + (x.numero || ""), tribunal: "TST", docTipo: "Acórdão", data: /^\d{4}-\d{2}-\d{2}/.test(x.julgamento) ? x.julgamento.slice(0, 10) : "", classe: "", processo: x.numero || "", orgao: [x.orgao, x.relator ? "Rel. " + titulo(x.relator) : ""].filter(Boolean).join(" · "), texto: x.ementa || x.dispositivo || "", link: "", acordao: true, decisao: true };
+    it.rot = "TST — Acórdão " + (x.numero || ""); return it; }).filter(it => it.texto);
+  return { itens, total: j.total || itens.length };
+}
+// acervos próprios (STF e TST) pelo proxy gratuito; devolve também erros parciais
+async function juBuscarTrib(termos, ctl) {
+  const q = termos.map(t => t.frase ? '"' + t.txt + '"' : t.txt).join(" "), fs = [];
+  if (juUsaStf()) fs.push(juBuscarStf(q, ctl).then(r => ({ nome: "STF", r }), e => ({ nome: "STF", e })));
+  if (juUsaTst()) fs.push(juBuscarTst(q, ctl).then(r => ({ nome: "TST", r }), e => ({ nome: "TST", e })));
+  const res = await Promise.all(fs), ok = res.filter(x => x.r), falhas = res.filter(x => x.e);
+  if (!ok.length) { const e = falhas[0].e; throw e; }
+  const itens = ok.flatMap(x => x.r.itens).sort((a, b) => (b.data || "").localeCompare(a.data || ""));
+  return { itens, total: ok.reduce((n, x) => n + x.r.total, 0), falhas: falhas.map(x => x.nome + ": " + (x.e.message || "erro")) };
+}
 function juCitacao(it) {
   if (it.fonte === "STF") return "BRASIL. Supremo Tribunal Federal. " + (it.processo || "Acórdão") + (it.orgao ? ". " + it.orgao : "") + (it.data ? ". Julgado em " + br(it.data) : "") + "." + (it.link ? " Inteiro teor: " + it.link : "") + " Fonte: Jurisprudência do STF (jurisprudencia.stf.jus.br).";
+  if (it.fonte === "TST") return "BRASIL. Tribunal Superior do Trabalho. " + (it.processo || "Acórdão") + (it.orgao ? ". " + it.orgao : "") + (it.data ? ". Julgado em " + br(it.data) : "") + ". Fonte: Jurisprudência do TST (jurisprudencia.tst.jus.br).";
   if (it.fonte === "BNP") return it.orgao + ". " + (JU_TIPOS[it.tipo] || it.tipo) + (it.nr != null ? " nº " + it.nr : "") + "." + (it.tese ? " Tese: " + it.tese : it.questao ? " Questão: " + it.questao : "") + (it.situacao ? " Situação: " + it.situacao + "." : "") + " Fonte: Banco Nacional de Precedentes (CNJ), " + JU_BNP_SITE + (it.atual ? ", atualizado em " + it.atual : "") + ".";
   return it.tribunal + ". " + (it.orgao ? it.orgao + ". " : "") + (it.classe ? it.classe + " " : "Processo ") + (it.processo ? "nº " + it.processo : "") + ". " + (it.docTipo || "Publicação") + " disponibilizado(a) no DJEN em " + br(it.data) + "." + (it.link ? " Disponível em: " + it.link : "") + " Fonte: Diário de Justiça Eletrônico Nacional (CNJ).";
 }
@@ -7076,7 +7109,7 @@ function juCitacao(it) {
 async function juPesquisar(q) {
   if (q != null) JU.q = q; const termos = juTermos(JU.q); if (JU.busy) return;
   if (!termos.length) { JU.status = "Digite ao menos uma palavra com 3 letras ou mais (ou uma frase entre aspas)."; JU.feito = false; return juDesenhar(); }
-  const tribs = juTribsSel(); JU.busy = true; JU.feito = true; JU.aba = ""; JU.ia = null; JU.iaErro = ""; JU.erroPrec = JU.erroDec = ""; JU.prec = []; JU.precParc = []; JU.dec = []; JU.decSem = []; JU.decTotal = 0; JU.decFora = 0; JU.verParc = false; JU.tri = []; JU.erroTri = ""; JU.semProxy = false; JU.triTotal = 0; JU.ldPrec = JU.ldDec = true; JU.ldTri = juUsaStf(); JU.ctl = new AbortController(); JU.ctl.parar = false; JU.status = ""; juDesenhar();
+  const tribs = juTribsSel(); JU.busy = true; JU.feito = true; JU.aba = ""; JU.ia = null; JU.iaErro = ""; JU.erroPrec = JU.erroDec = ""; JU.prec = []; JU.precParc = []; JU.dec = []; JU.decSem = []; JU.decTotal = 0; JU.decFora = 0; JU.verParc = false; JU.tri = []; JU.erroTri = ""; JU.avisoTri = ""; JU.semProxy = false; JU.triTotal = 0; JU.ldPrec = JU.ldDec = true; JU.ldTri = juUsaTri(); JU.ctl = new AbortController(); JU.ctl.parar = false; JU.status = ""; juDesenhar();
   // as duas bases são consultadas ao mesmo tempo e cada uma aparece assim que responde
   const aPrec = (async () => {
     try { let p = await juBuscarPrec(termos, tribs, JU.ctl); if (!p.itens.length && termos.some(t => t.frase)) p = await juBuscarPrec(termos, tribs, JU.ctl, true); JU.prec = p.itens.filter(x => x.completo); JU.precParc = p.itens.filter(x => !x.completo); JU.precTotal = p.total; }
@@ -7090,8 +7123,8 @@ async function juPesquisar(q) {
   })();
   const aTri = (async () => {
     if (!JU.ldTri) return;
-    try { const t = await juBuscarTrib(termos, JU.ctl); JU.tri = t.itens; JU.triTotal = t.total; }
-    catch (e) { if (e && e.semProxy) JU.semProxy = true; else if (!JU.ctl.parar) JU.erroTri = "Não foi possível consultar o acervo do STF agora (" + (e.message || "erro") + ")."; }
+    try { const t = await juBuscarTrib(termos, JU.ctl); JU.tri = t.itens; JU.triTotal = t.total; JU.avisoTri = (t.falhas || []).join(" · "); }
+    catch (e) { if (e && e.semProxy) JU.semProxy = true; else if (!JU.ctl.parar) JU.erroTri = "Não foi possível consultar o acervo do " + juNomeTri() + " agora (" + (e.message || "erro") + ")."; }
     JU.ldTri = false; juDesenhar();
   })();
   await Promise.all([aPrec, aDec, aTri]);
@@ -7160,7 +7193,7 @@ function juCartao(it, termos, ref) {
     const a = el("div", "acts"); const bc = btn("Copiar citação", () => juCopiar(juCitacao(it), bc)); a.appendChild(bc);
     for (const p of it.paradigmas.slice(0, 3)) a.appendChild(juLink("Processo paradigma " + p.numero, p.link)); a.appendChild(juLink("Conferir no Pangea (CNJ)", JU_BNP_SITE)); c.appendChild(a);
   } else {
-    top.append(el("b", "", it.tribunal), el("span", "tag" + (it.acordao ? " ok" : ""), it.docTipo || "Publicação"), el("span", "hint", it.fonte === "STF" ? "julgado em " + br(it.data) : "DJEN de " + br(it.data))); c.appendChild(top);
+    top.append(el("b", "", it.tribunal), el("span", "tag" + (it.acordao ? " ok" : ""), it.docTipo || "Publicação"), el("span", "hint", (it.fonte === "STF" || it.fonte === "TST") ? "julgado em " + br(it.data) : "DJEN de " + br(it.data))); c.appendChild(top);
     c.appendChild(el("div", "hint", [it.classe, it.processo, it.orgao].filter(Boolean).join(" · ")));
     const p = el("p", "jutxt"); p.appendChild(juRealce(it.texto, termos, 700)); c.appendChild(p);
     if (it.texto.length > 700) { const d = el("details", "juint"), s = el("summary", "", "Ver o texto integral publicado (" + nfmt(it.texto.length) + " caracteres)"); d.appendChild(s); d.addEventListener("toggle", () => { if (d.open && d.children.length < 2) { const pp = el("p", "jutxt"); pp.appendChild(juRealce(it.texto, termos)); d.appendChild(pp); } }); c.appendChild(d); }
@@ -7225,7 +7258,7 @@ function juDesenhar() {
   const refs = new Map(); JU.prec.slice(0, 8).forEach((it, i) => refs.set(it, "P" + (i + 1))); const decs = juDecVisiveis(); decs.slice(0, 6).forEach((it, i) => refs.set(it, "D" + (i + 1)));
   const aba = JU.aba || (JU.prec.length ? "prec" : decs.length ? "dec" : JU.tri.length ? "tri" : JU.ldPrec ? "prec" : "dec");
   const tabs = el("div", "tabs jutabs"); tabs.setAttribute("role", "tablist");
-  for (const [k, rot, n, car] of [["prec", "Súmulas e teses", JU.prec.length, JU.ldPrec], ["dec", "Decisões publicadas", decs.length, JU.ldDec]].concat(juUsaStf() ? [["tri", "Acervo do STF", JU.tri.length, JU.ldTri]] : []).concat([["sites", "Sites dos tribunais", null, false]])) { const b = el("button", "", rot); b.type = "button"; b.id = "juTab-" + k; b.setAttribute("role", "tab"); b.setAttribute("aria-selected", String(aba === k)); if (n != null) b.appendChild(el("span", "n", car ? "…" : String(n))); b.onclick = () => { JU.aba = k; juDesenhar(); }; tabs.appendChild(b); }
+  for (const [k, rot, n, car] of [["prec", "Súmulas e teses", JU.prec.length, JU.ldPrec], ["dec", "Decisões publicadas", decs.length, JU.ldDec]].concat(juUsaTri() ? [["tri", "Acervo do " + juNomeTri(), JU.tri.length, JU.ldTri]] : []).concat([["sites", "Sites dos tribunais", null, false]])) { const b = el("button", "", rot); b.type = "button"; b.id = "juTab-" + k; b.setAttribute("role", "tab"); b.setAttribute("aria-selected", String(aba === k)); if (n != null) b.appendChild(el("span", "n", car ? "…" : String(n))); b.onclick = () => { JU.aba = k; juDesenhar(); }; tabs.appendChild(b); }
   box.appendChild(tabs);
   const ts = juTribsSel(), stfOk = !JU.semProxy; if (!ts.length || ts.includes("STJ") || (ts.includes("STF") && !stfOk)) { // o acervo de acórdãos do STF e do STJ está nos sites deles, não no DJEN
     const av = el("div", "msg"); av.id = "juSup"; av.appendChild(el("b", "", stfOk ? "STJ: " : "STF e STJ: ")); av.appendChild(document.createTextNode(stfOk ? "os acórdãos do STJ ficam no site dele; o DJEN traz só despachos e decisões. Abra a pesquisa oficial já com os seus termos: " : "os acórdãos desses tribunais ficam no site próprio; o DJEN traz só despachos e decisões. Abra a pesquisa oficial já com os seus termos (ou ative o proxy gratuito em Integrações › Andamentos para ver o acervo do STF aqui): "));
@@ -7255,13 +7288,14 @@ function juDesenhar() {
   for (const it of decs.slice(0, 60)) p2.appendChild(juCartao(it, termos, refs.get(it)));
   if (decs.length > 60) p2.appendChild(el("p", "hint", "Mostrando as 60 primeiras. Refine os termos para ver resultados mais específicos."));
   box.appendChild(p2);
-  if (juUsaStf()) {
+  if (juUsaTri()) {
     const pt = el("div", "panel"); pt.id = "juTri"; pt.hidden = aba !== "tri";
-    pt.appendChild(el("p", "hint", "Acervo de acórdãos do Supremo Tribunal Federal (jurisprudencia.stf.jus.br), pesquisado no texto integral. Consulta feita pelo proxy gratuito do escritório."));
-    if (JU.ldTri) pt.appendChild(el("div", "msg", "Buscando no STF…"));
-    if (JU.semProxy) pt.appendChild(el("div", "msg warn", "Para ver o acervo do STF aqui é preciso ativar o proxy gratuito uma única vez (um advogado faz isso em Integrações › Andamentos). Enquanto isso, use o botão “Jurisprudência do STF” acima."));
+    pt.appendChild(el("p", "hint", "Acervo de acórdãos do " + juNomeTri() + " (sites oficiais jurisprudencia.stf.jus.br e jurisprudencia.tst.jus.br), pesquisado no texto. Consulta feita pelo proxy gratuito do escritório."));
+    if (JU.ldTri) pt.appendChild(el("div", "msg", "Buscando no " + juNomeTri() + "…"));
+    if (JU.semProxy) pt.appendChild(el("div", "msg warn", "Para ver o acervo do STF e do TST aqui é preciso ativar o proxy gratuito uma única vez (um advogado faz isso em Integrações › Andamentos). Enquanto isso, use o botão “Jurisprudência do STF” acima."));
     if (JU.erroTri) pt.appendChild(el("div", "msg err", JU.erroTri));
-    if (!JU.ldTri && !JU.semProxy && !JU.erroTri) { pt.appendChild(el("p", "hint", nfmt(JU.triTotal) + " acórdão(s) do STF para estes termos; mostrando os " + JU.tri.length + " mais relevantes." )); if (!JU.tri.length) { pt.appendChild(el("div", "hint", "Nenhum acórdão do STF encontrado para estes termos.")); juMenos(pt, termos); } }
+    if (!JU.ldTri && !JU.semProxy && !JU.erroTri) { pt.appendChild(el("p", "hint", nfmt(JU.triTotal) + " acórdão(s) do " + juNomeTri() + " para estes termos; mostrando os " + JU.tri.length + " mais relevantes." )); if (!JU.tri.length) { pt.appendChild(el("div", "hint", "Nenhum acórdão do " + juNomeTri() + " encontrado para estes termos.")); juMenos(pt, termos); } }
+    if (JU.avisoTri && !JU.ldTri) pt.appendChild(el("div", "msg warn", "Parte do acervo não respondeu: " + JU.avisoTri));
     for (const it of JU.tri) pt.appendChild(juCartao(it, termos));
     box.appendChild(pt);
   }
