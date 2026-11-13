@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-nWZEBaduYkZRaUUJIWigYP8CZyRxpxOohTVm9tVAa+I=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-L/lb14/ubByuZfdegzo2SStlIoq+HBHKmVwHQbSVkjM=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#202b47">
@@ -7349,7 +7349,7 @@ function juRelator(texto) {
 }
 const juOrgaoDe = it => String(it.orgaoJ || it.orgao || "").split(" · ")[0];
 const juEhCam = it => /c[aâ]mara/i.test(juOrgaoDe(it)), juEhTur = it => /turma/i.test(juOrgaoDe(it));
-function juPasseFiltro(it) { return (!JU.fCam || (juEhCam(it) && juOrgaoDe(it) === JU.fCam)) && (!JU.fTur || (juEhTur(it) && juOrgaoDe(it) === JU.fTur)) && (!JU.fRel || it.relator === JU.fRel); }
+function juPasseFiltro(it) { return (!JU.soRG || !!juIndicaRecurso(it)) && (!JU.fCam || (juEhCam(it) && juOrgaoDe(it) === JU.fCam)) && (!JU.fTur || (juEhTur(it) && juOrgaoDe(it) === JU.fTur)) && (!JU.fRel || it.relator === JU.fRel); }
 const juTriVisiveis = () => JU.tri.filter(juPasseFiltro);
 function juOpcoesFiltro() { const pool = (JU.soDec ? JU.dec.filter(x => x.decisao) : JU.dec).concat(JU.tri), c = new Set(), t = new Set(), r = new Set(); for (const it of pool) { if (juEhCam(it)) c.add(juOrgaoDe(it)); if (juEhTur(it)) t.add(juOrgaoDe(it)); if (it.relator) r.add(it.relator); } const o = a => [...a].sort((x, y) => x.localeCompare(y, "pt-BR", { numeric: true })); return { cam: o(c), tur: o(t), rel: o(r) }; }
 
@@ -7409,6 +7409,7 @@ function juIndicaRecurso(it) {
   if (it.fonte === "BNP" && it.tipo === "RG") return { tag: "Repercussão geral", txt: "Serve para recurso extraordinário: indique o tema como preliminar de repercussão geral (CPC, art. 1.035, § 2º)." };
   if (it.fonte === "BNP" && (it.tipo === "RR" || it.tipo === "IRR")) return { tag: "Recurso repetitivo", txt: "Serve para recurso especial (STJ) e para aplicar a tese na origem (CPC, arts. 1.036 e seguintes e 1.040)." };
   if (it.fonte === "BNP" && it.tipo === "SV") return { tag: "Súmula vinculante", txt: "Vincula o Judiciário e a administração; cabível reclamação ao STF em caso de descumprimento." };
+  if (it.fonte !== "BNP" && /repercuss[ãa]o\s+geral/i.test(it.texto || "")) { const tx = String(it.texto), m = /tema\s*(?:n[ºo°.]*\s*)?(\d{1,4})\b(?=[\s\S]{0,160}repercuss)/i.exec(tx) || /repercuss[ãa]o\s+geral[^.]{0,120}?tema\s*(?:n[ºo°.]*\s*)?(\d{1,4})\b/i.exec(tx); return { tag: "Repercussão geral" + (m ? " · Tema " + m[1] : ""), txt: "O texto menciona repercussão geral" + (m ? " (Tema " + m[1] + ")" : "") + ": confira o tema no site do STF antes de usá-lo em recurso extraordinário." }; }
   if (it.fonte === "STF" && it.rg) return { tag: "Repercussão geral", txt: "O STF marcou este acórdão como de repercussão geral: confira o tema no inteiro teor antes de usá-lo em recurso extraordinário." };
   return null;
 }
