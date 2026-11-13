@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-wCe7WjYp8e161aPpMeid9EYzbcZeImCRHmW9d706Ny0=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-O+xqJADB+7SpLuQudKbay/ympWlcK1jsn+E/gRq8B4s=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#202b47">
@@ -727,8 +727,6 @@ details.ajuda{margin-top:8px}
 details.ajuda>summary{display:inline-block;cursor:pointer;color:var(--muted);font-size:13px;list-style:none}
 details.ajuda>summary::before{content:"?";display:inline-grid;place-items:center;width:18px;height:18px;margin-right:6px;border:1px solid var(--line);border-radius:50%;font-size:11px}
 details.ajuda[open]>summary{margin-bottom:4px}
-/* um botão principal por barra de ações: os demais ficam discretos */
-.acts>.btn:not(.sec):not(.danger):not(:first-child):not(.pri),.hd .acts>.btn:not(.sec):not(.danger):not(:last-child){background:transparent;color:var(--ink);border:1px solid var(--line);box-shadow:none;font-weight:500}
 /* configurações: grupos recolhíveis */
 .cfgg[role=button]{cursor:pointer;display:flex;align-items:center;justify-content:space-between}
 .cfgg[role=button]::after{content:"›";transition:transform .15s}
@@ -736,6 +734,18 @@ details.ajuda[open]>summary{margin-bottom:4px}
 
 #crmTabs{display:none}
 .subabas .bd{margin-left:6px}
+
+/* prazo x tarefa */
+.tag.prazo{background:#fdebd0;color:#7a3e00;font-weight:700;letter-spacing:.04em}
+.tag.tarefa{background:var(--soft);color:var(--muted)}
+@media (prefers-color-scheme: dark){.tag.prazo{background:#4a2f10;color:#ffd8a8}}
+.pzul li{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.pzli.atr{border-left:4px solid #c0392b;padding-left:8px}
+.pzli.hoje{border-left:4px solid #e08a00;padding-left:8px}
+.pzli.ok{opacity:.65}
+.pzgrp{margin:16px 0 6px}
+.pzdesc{font-weight:600}
+.kpi-crit .v{color:#c0392b}
 
 </style>
 </head>
@@ -749,14 +759,15 @@ details.ajuda[open]>summary{margin-bottom:4px}
     <a href="#meu" data-v="meu" hidden><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>Meu painel<span class="bd red" id="bdMeu" hidden></span></a>
     <a href="#secretaria" data-v="secretaria" hidden><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Secretaria<span class="bd red" id="bdSec" hidden></span></a>
     <a href="#inicio" data-v="inicio"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>Início<span class="bd red" id="bdOrg" hidden></span></a>
+    <a href="#prazos" data-v="prazos"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 3h6"/></svg>Prazos<span class="bd red" id="bdPrazo" hidden></span></a>
     <a href="#clientes" data-v="clientes" hidden><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17 14.2c2.7.3 4.5 2.3 4.5 5.3"/></svg>Clientes</a>
-    <a href="#consulta" data-v="consulta"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>Publicações</a>
+    <a href="#consulta" data-v="consulta"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>Consulta</a>
     <a href="#processos" data-v="processos"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Processos<span class="bd" id="bdProc" hidden></span></a>
-    <a href="#audiencias" data-v="audiencias" class="sub"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 15h3"/></svg>Audiências</a>
+    <a href="#audiencias" data-v="audiencias"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 15h3"/></svg>Audiências</a>
     <a href="#crm" data-v="crm" class="sub"><svg viewBox="0 0 24 24"><path d="M3 5h18l-7 8v6l-4-2v-4z"/></svg>CRM<span class="bd red" id="bdCrm" hidden></span></a>
-    <a href="#relatorios" data-v="relatorios" class="sub"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Relatórios</a>
-    <a href="#advogados" data-v="advogados" class="sub"><svg viewBox="0 0 24 24"><path d="M12 3v18M5 7h14M5 7l-3 7a3 3 0 006 0zM19 7l-3 7a3 3 0 006 0z"/></svg>Advogados<span class="bd" id="bdAdv" hidden></span></a>
-    <a href="#ajuizamentos" data-v="ajuizamentos" class="sub" hidden><svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M12 8v5M12 16v.01"/></svg>Ajuizamentos</a>
+    <a href="#relatorios" data-v="relatorios"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Relatórios</a>
+    <a href="#advogados" data-v="advogados"><svg viewBox="0 0 24 24"><path d="M12 3v18M5 7h14M5 7l-3 7a3 3 0 006 0zM19 7l-3 7a3 3 0 006 0z"/></svg>Advogados<span class="bd" id="bdAdv" hidden></span></a>
+    <a href="#ajuizamentos" data-v="ajuizamentos" hidden><svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M12 8v5M12 16v.01"/></svg>Ajuizamentos</a>
     <a href="#jurisprudencia" data-v="jurisprudencia" hidden><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 012-2h12v16H6a2 2 0 00-2 2z"/><path d="M4 21a2 2 0 012-2h12v2z"/><path d="M9 8h6M9 12h4"/></svg>Jurisprudência</a>
     <a href="#calculos" data-v="calculos" hidden><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h2M12 12h2M16 12h0M8 16h2M12 16h2M16 16h0"/></svg>Cálculos</a>
     <a href="#configuracoes" data-v="configuracoes"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 01-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 010-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 014 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 010 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg>Configurações<span class="bd red" id="bdUsr" hidden></span></a>
@@ -850,6 +861,10 @@ details.ajuda[open]>summary{margin-bottom:4px}
 
 <!-- ===================== INÍCIO ===================== -->
 <section class="view" id="v-inicio" hidden>
+  <div class="cols2">
+    <div class="panel"><h2>Audiências futuras <a class="btn sec sm" href="#audiencias">Abrir</a></h2><div id="inAud"></div></div>
+    <div class="panel"><h2>Prazos <a class="btn sec sm" href="#prazos">Abrir</a></h2><div id="inPrazosProc"></div></div>
+  </div>
   <div class="kpis" id="kpisInicio"></div>
   <div class="cols2">
     <div class="panel"><h2>Agenda dos próximos 14 dias <span class="hint">audiências, prazos e tarefas</span></h2><div id="orgPrazos"></div></div>
@@ -861,14 +876,16 @@ details.ajuda[open]>summary{margin-bottom:4px}
         <select id="orgResp" style="width:auto"><option value="">Todos</option><option value="Fábio">Fábio</option><option value="Davi">Davi</option><option value="Equipe">Equipe</option><option value="Secretaria">Secretaria</option></select></label>
         <button class="btn sm sec" id="orgModelo" type="button">Aplicar modelo de tarefas</button> <button class="btn sm" id="orgNova" type="button">Nova tarefa</button></div></div>
     <div class="board" id="board"></div>
-    <details class="ajuda"><summary>Como usar o quadro</summary><div class="hint">Arraste os cartões entre as colunas (ou use as setas). Clique no título para editar. Tarefas também podem ser criadas a partir de uma publicação, na tela Advogados.</div></details>
+    <div class="hint">Arraste os cartões entre as colunas (ou use as setas). Clique no título para editar. Tarefas também podem ser criadas a partir de uma publicação, na tela Advogados.</div>
   </div>
-  <div class="panel" id="inClientesBox" hidden><h2>Clientes monitorados</h2>
-    <div class="chips" id="inClientes"></div>
-    <details class="ajuda"><summary>Como usar</summary><div class="hint">Clique em um nome para consultar o DJEN e abrir o relatório. A lista é editada na tela Consulta.</div></details></div>
-  <details class="panel ideiasbox"><summary><b>Rotina do escritório</b></summary><div id="rotina"></div><div class="hint">Os itens reiniciam sozinhos a cada dia, semana ou mês.</div></details>
-  <details class="panel ideiasbox"><summary><b>Sugestões para organizar o escritório</b></summary>
-    <div class="ideas" id="ideias"></div></details>
+  <div class="cols2">
+    <div class="panel"><h2>Rotina do escritório</h2><div id="rotina"></div><div class="hint">Os itens reiniciam sozinhos a cada dia, semana ou mês.</div></div>
+    <div class="panel" id="inClientesBox"><h2>Clientes monitorados</h2>
+      <div class="chips" id="inClientes"></div>
+      <div class="hint">Clique em um nome para consultar o DJEN e abrir o relatório. A lista é editada na tela Consulta.</div></div>
+  </div>
+  <div class="panel"><h2>Sugestões para começar a organizar o escritório</h2>
+    <div class="ideas" id="ideias"></div></div>
 </section>
 
 <!-- ===================== CONSULTA ===================== -->
@@ -955,6 +972,18 @@ details.ajuda[open]>summary{margin-bottom:4px}
     </div>
   </div>
   <div id="pDetalhe" hidden></div>
+</section>
+
+<!-- ===================== PRAZOS ===================== -->
+<section class="view" id="v-prazos" hidden>
+  <div class="kpis" id="pzKpis"></div>
+  <div class="panel">
+    <div class="hd"><h2>Prazos dos processos <span class="hint">prazos processuais; tarefas internas ficam no quadro do Início</span></h2>
+      <div class="acts"><select id="pzProc" aria-label="Processo do novo prazo"></select><button class="btn" id="pzNovo" type="button">Novo prazo</button></div></div>
+    <div class="acts"><label style="flex-direction:row;align-items:center;gap:6px">Responsável <select id="pzRespF" style="width:auto"><option value="">Todos</option><option>Fábio</option><option>Davi</option><option>Equipe</option><option>Secretaria</option></select></label>
+      <label class="chk"><input type="checkbox" id="pzCumpr"> Mostrar cumpridos</label></div>
+    <div id="pzLista"></div>
+  </div>
 </section>
 
 <!-- ===================== AUDIÊNCIAS ===================== -->
@@ -3740,6 +3769,7 @@ function atualizarBadges() {
   if (typeof crmBadge === "function") crmBadge();
   if (typeof badgesPapel === "function") badgesPapel();
   if (typeof badgesGrupo === "function") badgesGrupo();
+  if (typeof pzBadge === "function") pzBadge();
   if (typeof alAtualizar === "function") alAtualizar();
 }
 function advIniciar() {
@@ -3958,7 +3988,7 @@ const agendaAtrasada = e => e.tipo !== "Audiência" && e.data < hojeIso();
 function totalAtrasos() { return agendaItens().filter(agendaAtrasada).length; }
 function agendaLi(e) {
   const li = el("li"), atr = agendaAtrasada(e);
-  li.append(el("b", "", br(e.data) + (e.hora ? " " + e.hora : "")), el("span", "tag" + (atr ? " crit" : e.tipo === "Audiência" ? " dist" : ""), atr ? "Atrasado · " + e.tipo : e.tipo + " · " + e.resp), document.createTextNode(e.titulo));
+  li.append(el("b", "", br(e.data) + (e.hora ? " " + e.hora : "")), el("span", "tag" + (atr ? " crit" : e.tipo === "Audiência" ? " dist" : e.tipo === "Prazo" ? " prazo" : " tarefa"), atr ? "Atrasado · " + e.tipo : (e.tipo === "Prazo" ? "PRAZO" : e.tipo) + " · " + e.resp), document.createTextNode(e.titulo));
   const pp = e.procId ? PROCS.find(x => x.id === e.procId) : e.proc ? PROCS.find(x => x.chave === chaveDe(e.proc)) : null;
   if (pp && /^https?:\/\//.test(pp.linkPasta || "")) { const a = el("a", "", "📁 pasta"); a.href = pp.linkPasta; a.target = "_blank"; a.rel = "noopener noreferrer"; a.style.marginLeft = "8px"; a.onclick = ev => ev.stopPropagation(); li.appendChild(a); }
   li.style.cursor = "pointer"; li.onclick = () => e.procId ? abrirPasta(e.procId) : abrirTarefa(null, e.tarefaId); return li;
@@ -6527,10 +6557,10 @@ async function iaResumirPub(p, x) {
 const NUVEM_SRI_OFF = false; // só os testes automáticos desligam (usam um Firebase simulado)
 const NV = { ativo: !!NUVEM_CFG, user: null, perfil: null, papel: "local", advId: null, db: null, auth: null, unsubs: [], mapas: {}, sessao: false, cadastrando: false, users: [] };
 const ACESSO = {
-  local: ["inicio", "clientes", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "ajuizamentos", "jurisprudencia", "calculos", "configuracoes"],
-  admin: ["meu", "inicio", "secretaria", "clientes", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "ajuizamentos", "jurisprudencia", "calculos", "configuracoes"],
-  advogado: ["meu", "inicio", "clientes", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "ajuizamentos", "jurisprudencia", "calculos", "configuracoes"],
-  secretaria: ["secretaria", "clientes", "audiencias", "processos", "crm", "configuracoes"]
+  local: ["inicio", "prazos", "clientes", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "ajuizamentos", "jurisprudencia", "calculos", "configuracoes"],
+  admin: ["meu", "inicio", "prazos", "secretaria", "clientes", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "ajuizamentos", "jurisprudencia", "calculos", "configuracoes"],
+  advogado: ["meu", "inicio", "prazos", "clientes", "consulta", "processos", "audiencias", "crm", "relatorios", "advogados", "ajuizamentos", "jurisprudencia", "calculos", "configuracoes"],
+  secretaria: ["secretaria", "prazos", "clientes", "audiencias", "processos", "crm", "configuracoes"]
 };
 const PAPEL_ROT = { admin: "Administrador", advogado: "Advogado(a)", secretaria: "Secretaria", local: "" };
 const souAdvogado = () => NV.papel !== "secretaria";
@@ -8179,7 +8209,7 @@ function cfgAbrir(sec) {
   if ((location.hash || "") !== "#configuracoes") history.replaceState(null, "", "#configuracoes");
   cfgDesenhar();
 }
-const CFG_AVANCADO = ["Integrações", "Aplicativo"]; // grupos recolhidos por padrão (menos opções à vista)
+const CFG_AVANCADO = []; // grupos recolhidos por padrão (menos opções à vista)
 const cfgAberto = g => !CFG_AVANCADO.includes(g) || (CFG.abertos || (CFG.abertos = new Set())).has(g) || CFG_SECS.some(x => x[2] === g && x[0] === CFG.sec);
 function cfgMenu() {
   const m = $("cfgMenu"); m.textContent = ""; let grupo = "";
@@ -8304,6 +8334,7 @@ const VIEWS = {
   meu: ["Meu painel", ""],
   secretaria: ["Área da secretaria", "Cadastro de processos, audiências, prazos e tarefas"],
   inicio: ["Início", "Agenda, tarefas, rotina e publicações do escritório"],
+  prazos: ["Prazos", "Prazos processuais de todos os processos, separados das tarefas internas"],
   clientes: ["Clientes", "Cada cliente e os processos dele: abra a pasta, edite o cadastro ou cadastre um processo novo"],
   consulta: ["Consulta DJEN", "Busca por nome da parte no Diário de Justiça Eletrônico Nacional"],
   processos: ["Processos", "Pastas dos processos: cadastro pelo número, audiências, prazos e tarefas"],
@@ -8327,6 +8358,7 @@ function desenharVista(v) {
   if (v === "audiencias") audDesenhar();
   if (v === "crm") crmDesenhar();
   if (v === "inicio") orgDesenhar();
+  if (v === "prazos") pzDesenhar();
   if (v === "advogados") advDesenhar();
   if (v === "meu") meuDesenhar();
   if (v === "secretaria") secDesenhar();
@@ -8340,9 +8372,7 @@ function atualizarTudo() { desenharVista(vistaAtual()); atualizarBadges(); }
 
 // ---- menu enxuto: itens principais + faixa de seções dentro de cada grupo
 const GRUPOS = [
-  { id: "clientes", vistas: [["clientes", "Clientes"], ["crm", "Contatos e leads", "contatos"], ["crm", "Funil de captação", "funil"], ["crm", "Atividades", "ativ"], ["crm", "Painel", "painel"], ["crm", "Ajustes", "ajustes"]] },
-  { id: "processos", vistas: [["processos", "Processos"], ["audiencias", "Audiências"]] },
-  { id: "consulta", vistas: [["consulta", "Consulta DJEN"], ["advogados", "Advogados"], ["ajuizamentos", "Ajuizamentos"], ["relatorios", "Relatórios"]] }
+  { id: "clientes", vistas: [["clientes", "Clientes"], ["crm", "Contatos e leads", "contatos"], ["crm", "Funil de captação", "funil"], ["crm", "Atividades", "ativ"], ["crm", "Painel", "painel"], ["crm", "Ajustes", "ajustes"]] }
 ];
 const grupoDe = v => GRUPOS.find(g => g.vistas.some(x => x[0] === v));
 const badgeDe = k => { const b = document.querySelector('#nav a[data-v="' + k + '"] .bd'); return b && !b.hidden && b.textContent.trim() ? b.textContent.trim() : ""; };
@@ -8389,17 +8419,16 @@ function desenharInicioClientes() {
 }
 function inicioDesenhar() {
   const novas = Object.values(AD.pubs).filter(ehNova), abertas = TAREFAS.filter(t => t.status !== "concluida"), atr = totalAtrasos();
-  const k = $("kpisInicio"); k.textContent = ""; { const cb = $("inClientesBox"); if (cb) cb.hidden = !lerLista().length; }
+  const k = $("kpisInicio"); k.textContent = "";
   const K = (v, l, s) => { const d = el("div", "kpi"); d.append(el("div", "v", v), el("div", "l", l)); if (s) d.appendChild(el("div", "s", s)); return d; };
   const proc = E.itens.length ? new Set(E.itens.filter(i => i.exato || !E.termos.length).map(i => i.chave)).size : 0;
-  k.append(K(novas.length, "Publicações novas", "dos dois advogados, ainda não tratadas"), K(abertas.length, "Tarefas em aberto"), K(PROCS.filter(x => x.status !== "arquivado").length, "Pastas de processos", "ativas"), K(atr, "Prazos/tarefas atrasados", atr ? "exigem atenção" : "nenhum"));
-  if (E.busca) k.appendChild(K(proc, "Processos na última consulta", E.busca.nomes || "consulta avulsa"));
+  k.append(K(novas.length, "Publicações novas", "dos dois advogados, ainda não tratadas"), K(abertas.length, "Tarefas em aberto"), K(PROCS.filter(x => x.status !== "arquivado").length, "Pastas de processos", "ativas"), K(atr, "Prazos/tarefas atrasados", atr ? "exigem atenção" : "nenhum"), K(proc, "Processos na última consulta", E.busca ? E.busca.nomes || "consulta avulsa" : "faça uma consulta"));
   const a = $("inAdv"); a.textContent = ""; const ul = el("ul", "mini");
   for (const ad of ADVS) {
     const mine = Object.values(AD.pubs).filter(p => p.quem.includes(ad.id)), n = mine.filter(ehNova).length, ult = mine.reduce((m, p) => p.data > m ? p.data : m, "");
     const li = el("li"); li.append(el("b", "", ad.nome), el("span", "tag" + (n ? " dist" : ""), n + " nova(s)"), el("span", "hint", ult ? "última publicação em " + br(ult) : "sem dados")); ul.appendChild(li);
   }
-  a.appendChild(ul); if (!AD.meta.ultima) a.appendChild(el("div", "hint", "As publicações são carregadas ao abrir o site."));
+  a.appendChild(ul); if (typeof inicioAudPrazos === "function") inicioAudPrazos(); if (!AD.meta.ultima) a.appendChild(el("div", "hint", "As publicações são carregadas ao abrir o site."));
 }
 
 // ---- backup dos dados deste navegador
@@ -8458,6 +8487,56 @@ function buscaGlobalIniciar() {
   document.addEventListener("keydown", e => { if (e.key === "/" && !e.ctrlKey && !e.metaKey && !/^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName || "") && !(document.activeElement || {}).isContentEditable) { e.preventDefault(); q.focus(); } });
 }
 buscaGlobalIniciar();
+
+
+/* ===== 52-prazos: aba Prazos (prazos processuais, separados das tarefas) e painéis de prazos/audiências no Início ===== */
+const PZ = { resp: "", cumpr: false };
+function pzTodos() { // todos os prazos processuais das pastas não arquivadas, já com o processo
+  const out = []; for (const p of PROCS) { if (p.status === "arquivado") continue; for (const z of p.prazos || []) out.push({ z, p }); }
+  return out.sort((a, b) => (a.z.cumprido ? 1 : 0) - (b.z.cumprido ? 1 : 0) || String(a.z.data).localeCompare(String(b.z.data)));
+}
+function pzLinha(x, compacto) {
+  const { z, p } = x, hoje = hojeIso(), atr = !z.cumprido && z.data < hoje, hj = !z.cumprido && z.data === hoje;
+  const li = el("li", "pzli" + (atr ? " atr" : hj ? " hoje" : z.cumprido ? " ok" : ""));
+  const dias = Math.round((new Date(z.data + "T12:00:00") - new Date(hoje + "T12:00:00")) / 864e5);
+  li.append(el("b", "", br(z.data)), el("span", "tag prazo", "PRAZO"), el("span", "pzdesc", z.desc), el("span", "hint", [p.numero, p.cliente].filter(Boolean).join(" · ")), el("span", "tag" + (atr ? " crit" : hj ? " warn" : ""), z.cumprido ? "Cumprido" : atr ? "Atrasado " + Math.abs(dias) + " d" : hj ? "Vence hoje" : "em " + dias + " d"), el("span", "hint", z.resp || p.resp));
+  if (!compacto) { const ac = el("span", "acts"); ac.style.marginLeft = "auto"; ac.append(btn(z.cumprido ? "Reabrir" : "Cumprido", () => { z.cumprido = !z.cumprido; salvarProcs(); atualizarTudo(); }), btn("Editar", () => abrirPrazo(p, z, z.id)), btn("Abrir pasta", () => abrirPasta(p.id, "prazos"))); li.appendChild(ac); }
+  else { li.style.cursor = "pointer"; li.onclick = () => abrirPasta(p.id, "prazos"); }
+  return li;
+}
+function pzDesenhar() {
+  pzBadge();
+  const box = $("pzLista"); if (!box) return; box.textContent = ""; const hoje = hojeIso(), l7 = somaDias(hoje, 7);
+  const todos = pzTodos(), abertos = todos.filter(x => !x.z.cumprido);
+  const k = $("pzKpis"); k.textContent = "";
+  const K = (v, l, s, cls) => { const d = el("div", "kpi" + (cls ? " " + cls : "")); d.append(el("div", "v", v), el("div", "l", l)); if (s) d.appendChild(el("div", "s", s)); return d; };
+  const atr = abertos.filter(x => x.z.data < hoje), hj = abertos.filter(x => x.z.data === hoje), sem = abertos.filter(x => x.z.data > hoje && x.z.data <= l7);
+  k.append(K(atr.length, "Atrasados", atr.length ? "exigem atenção agora" : "nenhum", atr.length ? "kpi-crit" : ""), K(hj.length, "Vencem hoje"), K(sem.length, "Próximos 7 dias"), K(abertos.length, "Prazos em aberto", "dos processos ativos"));
+  const sel = $("pzProc"); sel.textContent = ""; const o0 = el("option", "", "Escolha o processo…"); o0.value = ""; sel.appendChild(o0);
+  for (const p of PROCS.filter(x => x.status !== "arquivado")) { const o = el("option", "", p.numero + (p.cliente ? " — " + p.cliente : "")); o.value = p.id; sel.appendChild(o); }
+  $("pzRespF").value = PZ.resp; $("pzCumpr").checked = PZ.cumpr;
+  const l = todos.filter(x => (!PZ.resp || (x.z.resp || x.p.resp) === PZ.resp) && (PZ.cumpr || !x.z.cumprido));
+  if (!l.length) { box.appendChild(el("div", "empty", PROCS.length ? "Nenhum prazo cadastrado com estes filtros." : "Nenhum processo cadastrado ainda. Cadastre processos na tela Processos e registre os prazos aqui ou na pasta de cada um.")); return; }
+  const grupos = [["Atrasados", x => !x.z.cumprido && x.z.data < hoje], ["Vencem hoje", x => !x.z.cumprido && x.z.data === hoje], ["Próximos 7 dias", x => !x.z.cumprido && x.z.data > hoje && x.z.data <= l7], ["Depois", x => !x.z.cumprido && x.z.data > l7], ["Cumpridos", x => x.z.cumprido]];
+  for (const [rot, f] of grupos) { const g = l.filter(f); if (!g.length) continue; box.appendChild(el("h3", "pzgrp", rot + " (" + g.length + ")")); const ul = el("ul", "mini pzul"); for (const x of g) ul.appendChild(pzLinha(x)); box.appendChild(ul); }
+}
+function pzIniciar() {
+  $("pzNovo").onclick = () => { const p = PROCS.find(x => x.id === $("pzProc").value); if (!p) { $("pzProc").focus(); return; } abrirPrazo(p); };
+  $("pzRespF").onchange = () => { PZ.resp = $("pzRespF").value; pzDesenhar(); };
+  $("pzCumpr").onchange = () => { PZ.cumpr = $("pzCumpr").checked; pzDesenhar(); };
+}
+pzIniciar();
+function pzBadge() { const b = $("bdPrazo"); if (!b) return; const n = pzTodos().filter(x => !x.z.cumprido && x.z.data < hojeIso()).length; b.hidden = !n; b.textContent = n > 99 ? "99+" : n; }
+// painéis do topo do Início: audiências futuras e prazos
+function inicioAudPrazos() {
+  pzBadge();
+  const hoje = hojeIso(), a = $("inAud"), p = $("inPrazosProc"); if (!a || !p) return; a.textContent = ""; p.textContent = "";
+  const auds = []; for (const pr of PROCS) { if (pr.status === "arquivado") continue; for (const x of pr.audiencias || []) if (!x.feita && x.data >= hoje) auds.push({ x, pr }); }
+  auds.sort((u, v) => (u.x.data + (u.x.hora || "")).localeCompare(v.x.data + (v.x.hora || "")));
+  if (!auds.length) a.appendChild(el("div", "hint", "Nenhuma audiência futura cadastrada.")); else { const ul = el("ul", "mini"); for (const { x, pr } of auds.slice(0, 8)) { const li = el("li"); li.append(el("b", "", br(x.data) + (x.hora ? " " + x.hora : "")), el("span", "tag dist", "Audiência"), document.createTextNode((x.tipo ? x.tipo + " · " : "") + pr.numero + (pr.cliente ? " · " + pr.cliente : ""))); li.style.cursor = "pointer"; li.onclick = () => abrirPasta(pr.id, "audiencias"); ul.appendChild(li); } a.appendChild(ul); if (auds.length > 8) a.appendChild(el("div", "hint", "+ " + (auds.length - 8) + " audiência(s) — veja todas na aba Audiências.")); }
+  const ab = pzTodos().filter(x => !x.z.cumprido);
+  if (!ab.length) p.appendChild(el("div", "hint", "Nenhum prazo em aberto.")); else { const ul = el("ul", "mini"); for (const x of ab.slice(0, 8)) ul.appendChild(pzLinha(x, true)); p.appendChild(ul); if (ab.length > 8) p.appendChild(el("div", "hint", "+ " + (ab.length - 8) + " prazo(s) — veja todos na aba Prazos.")); }
+}
 
 </script>
 </body>
