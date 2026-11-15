@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-MR2doMZBpZjn2D4c0MDInLmCeAuWIFD06YNKmAVUzkc=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-iQ+HxEk6MNtu8mK4FS+ria5c4DkX9aYS6CW7uhhzCj0=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#202b47">
@@ -3656,12 +3656,10 @@ $("relPrint").addEventListener("click", () => {
 const AD = { pubs: LS.get("adv.pubs", {}), estado: LS.get("adv.estado", {}), meta: LS.get("adv.meta", { ultima: 0 }), rodando: false, aba: "novas", limite: 60, ctl: { parar: false }, timer: null };
 const TITULO_BASE = document.title;
 const advPor = id => ADVS.find(a => a.id === id);
-// Privacidade: quem está ligado a um advogado (login) vê e guarda só as publicações em nome dele. Administrador sem advogado vinculado e modo local veem todas.
+// Todos veem as publicações dos dois advogados; só os ALERTAS (selo, título da aba, notificação, KPI) contam as que são em nome de quem está logado.
 const advRestrito = () => NV.papel !== "local" && !!meuAdv();
-const advVisivel = p => !advRestrito() || (p.quem || []).includes(NV.advId);
-const advPubs = () => Object.values(AD.pubs).filter(advVisivel);
-const advLista = () => advRestrito() ? ADVS.filter(a => a.id === NV.advId) : ADVS;
-function advPodar() { if (!advRestrito()) return; let n = 0; for (const id of Object.keys(AD.pubs)) if (!advVisivel(AD.pubs[id])) { delete AD.pubs[id]; delete AD.estado[id]; n++; } if (n) advSalvar(); }
+const advPubs = () => Object.values(AD.pubs);
+const advMinhas = () => advRestrito() ? advPubs().filter(p => (p.quem || []).includes(NV.advId)) : advPubs();
 const ehNova = p => !(AD.estado[p.id] && AD.estado[p.id].tratada);
 
 function advSalvar() {
@@ -3679,9 +3677,9 @@ async function advCarregar(dias, silencioso) {
   if (AD.rodando) return; AD.rodando = true; AD.ctl = { parar: false };
   const primeira = !AD.meta.ultima, fim = hojeIso(), ini = somaDias(fim, -dias), st = t => { $("advStatus").textContent = t; };
   $("advAtualizar").disabled = true; $("advHist").disabled = true; aviso("advMsg", "");
-  let novos = 0;
+  let novos = 0, novosMeus = 0;
   try {
-    for (const a of advLista()) {
+    for (const a of ADVS) {
       const { todos, cortado } = await buscarTudo({ numeroOab: a.oab, ufOab: a.uf, dataDisponibilizacaoInicio: ini, dataDisponibilizacaoFim: fim }, AD.ctl, a.curto + " (" + a.rot + ")", st, 6);
       if (cortado) aviso("advMsg", "Para " + a.curto + " há mais de 600 publicações no período; foram carregadas as 600 mais recentes. Reduza o período para ver o restante.");
       for (const i of todos) {
@@ -3689,19 +3687,19 @@ async function advCarregar(dias, silencioso) {
         for (const x of ADVS) if (it.oabs.some(o => o.num === x.oab && o.uf === x.uf)) quem.add(x.id);
         const ex = AD.pubs[it.id];
         if (ex) { for (const q of quem) if (!ex.quem.includes(q)) ex.quem.push(q); }
-        else { AD.pubs[it.id] = slim(it, [...quem]); novos++; }
+        else { AD.pubs[it.id] = slim(it, [...quem]); novos++; if (!advRestrito() || quem.has(NV.advId)) novosMeus++; }
       }
       advDesenhar();
     }
     AD.meta.ultima = Date.now(); advSalvar(); if (typeof procsMesclarAdv === "function") procsMesclarAdv();
     st("Atualizado às " + new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) + (novos ? " · " + novos + " publicação(ões) nova(s)" : " · nada novo"));
-    if (novos && !primeira) advAvisarNovas(novos);
+    if (novosMeus && !primeira) advAvisarNovas(novosMeus);
   } catch (e) { st(""); const [t, err] = erroAmigavel(e); aviso("advMsg", t, err); }
   AD.rodando = false; $("advAtualizar").disabled = false; $("advHist").disabled = false;
   advDesenhar(); atualizarBadges();
 }
 function advAvisarNovas(n) {
-  try { if ("Notification" in window && Notification.permission === "granted" && document.hidden) new Notification("Advocacia Lunelli · DJEN", { body: n + " nova(s) publicação(ões) para Fábio ou Davi." }); } catch (e) {}
+  try { if ("Notification" in window && Notification.permission === "granted" && document.hidden) new Notification("Advocacia Lunelli · DJEN", { body: n + " nova(s) publicação(ões) " + (advRestrito() ? "em seu nome." : "para Fábio ou Davi.") }); } catch (e) {}
 }
 
 function advFiltradas() {
@@ -3771,8 +3769,11 @@ function advCard(p) {
   if (/^https:\/\//.test(p.link)) { const a = el("a", "btn sec sm", "Abrir documento"); a.href = p.link; a.target = "_blank"; a.rel = "noopener noreferrer"; a.style.textDecoration = "none"; ac.appendChild(a); }
   c.appendChild(ac); return c;
 }
+// O contador "(96)" do título da aba não pode ir para o cabeçalho de documentos impressos / PDF.
+window.addEventListener("beforeprint", () => { document.title = TITULO_BASE; });
+window.addEventListener("afterprint", () => { atualizarBadges(); });
 function atualizarBadges() {
-  const n = advPubs().filter(ehNova).length, b = $("bdAdv");
+  const n = advMinhas().filter(ehNova).length, b = $("bdAdv");
   b.hidden = !n; b.textContent = n > 99 ? "99+" : n;
   document.title = (n ? "(" + (n > 99 ? "99+" : n) + ") " : "") + TITULO_BASE;
   if (typeof atualizarBadgeOrg === "function") atualizarBadgeOrg();
@@ -6699,7 +6700,6 @@ function aplicarPapel() {
   }
   $("pResp").value = respPadrao();
   if (meuAdv() && $("advFiltro").querySelector('option[value="' + NV.advId + '"]')) $("advFiltro").value = NV.advId;
-  if (advRestrito()) { for (const o of [...$("advFiltro").options]) if (o.value !== NV.advId) o.remove(); $("advFiltro").disabled = true; advPodar(); }
 }
 
 // ---------- ações de login
@@ -8451,13 +8451,13 @@ function desenharInicioClientes() {
   }
 }
 function inicioDesenhar() {
-  const novas = advPubs().filter(ehNova), abertas = TAREFAS.filter(t => t.status !== "concluida"), atr = totalAtrasos();
+  const novas = advMinhas().filter(ehNova), abertas = TAREFAS.filter(t => t.status !== "concluida"), atr = totalAtrasos();
   const k = $("kpisInicio"); k.textContent = "";
   const K = (v, l, s) => { const d = el("div", "kpi"); d.append(el("div", "v", v), el("div", "l", l)); if (s) d.appendChild(el("div", "s", s)); return d; };
   const proc = E.itens.length ? new Set(E.itens.filter(i => i.exato || !E.termos.length).map(i => i.chave)).size : 0;
   k.append(K(novas.length, "Publicações novas", advRestrito() ? "em seu nome, ainda não tratadas" : "dos dois advogados, ainda não tratadas"), K(abertas.length, "Tarefas em aberto"), K(PROCS.filter(x => x.status !== "arquivado").length, "Processos", "ativas"), K(atr, "Prazos/tarefas atrasados", atr ? "exigem atenção" : "nenhum"), K(proc, "Processos na última consulta", E.busca ? E.busca.nomes || "consulta avulsa" : "faça uma consulta"));
   const a = $("inAdv"); a.textContent = ""; const ul = el("ul", "mini");
-  for (const ad of advLista()) {
+  for (const ad of ADVS) {
     const mine = advPubs().filter(p => p.quem.includes(ad.id)), n = mine.filter(ehNova).length, ult = mine.reduce((m, p) => p.data > m ? p.data : m, "");
     const li = el("li"); li.append(el("b", "", ad.nome), el("span", "tag" + (n ? " dist" : ""), n + " nova(s)"), el("span", "hint", ult ? "última publicação em " + br(ult) : "sem dados")); ul.appendChild(li);
   }
