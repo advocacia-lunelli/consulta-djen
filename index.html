@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-SOEky94rMqMlq/Uzb1Q8Rn/zLCpdWHNwWs97PygDKdk=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-MR2doMZBpZjn2D4c0MDInLmCeAuWIFD06YNKmAVUzkc=' https://www.gstatic.com/firebasejs/ https://accounts.google.com/gsi/ https://cdnjs.cloudflare.com/ajax/libs/exceljs/ https://cdn.jsdelivr.net/npm/exceljs@4.4.0/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://accounts.google.com/gsi/ https://comunicaapi.pje.jus.br https://api-publica.datajud.cnj.jus.br https://pangeabnp.pdpj.jus.br https://api.bcb.gov.br https://api.anthropic.com https://api.emailjs.com https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/ https://lunelli-radar-djen.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#202b47">
@@ -3656,6 +3656,12 @@ $("relPrint").addEventListener("click", () => {
 const AD = { pubs: LS.get("adv.pubs", {}), estado: LS.get("adv.estado", {}), meta: LS.get("adv.meta", { ultima: 0 }), rodando: false, aba: "novas", limite: 60, ctl: { parar: false }, timer: null };
 const TITULO_BASE = document.title;
 const advPor = id => ADVS.find(a => a.id === id);
+// Privacidade: quem está ligado a um advogado (login) vê e guarda só as publicações em nome dele. Administrador sem advogado vinculado e modo local veem todas.
+const advRestrito = () => NV.papel !== "local" && !!meuAdv();
+const advVisivel = p => !advRestrito() || (p.quem || []).includes(NV.advId);
+const advPubs = () => Object.values(AD.pubs).filter(advVisivel);
+const advLista = () => advRestrito() ? ADVS.filter(a => a.id === NV.advId) : ADVS;
+function advPodar() { if (!advRestrito()) return; let n = 0; for (const id of Object.keys(AD.pubs)) if (!advVisivel(AD.pubs[id])) { delete AD.pubs[id]; delete AD.estado[id]; n++; } if (n) advSalvar(); }
 const ehNova = p => !(AD.estado[p.id] && AD.estado[p.id].tratada);
 
 function advSalvar() {
@@ -3675,7 +3681,7 @@ async function advCarregar(dias, silencioso) {
   $("advAtualizar").disabled = true; $("advHist").disabled = true; aviso("advMsg", "");
   let novos = 0;
   try {
-    for (const a of ADVS) {
+    for (const a of advLista()) {
       const { todos, cortado } = await buscarTudo({ numeroOab: a.oab, ufOab: a.uf, dataDisponibilizacaoInicio: ini, dataDisponibilizacaoFim: fim }, AD.ctl, a.curto + " (" + a.rot + ")", st, 6);
       if (cortado) aviso("advMsg", "Para " + a.curto + " há mais de 600 publicações no período; foram carregadas as 600 mais recentes. Reduza o período para ver o restante.");
       for (const i of todos) {
@@ -3700,11 +3706,11 @@ function advAvisarNovas(n) {
 
 function advFiltradas() {
   const f = $("advFiltro").value, tp = $("advTipo").value, tr = $("advTrib").value, q = norm($("advBusca").value);
-  return Object.values(AD.pubs).filter(p => (!f || p.quem.includes(f)) && (!tp || p.tipo === tp) && (!tr || p.tribunal === tr) && (!q || norm(p.processo + " " + p.texto + " " + p.classe + " " + p.orgao).includes(q)))
+  return advPubs().filter(p => (!f || p.quem.includes(f)) && (!tp || p.tipo === tp) && (!tr || p.tribunal === tr) && (!q || norm(p.processo + " " + p.texto + " " + p.classe + " " + p.orgao).includes(q)))
     .sort((a, b) => (b.data || "").localeCompare(a.data || "") || b.visto - a.visto);
 }
 function advOpcoes() {
-  const ps = Object.values(AD.pubs);
+  const ps = advPubs();
   for (const [id, campo] of [["advTipo", "tipo"], ["advTrib", "tribunal"]]) {
     const s = $(id), cur = s.value, vals = [...new Set(ps.map(p => p[campo]).filter(Boolean))].sort();
     s.textContent = ""; const o = el("option", "", "Todos"); o.value = ""; s.appendChild(o);
@@ -3717,7 +3723,7 @@ function advDesenhar() {
   const todas = advFiltradas(), novas = todas.filter(ehNova), trat = todas.filter(p => !ehNova(p));
   $("nNovas").textContent = novas.length; $("nTrat").textContent = trat.length; $("nTodas").textContent = todas.length;
   const lista = AD.aba === "novas" ? novas : AD.aba === "tratadas" ? trat : todas, box = $("advLista"); box.textContent = "";
-  $("advInfo").textContent = AD.meta.ultima ? "Última atualização: " + new Date(AD.meta.ultima).toLocaleString("pt-BR") + " · " + nfmt(Object.keys(AD.pubs).length) + " publicações guardadas neste navegador" : "Ainda não carregado.";
+  $("advInfo").textContent = AD.meta.ultima ? "Última atualização: " + new Date(AD.meta.ultima).toLocaleString("pt-BR") + " · " + nfmt(advPubs().length) + " publicações guardadas neste navegador" : "Ainda não carregado.";
   if (!lista.length) box.appendChild(el("div", "empty", AD.rodando ? "Carregando as publicações…" : AD.aba === "novas" ? "Nenhuma publicação nova. Tudo tratado por aqui." : "Nada para mostrar com estes filtros."));
   AD.lista = lista; const vivos = new Set(lista.map(p => p.id)); for (const id of [...AD.selec]) if (!vivos.has(id)) AD.selec.delete(id); advBarra();
   for (const p of lista.slice(0, AD.limite)) box.appendChild(advCard(p));
@@ -3766,7 +3772,7 @@ function advCard(p) {
   c.appendChild(ac); return c;
 }
 function atualizarBadges() {
-  const n = Object.values(AD.pubs).filter(ehNova).length, b = $("bdAdv");
+  const n = advPubs().filter(ehNova).length, b = $("bdAdv");
   b.hidden = !n; b.textContent = n > 99 ? "99+" : n;
   document.title = (n ? "(" + (n > 99 ? "99+" : n) + ") " : "") + TITULO_BASE;
   if (typeof atualizarBadgeOrg === "function") atualizarBadgeOrg();
@@ -3906,7 +3912,7 @@ function novaPasta(chave, opc) {
 function procsMesclarAdv() {
   let mudou = false;
   for (const p of PROCS) {
-    const itens = Object.values(AD.pubs).filter(x => x.chave === p.chave && !p.pubs.some(y => y.id === x.id));
+    const itens = advPubs().filter(x => x.chave === p.chave && !p.pubs.some(y => y.id === x.id));
     if (!itens.length) continue;
     aplicarItens(p, itens.map(x => ({ id: x.id, data: x.data, tipo: x.tipo, docTipo: x.docTipo, link: x.link, texto: x.texto, orgao: x.orgao, classe: x.classe, dest: x.dest || [], oabs: [] })));
     p.semDjen = false; mudou = true;
@@ -6693,6 +6699,7 @@ function aplicarPapel() {
   }
   $("pResp").value = respPadrao();
   if (meuAdv() && $("advFiltro").querySelector('option[value="' + NV.advId + '"]')) $("advFiltro").value = NV.advId;
+  if (advRestrito()) { for (const o of [...$("advFiltro").options]) if (o.value !== NV.advId) o.remove(); $("advFiltro").disabled = true; advPodar(); }
 }
 
 // ---------- ações de login
@@ -7028,7 +7035,7 @@ function secDesenhar() {
   const bt = $("secTarefas"); bt.textContent = ""; if (!tSec.length) bt.appendChild(el("div", "hint", "Nenhuma tarefa atribuída à secretaria."));
   for (const t of tSec) bt.appendChild(tkCard(t));
   const bp = $("secPubs"); bp.textContent = "";
-  const pubs = Object.values(AD.pubs).sort((a, b) => b.data.localeCompare(a.data)).slice(0, 10);
+  const pubs = advPubs().sort((a, b) => b.data.localeCompare(a.data)).slice(0, 10);
   if (!pubs.length) bp.appendChild(el("div", "hint", AD.meta.ultima ? "Nenhuma publicação recente." : "As publicações são carregadas ao abrir o site."));
   for (const p of pubs) bp.appendChild(secPubCard(p));
   badgesPapel();
@@ -8444,14 +8451,14 @@ function desenharInicioClientes() {
   }
 }
 function inicioDesenhar() {
-  const novas = Object.values(AD.pubs).filter(ehNova), abertas = TAREFAS.filter(t => t.status !== "concluida"), atr = totalAtrasos();
+  const novas = advPubs().filter(ehNova), abertas = TAREFAS.filter(t => t.status !== "concluida"), atr = totalAtrasos();
   const k = $("kpisInicio"); k.textContent = "";
   const K = (v, l, s) => { const d = el("div", "kpi"); d.append(el("div", "v", v), el("div", "l", l)); if (s) d.appendChild(el("div", "s", s)); return d; };
   const proc = E.itens.length ? new Set(E.itens.filter(i => i.exato || !E.termos.length).map(i => i.chave)).size : 0;
-  k.append(K(novas.length, "Publicações novas", "dos dois advogados, ainda não tratadas"), K(abertas.length, "Tarefas em aberto"), K(PROCS.filter(x => x.status !== "arquivado").length, "Processos", "ativas"), K(atr, "Prazos/tarefas atrasados", atr ? "exigem atenção" : "nenhum"), K(proc, "Processos na última consulta", E.busca ? E.busca.nomes || "consulta avulsa" : "faça uma consulta"));
+  k.append(K(novas.length, "Publicações novas", advRestrito() ? "em seu nome, ainda não tratadas" : "dos dois advogados, ainda não tratadas"), K(abertas.length, "Tarefas em aberto"), K(PROCS.filter(x => x.status !== "arquivado").length, "Processos", "ativas"), K(atr, "Prazos/tarefas atrasados", atr ? "exigem atenção" : "nenhum"), K(proc, "Processos na última consulta", E.busca ? E.busca.nomes || "consulta avulsa" : "faça uma consulta"));
   const a = $("inAdv"); a.textContent = ""; const ul = el("ul", "mini");
-  for (const ad of ADVS) {
-    const mine = Object.values(AD.pubs).filter(p => p.quem.includes(ad.id)), n = mine.filter(ehNova).length, ult = mine.reduce((m, p) => p.data > m ? p.data : m, "");
+  for (const ad of advLista()) {
+    const mine = advPubs().filter(p => p.quem.includes(ad.id)), n = mine.filter(ehNova).length, ult = mine.reduce((m, p) => p.data > m ? p.data : m, "");
     const li = el("li"); li.append(el("b", "", ad.nome), el("span", "tag" + (n ? " dist" : ""), n + " nova(s)"), el("span", "hint", ult ? "última publicação em " + br(ult) : "sem dados")); ul.appendChild(li);
   }
   a.appendChild(ul); if (typeof inicioAudPrazos === "function") inicioAudPrazos(); if (!AD.meta.ultima) a.appendChild(el("div", "hint", "As publicações são carregadas ao abrir o site."));
